@@ -8,7 +8,7 @@ ENDIF(NOT APPLE)
 
 find_package(ossim)
 find_package(OpenThreads)
-find_package(ossim-video)
+find_package(OssimVideo)
 find_package(FFmpeg)
 
 # GEOS - Currently optional until it is actually called.:
