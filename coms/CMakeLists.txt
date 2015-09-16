@@ -1,5 +1,3 @@
-PROJECT(oms)
-
 IF(NOT APPLE)
   cmake_minimum_required(VERSION 2.6)
 ELSE(NOT APPLE)
