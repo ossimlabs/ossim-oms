@@ -1,4 +1,5 @@
 PROJECT(ossim-oms)
+
 INCLUDE(OssimVersion)
 INCLUDE(OssimUtilities)
 INCLUDE(OssimCommonVariables)
