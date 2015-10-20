@@ -29,7 +29,7 @@ MESSAGE( STATUS "FFMPEG_LIBRARIES = ${FFMPEG_LIBRARIES}")
 MESSAGE( STATUS "FFMPEG_INCLUDE_DIRS = ${FFMPEG_INCLUDE_DIRS}")
 
 
-################################################## BUILD THE LIBRARY #######################################
+################################################## BUILD THE C OMS LIBRARY #######################################
 SET(LIB_NAME oms)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
