@@ -1,5 +1,5 @@
 PROJECT(ossim-oms)
-################################################## SETTING UP C OMS LIBRARY #######################################
+Message("################## Setting up C OMS library #########################")
 
 INCLUDE(OssimVersion)
 INCLUDE(OssimUtilities)
