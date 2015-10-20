@@ -1,4 +1,5 @@
 PROJECT(ossim-oms)
+################################################## SETTING UP C OMS LIBRARY #######################################
 
 INCLUDE(OssimVersion)
 INCLUDE(OssimUtilities)
