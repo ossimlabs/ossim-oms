@@ -23,7 +23,7 @@ if [ ! -a local.properties ]
    cp local.properties.template local.properties
 fi
 
-ant -v clean mvn-install
+ant clean mvn-install
 popd >/dev/null
 
 #
