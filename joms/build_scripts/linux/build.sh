@@ -29,7 +29,17 @@ if [ -z "$GROOVY_HOME"]; then
 fi
 
 ant clean mvn-install
+antReturnCode=$?
+ 
+ 
 popd >/dev/null
 
 #
 popd >/dev/null
+
+if [ $antReturnCode -ne 0 ];then
+    echo "BUILD ERROR: ant failed build..."
+    exit 1;
+else
+    exit 0;
+fi
