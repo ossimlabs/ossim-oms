@@ -262,7 +262,7 @@
                   <include name="*.cxx" />
                 </fileset>
                 <linkerarg value="-Wall" />
-                <libset dir="${ossim.build}" libs="ossim,oms" />
+                <libset dir="${ossim.build}/lib" libs="ossim,oms" />
               </cc>
             </then>
           </elseif>
