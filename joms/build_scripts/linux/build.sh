@@ -23,6 +23,8 @@ if [ ! -a local.properties ]
    cp local.properties.template local.properties
 fi
 
+sdkman use groovy $GROOVY_VERSION
+
 ant clean mvn-install
 popd >/dev/null
 
