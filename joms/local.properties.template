@@ -15,7 +15,7 @@ jdk.home=${env.JAVA_HOME}
 mac.sdk_version=10.7
 
 <!-- The top level of this module. -->
-oms.home=${env.OSSIM_DEV_HOME}/oms
+oms.home=${env.OSSIM_DEV_HOME}/ossim-oms
 
 <!-- The name of this module. -->
 module.name=joms
@@ -30,7 +30,7 @@ ossim.version=${env.OSSIM_VERSION}
 
 
 <!-- Home of ossimPredator. -->
-predator.home=${env.OSSIM_DEV_HOME}/ossimPredator
+predator.home=${env.OSSIM_DEV_HOME}/ossim-video
 
 groovy.home=${env.GROOVY_HOME}
 groovy.version=${env.GROOVY_VERSION}
