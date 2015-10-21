@@ -23,7 +23,10 @@ if [ ! -a local.properties ]
    cp local.properties.template local.properties
 fi
 
-sdkman use groovy $GROOVY_VERSION
+if [ -z "$GROOVY_HOME"]; then
+   source "$HOME/.sdkman/bin/sdkman-init.sh"
+   sdkman use groovy $GROOVY_VERSION
+fi
 
 ant clean mvn-install
 popd >/dev/null
