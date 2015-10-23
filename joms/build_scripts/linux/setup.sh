@@ -1,6 +1,9 @@
 #!/bin/bash
+echo "Checking for sdkman: $HOME/.sdkman"
 if [ ! -d "$HOME/.sdkman" ]; then
+   echo "Installing sdkman....."
    curl -s get.sdkman.io | bash
+   echo "Done installing sdkman....."
 fi
 
 source "$HOME/.sdkman/bin/sdkman-init.sh"
