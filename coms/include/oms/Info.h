@@ -8,7 +8,7 @@
 // Description: Wrapper class for ossimInfo with swig readable interfaces.
 //
 //-----------------------------------------------------------------------------
-// $Id: Info.h 22320 2013-07-19 15:21:03Z dburken $
+// $Id: Info.h 23591 2015-10-21 13:14:26Z dburken $
 
 #ifndef omsInfo_HEADER
 #define omsInfo_HEADER 1
@@ -110,6 +110,24 @@ namespace oms
        * ossimImageHandler if open.
        */
       void closeImage();
+
+      /**
+       * @brief Gets ossim build date.
+       * @return Build date as a string.
+       */
+      std::string getOssimBuildDate() const;
+      
+      /**
+       * @brief Gets revision number.
+       * @return Revision number as a string.
+       */
+      std::string getOssimRevisionNumber() const;
+      
+      /**
+       * @brief Gets version.
+       * @param Version number as a string.
+       */
+      std::string getOssimVersion() const; 
 
    private:
 

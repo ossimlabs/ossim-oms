@@ -819,7 +819,7 @@ geos::geom::Geometry*  createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvT
 
 
    try{
-      result = reader.read("POLYGON(("
+      result = reader.read("MULTIPOLYGON((("
                        +ossimString::toString(ul.lond())+" "
                        +ossimString::toString(ul.latd())+","
                        +ossimString::toString(ur.lond())+" "
@@ -830,7 +830,7 @@ geos::geom::Geometry*  createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvT
                        +ossimString::toString(ll.latd())+","
                        +ossimString::toString(ul.lond())+" "
                        +ossimString::toString(ul.latd())+" "
-                       +"))");
+                       +")))");
 
    }
    catch(...)
@@ -900,7 +900,7 @@ void appendVideoGeom(std::string& result,
    geoPoly.addPoint(ll);
    double degarea = ossim::abs(geoPoly.area());
    
-   groundGeometry+=("POLYGON(("
+   groundGeometry+=("MULTIPOLYGON((("
                     +ossimString::toString(ul.lond())+" "
                     +ossimString::toString(ul.latd())+","
                     +ossimString::toString(ur.lond())+" "
@@ -911,7 +911,7 @@ void appendVideoGeom(std::string& result,
                     +ossimString::toString(ll.latd())+","
                     +ossimString::toString(ul.lond())+" "
                     +ossimString::toString(ul.latd())+" "
-                    +"))"); 
+                    +")))"); 
    
    ossim_float32 oangle;
    if(klvTable->getObliquityAngle(oangle)) { 
@@ -1711,9 +1711,6 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
    if (geom.valid()&&geom->getProjection())
    {
       ossimDpt gsd = geom->getMetersPerPixel();
-      outputString += indentation + "<gsd unit=\"meters\" dx=\"" +
-         ossimString::toString(gsd.x,15).string() + "\" dy=\"" +
-         ossimString::toString(gsd.y,15).string() + "\"/>" + separator;
       ossimGpt ul;
       ossimGpt ur;
       ossimGpt lr;
@@ -1722,10 +1719,10 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
       geom->localToWorld(rect.ur(), ur);
       geom->localToWorld(rect.lr(), lr);
       geom->localToWorld(rect.ll(), ll);
-      
+
       if (ul.isLatNan() || ul.isLonNan() || ur.isLatNan() || ur.isLonNan()
           || lr.isLatNan() || lr.isLonNan() || ll.isLatNan()
-          || ll.isLonNan())
+          || ll.isLonNan() )
       {
          return;
       }
@@ -1733,15 +1730,20 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
       ur.changeDatum(wgs84.datum());
       lr.changeDatum(wgs84.datum());
       ll.changeDatum(wgs84.datum());
-      
+
       std::string polyString;
+      //std::cout <<"----------------GETTING FOOTPRINT--------------------\n";
+      outputString += indentation + "<gsd unit=\"meters\" dx=\"" +
+         ossimString::toString(gsd.x,15).string() + "\" dy=\"" +
+         ossimString::toString(gsd.y,15).string() + "\"/>" + separator;
+
       if ( getWktFootprint( geom.get(), polyString ) )
       {
          groundGeometry += polyString;
       }
       else
       {
-         groundGeometry += ("POLYGON((" + ossimString::toString(ul.lond()) + " "
+         groundGeometry += ("MULTIPOLYGON(((" + ossimString::toString(ul.lond()) + " "
                             + ossimString::toString(ul.latd()) + ","
                             + ossimString::toString(ur.lond()) + " "
                             + ossimString::toString(ur.latd()) + ","
@@ -1750,7 +1752,7 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
                             + ossimString::toString(ll.lond()) + " "
                             + ossimString::toString(ll.latd()) + ","
                             + ossimString::toString(ul.lond()) + " "
-                            + ossimString::toString(ul.latd()) + "))");
+                            + ossimString::toString(ul.latd()) + ")))");
       }
 
       outputString += indentation + "<groundGeom srs=\"epsg:4326\">"
@@ -2445,6 +2447,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // Title:
          getTitle( kwl3, title.string() );
 
+
          outputString += indentation + "   <filename>" + ossimXmlString::wrapCDataIfNeeded(thePrivateData->theFilename.string()).string() +
             "</filename>" + separator; 
          outputString += indentation + "   <imageId>" + ossimXmlString::wrapCDataIfNeeded(imageId.string()).string() + "</imageId>" +
@@ -2457,7 +2460,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             outputString += indentation + "   <isorce>" + isorce.string() + "</isorce>" +
                separator;
          }
-         
+
          outputString += indentation + "   <targetId>" + targetId.string() + "</targetId>" +
             separator; 
          outputString += indentation + "   <productId>" + productId.string() + "</productId>" +
@@ -2514,6 +2517,12 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       }
       outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() + "</azimuthAngle>" + separator; 
       
+   }
+   ossimRefPtr<ossimImageGeometry> geom = thePrivateData->theImageHandler->getImageGeometry();
+   if(geom.valid())
+   {
+      bool crossesDateline = geom->getCrossesDateline();
+      outputString += indentation + "   <crossesDateline>" + (crossesDateline?"true":"false") + "</crossesDateline>" + separator;
    }
    outputString += indentation + "   <fileType>" + thePrivateData->formatName() + "</fileType>" + separator; 
    outputString += indentation + "   <className>" + (thePrivateData->theImageHandler.valid()?thePrivateData->theImageHandler->getClassName().string():ossimString("").string()) + "</className>" + separator; 
