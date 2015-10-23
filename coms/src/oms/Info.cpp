@@ -8,7 +8,7 @@
 // Description: Class definition for Info.
 //
 //-----------------------------------------------------------------------------
-// $Id: Info.cpp 22969 2014-11-10 14:30:32Z dburken $
+// $Id: Info.cpp 23591 2015-10-21 13:14:26Z dburken $
 
 #include <oms/Info.h>
 #include <oms/Keywordlist.h>
@@ -163,3 +163,25 @@ void oms::Info::closeImage()
          << "oms::Info::closeImage caught exception!" << std::endl;
    }
 }
+
+std::string oms::Info::getOssimBuildDate() const
+{
+   std::string s;
+   m_info->getBuildDate( s );
+   return s;
+}
+
+std::string oms::Info::getOssimRevision() const
+{
+   std::string s;
+   m_info->getRevision( s );
+   return s;
+}
+
+std::string oms::Info::getOssimVersion() const
+{
+   std::string s;
+   m_info->getVersion( s );
+   return s;
+}
+
