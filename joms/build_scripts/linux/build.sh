@@ -25,7 +25,7 @@ fi
 
 if [ -z "$GROOVY_HOME"]; then
    source "$HOME/.sdkman/bin/sdkman-init.sh"
-   sdkman use groovy $GROOVY_VERSION
+   sdk use groovy $GROOVY_VERSION
 fi
 
 ant clean mvn-install
