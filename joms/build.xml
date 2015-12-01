@@ -215,6 +215,7 @@
                         <path location="${ossim.install_prefix}" />
                         <path location="${ossim.dependencies}/Frameworks" />
                         <path location="${ossim.dependencies}/include" />
+                        <path location="/usr/local/include" />
                     </includepath>
                     <fileset dir="swig" id="id">
                         <!--
@@ -223,10 +224,14 @@
                         <include name="*.cxx" />
                     </fileset>
                     <linkerarg value="-dynamiclib" />
+                    <linkerarg value="-rpath,${ossim.install_prefix}"/>
                     <linkerarg value="-framework" />
                     <linkerarg value="JavaVM" />
+                    <linkerarg value="-L/usr/local/lib" />
+                    <linkerarg value="-F${ossim.build}" />
                     <linkerarg value="-F${ossim.build}" />
                     <linkerarg value="-F${ossim.install_prefix}/Frameworks" />
+
                     <!--
                     <linkerarg value="-F${ossim.dependencies}/Frameworks" />
                     <linkerarg value="-F${ossim.dependencies}/Frameworks" />
@@ -235,7 +240,10 @@
                     <linkerarg value="ossim" />
                     <linkerarg value="-framework" />
                     <linkerarg value="oms" />
+                    <linkerarg value="-lOpenThreads" />
+                   <!--
                     <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
+                    -->
                     <syslibset libs="c,stdc++" />
                 </cc>
                 <move file="lib${module.name}.dylib" tofile="${library.name}" />
@@ -262,7 +270,7 @@
                   <include name="*.cxx" />
                 </fileset>
                 <linkerarg value="-Wall" />
-                <libset dir="${ossim.build}/lib" libs="ossim,oms" />
+                <libset dir="${ossim.build}" libs="ossim,oms" />
               </cc>
             </then>
           </elseif>
