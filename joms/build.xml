@@ -297,7 +297,9 @@
                 </fileset>
                 <linkerarg value="-Wall" />
                 <linkerarg value="-Wl,--kill-at" />
-                <libset dir="${ossim.install_prefix}/lib" libs="ossim,oms" />
+                <linkerarg value="-L${ossim.build}/lib" />
+                <linkerarg value="-lossim" />
+                <linkerarg value="-oms" />
               </cc>
             </then>
           </elseif>
