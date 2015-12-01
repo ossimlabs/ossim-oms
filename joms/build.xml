@@ -270,7 +270,11 @@
                   <include name="*.cxx" />
                 </fileset>
                 <linkerarg value="-Wall" />
-                <libset dir="${ossim.build}" libs="ossim,oms" />
+                <linkerarg value="-L${ossim.build}" />
+                <linkerarg value="-L${ossim.build}/lib" />
+                <linkerarg value="-L${ossim.build}/lib64" />
+                <linkerarg value="-lossim" />
+                <linkerarg value="-loms" />
               </cc>
             </then>
           </elseif>
@@ -297,9 +301,7 @@
                 </fileset>
                 <linkerarg value="-Wall" />
                 <linkerarg value="-Wl,--kill-at" />
-                <linkerarg value="-L${ossim.build}/lib" />
-                <linkerarg value="-lossim" />
-                <linkerarg value="-oms" />
+                <libset dir="${ossim.build}/lib" libs="ossim,oms" />
               </cc>
             </then>
           </elseif>
