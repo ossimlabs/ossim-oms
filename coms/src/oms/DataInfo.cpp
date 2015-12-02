@@ -19,6 +19,8 @@
 #include <ossim/support_data/ossimInfoBase.h>
 #include <ossim/base/ossimDrect.h>
 #include <ossim/base/ossimXmlString.h>
+#include <ossim/base/ossimPolygon.h>
+#include <ossim/base/ossimPolyArea2d.h>
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/CoordinateArraySequence.h>
 #include <geos/geom/GeometryFactory.h>
@@ -2551,18 +2553,52 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 bool oms::DataInfo::getWktFootprint( const ossimImageGeometry* geom, std::string& s ) const
 {
    bool status = false;
-   if ( geom )
+   if ( geom &&geom->getProjection())
    {
-      ossimKeywordlist kwl;
-      if ( geom->saveState( kwl ) )
+      ossimPolyArea2d polyArea;
+
+      bool mapProjectedFlag = (dynamic_cast<const ossimMapProjection*>(geom->getProjection())!=0);
+
+      if(!mapProjectedFlag)
       {
-         s = kwl.findKey( std::string("projection.wkt_footprint") );
-         if ( s.size() )
-         {
-            status = true;
-         }
-         
+         geom->calculatePolyBounds(polyArea, 25);
       }
+      else
+      {
+         geom->calculatePolyBounds(polyArea, 1);
+      }
+
+      polyArea.toMultiPolygon();
+      if(!polyArea.isEmpty())
+      {
+         s = polyArea.toString();
+         status = true;
+      }
+      // ossimKeywordlist kwl;
+      // if ( geom->saveState( kwl ) )
+      // {
+      //    s = kwl.findKey( std::string("projection.wkt_footprint") );
+      //    if ( s.size() )
+      //    {
+      //       status = true;
+      //    }
+      //    else
+      //    {
+      //       std::vector<ossimGpt> poly;
+      //       geom->localToWorld(ossimDpt(0,0), gpt);
+      //       poly.push_back(gpt);
+      //       geom->localToWorld(ossimDpt(w1, 0), gpt);
+      //       poly.push_back(gpt);
+      //       geom->localToWorld(ossimDpt(w1, h1), gpt);
+      //       poly.push_back(gpt);
+      //       geom->localToWorld(ossimDpt(0, h1), gpt);
+      //       poly.push_back(gpt);
+      //       poly.push_back(poly[0]);
+      //       ossimPolyArea2d polyArea(poly);
+      //       s = polyArea.toMultiPolygon().toString();
+      //       status = !s.empty();
+      //    }
+      // }
    }
    return status;
 }

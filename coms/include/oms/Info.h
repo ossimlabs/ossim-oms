@@ -118,10 +118,10 @@ namespace oms
       std::string getOssimBuildDate() const;
       
       /**
-       * @brief Gets revision of ossim code.
-       * @return Revision as a string.
+       * @brief Gets revision number.
+       * @return Revision number as a string.
        */
-      std::string getOssimRevision() const;
+      std::string getOssimRevisionNumber() const;
       
       /**
        * @brief Gets version.

@@ -171,10 +171,10 @@ std::string oms::Info::getOssimBuildDate() const
    return s;
 }
 
-std::string oms::Info::getOssimRevision() const
+std::string oms::Info::getOssimRevisionNumber() const
 {
    std::string s;
-   m_info->getRevision( s );
+   m_info->getRevisionNumber( s );
    return s;
 }
 
