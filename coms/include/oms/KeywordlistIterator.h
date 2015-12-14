@@ -17,6 +17,11 @@
 #include <map>
 #include <string>
 
+namespace OpenThreads
+{
+   class Mutex;
+}
+
 namespace oms
 {
    class Keywordlist;
@@ -95,6 +100,7 @@ namespace oms
       
       Keywordlist*            m_kwl;
       StringPairMap::iterator m_iter;
+      OpenThreads::Mutex*      m_mutex;
    };
 
 } // End of namespace oms.

@@ -297,6 +297,19 @@ double oms::ImageModel::upIsUpRotation()const
    return result;
 }
 
+double oms::ImageModel::northIsUpRotation()const
+{
+   double result = 0.0;
+   if(!thePrivateData) return result;
+
+   ossimRefPtr<ossimImageGeometry> geom = thePrivateData->theImageGeometry.get();
+   ossimDrect bounds = thePrivateData->theImageHandler->getBoundingRect();
+   if(geom.valid())
+   {
+      result = geom->northUpAngle();
+   }   
+   return result;
+}
 
 bool oms::ImageModel::getProjSurfaceInfo(const ossimGpt& gpt, ossimElevationAccuracyInfo& info)
 {

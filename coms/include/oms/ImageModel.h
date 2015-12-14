@@ -35,6 +35,7 @@ public:
                       unsigned int resolutionLevel=0)const;
    
    double upIsUpRotation()const;
+   double northIsUpRotation()const;
 
    bool imageToGroundErrorPropagation(const ossimGpt& gpt,
                                       double probLev,
