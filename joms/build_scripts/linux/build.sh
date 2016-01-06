@@ -23,7 +23,7 @@ if [ ! -a local.properties ]
    cp local.properties.template local.properties
 fi
 
-if [ -z "$GROOVY_HOME"]; then
+if [ -z "$GROOVY_HOME" ]; then
    source "$HOME/.sdkman/bin/sdkman-init.sh"
    if [ ! -z "$GROOVY_VERSION" ]; then
       sdk use groovy $GROOVY_VERSION
@@ -32,7 +32,17 @@ fi
 
 ant clean dist mvn-install
 antReturnCode=$?
- 
+if [ $antReturnCode -ne 0 ];then
+    echo "BUILD ERROR: ant failed dist mvn-install build..."
+    exit 1;
+else
+    exit 0;
+fi
+
+if [ ! -z "$OSSIM_INSTALL_PREFIX" ]; then
+   ant install
+   antReturnCode=$?
+fi 
  
 popd >/dev/null
 
@@ -40,7 +50,7 @@ popd >/dev/null
 popd >/dev/null
 
 if [ $antReturnCode -ne 0 ];then
-    echo "BUILD ERROR: ant failed build..."
+    echo "BUILD ERROR: ant failed install..."
     exit 1;
 else
     exit 0;
