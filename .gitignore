@@ -1,2 +1,10 @@
 *.jar
 *~
+joms/swig/oms_wrap*
+joms/swig/*.xml
+local.properties
+*.swp
+*.xml
+gensrc
+bin
+libjoms.*
