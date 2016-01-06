@@ -397,7 +397,7 @@
         <copy file="../lib/${module.name}-${ossim.version}.jar" todir="${ossim.install_prefix}/share/java"/>
     </target>
 
-    <target name="mvn-install" depends="install">
+    <target name="mvn-install" depends="dist">
         <exec executable="mvn">
             <arg value="install:install-file"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}.jar"/>
