@@ -30,7 +30,7 @@ if [ -z "$GROOVY_HOME"]; then
    fi
 fi
 
-ant clean mvn-install
+ant clean dist mvn-install
 antReturnCode=$?
  
  
