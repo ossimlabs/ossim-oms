@@ -395,6 +395,13 @@
         <!-- Note: "copy changing library perms to 664. -->
         <copy file="${library.name}" todir="${ossim.install_prefix}/lib${lib_suffix}"/>
         <copy file="../lib/${module.name}-${ossim.version}.jar" todir="${ossim.install_prefix}/share/java"/>
+        
+        <if>
+            <equals arg1="${os.name}" arg2="Mac OS X" />
+            <then>
+                <copy file="${library.name}" todir="${user.home}/Library/Java/Extensions"/>
+            </then>
+        </if>
     </target>
 
     <target name="mvn-install" depends="dist">
