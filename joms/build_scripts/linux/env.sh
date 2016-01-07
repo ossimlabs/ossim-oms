@@ -1,11 +1,13 @@
 #!/bin/bash
 pushd `dirname $0` >/dev/null
 export SCRIPT_DIR=`pwd -P`
+popd >/dev/null
 
 pushd $SCRIPT_DIR/../.. >/dev/null
 export JOMS_HOME=$PWD
 echo "@@@@@ SCRIPT_DIR=$SCRIPT_DIR"
 echo "@@@@@ JOMS_HOME=$JOMS_HOME"
+popd >/dev/null
 
 pushd $JOMS_HOME/../.. >/dev/null
 export OSSIM_DEV_HOME=$PWD
@@ -16,3 +18,4 @@ fi
 if [ -z "$OSSIM_INSTALL_PREFIX" ]; then
    export OSSIM_INSTALL_PREFIX=$OSSIM_DEV_HOME/install
 fi
+popd >/dev/null
