@@ -216,6 +216,7 @@
                         <path location="${ossim.dependencies}/Frameworks" />
                         <path location="${ossim.dependencies}/include" />
                         <path location="/usr/local/include" />
+                        <path location="/opt/local/include" />
                     </includepath>
                     <fileset dir="swig" id="id">
                         <!--
@@ -228,6 +229,7 @@
                     <linkerarg value="-framework" />
                     <linkerarg value="JavaVM" />
                     <linkerarg value="-L/usr/local/lib" />
+                    <linkerarg value="-L/opt/local/lib" />
                     <linkerarg value="-F${ossim.build}" />
                     <linkerarg value="-F${ossim.build}" />
                     <linkerarg value="-F${ossim.install_prefix}/Frameworks" />
