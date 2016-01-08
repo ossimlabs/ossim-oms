@@ -24,7 +24,7 @@ module.name=joms
 ossim.home=${env.OSSIM_DEV_HOME}/ossim
 
 ossim.install_prefix=${env.OSSIM_INSTALL_PREFIX}
-ossim.build=${env.OSSIM_BUILD_DIR}/${env.OSSIM_BUILD_TYPE}
+ossim.build=${env.OSSIM_BUILD_DIR}
 ossim.dependencies=${env.OSSIM_DEPENDENCIES}
 ossim.version=${env.OSSIM_VERSION}
 
