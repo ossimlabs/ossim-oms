@@ -59,16 +59,15 @@
 // If not you must add java arg "-Djava.library.path=/path/to/libs".
 // 
 // --- 
-
 test1.name: Java org.ossim.jni.apps.DataInfoTest
 test1.description: Test oms/joms DataInfoTest and associated bindings.
 test1.enabled: 1
 
 // Commands to generate expected results:
-test1.expected_results_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/oms/joms -cp $(OSSIM_DEV_HOME)/oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.DataInfoTest $(OSSIM_BATCH_TEST_DATA)/public/tif/Iowa-utm.tif > $(OBT_EXP_DIR)/info.txt
+test1.expected_results_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/ossim-oms/joms -cp $(OSSIM_DEV_HOME)/ossim-oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.DataInfoTest $(OSSIM_BATCH_TEST_DATA)/public/tif/Iowa-utm.tif > $(OBT_EXP_DIR)/info.txt
 
 // The actual commands to test:
-test1.test_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/oms/joms -cp $(OSSIM_DEV_HOME)/oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.DataInfoTest $(OSSIM_BATCH_TEST_DATA)/public/tif/Iowa-utm.tif > $(OBT_OUT_DIR)/info.txt
+test1.test_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/ossim-oms/joms -cp $(OSSIM_DEV_HOME)/ossim-oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.DataInfoTest $(OSSIM_BATCH_TEST_DATA)/public/tif/Iowa-utm.tif > $(OBT_OUT_DIR)/info.txt
 
 // Post process commands for diffs and stuff:
 test1.postprocess_command0: $(DIFF_CMD) $(OBT_EXP_DIR)/info.txt $(OBT_OUT_DIR)/info.txt
@@ -81,12 +80,30 @@ test2.description: Test oms/joms ImageModelTest and associated bindings.
 test2.enabled: 1
 
 // Commands to generate expected results:
-test2.expected_results_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/oms/joms -cp $(OSSIM_DEV_HOME)/oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.ImageModelTest $(OSSIM_BATCH_TEST_DATA)/geoeye1/GE1_Hobart_GeoStereo_NITF-NCD/001508507_01000SP00332258/5V090205M0001912264B220000100072M_001508507/Volume1/5V090205M0001912264B220000100072M_001508507.ntf > $(OBT_EXP_DIR)/test2-info.txt
+test2.expected_results_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/ossim-oms/joms -cp $(OSSIM_DEV_HOME)/ossim-oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.ImageModelTest $(OSSIM_BATCH_TEST_DATA)/geoeye1/GE1_Hobart_GeoStereo_NITF-NCD/001508507_01000SP00332258/5V090205M0001912264B220000100072M_001508507/Volume1/5V090205M0001912264B220000100072M_001508507.ntf > $(OBT_EXP_DIR)/test2-info.txt
 
 // The actual commands to test:
-test2.test_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/oms/joms -cp $(OSSIM_DEV_HOME)/oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.ImageModelTest $(OSSIM_BATCH_TEST_DATA)/geoeye1/GE1_Hobart_GeoStereo_NITF-NCD/001508507_01000SP00332258/5V090205M0001912264B220000100072M_001508507/Volume1/5V090205M0001912264B220000100072M_001508507.ntf  > $(OBT_OUT_DIR)/test2-info.txt
+test2.test_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/ossim-oms/joms -cp $(OSSIM_DEV_HOME)/ossim-oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.ImageModelTest $(OSSIM_BATCH_TEST_DATA)/geoeye1/GE1_Hobart_GeoStereo_NITF-NCD/001508507_01000SP00332258/5V090205M0001912264B220000100072M_001508507/Volume1/5V090205M0001912264B220000100072M_001508507.ntf  > $(OBT_OUT_DIR)/test2-info.txt
 
 // Post process commands for diffs and stuff:
 test2.postprocess_command0: $(DIFF_CMD) $(OBT_EXP_DIR)/test2-info.txt $(OBT_OUT_DIR)/test2-info.txt
 
 // End test2:
+
+// ---
+// Begin test3:
+// --- 
+test3.name: Java org.ossim.jni.apps.DataInfoTest
+test3.description: Test oms/joms DataInfoTest and associated bindings for video.
+test3.enabled: 1
+
+// Commands to generate expected results:
+test3.expected_results_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/ossim-oms/joms -cp $(OSSIM_DEV_HOME)/ossim-oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.DataInfoTest $(OSSIM_BATCH_TEST_DATA)/uav/predator/MISP-_42FB6D65_21FEB03000019071saMISP-_HD000999.mpg > $(OBT_EXP_DIR)/test3-info.txt
+
+// The actual commands to test:
+test3.test_command0: java -Djava.library.path=$(OSSIM_DEV_HOME)/ossim-oms/joms -cp $(OSSIM_DEV_HOME)/ossim-oms/lib/joms-$(OSSIM_VERSION).jar org.ossim.oms.apps.DataInfoTest $(OSSIM_BATCH_TEST_DATA)/uav/predator/MISP-_42FB6D65_21FEB03000019071saMISP-_HD000999.mpg > $(OBT_OUT_DIR)/test3-info.txt
+
+// Post process commands for diffs and stuff:
+test3.postprocess_command0: $(DIFF_CMD) $(OBT_EXP_DIR)/test3-info.txt $(OBT_OUT_DIR)/test3-info.txt
+
+// End test3:
