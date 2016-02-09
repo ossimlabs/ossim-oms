@@ -31,8 +31,7 @@
 #include <geos/io/WKTReader.h>
 #include <geos/io/WKTWriter.h>
 #include <geos/util/GEOSException.h>
-
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
 #  include <ossimPredator/ossimPredatorVideo.h>
 #  include <ossimPredator/ossimPredatorKlvTable.h>
 #endif
@@ -276,7 +275,7 @@ namespace oms
       {
          theFilename = "";
          theImageHandler = 0;
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
          
          thePredatorVideo = 0;
          thePredatorVideoFrameInfo = 0;
@@ -286,7 +285,7 @@ namespace oms
       
       std::string formatName() const
       {
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
          
          if(thePredatorVideo.valid())
          {
@@ -448,7 +447,7 @@ namespace oms
       }
       ossimFilename theFilename;
       ossimRefPtr<ossimImageHandler> theImageHandler;
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
       ossimRefPtr<ossimPredatorVideo> thePredatorVideo;
       ossimRefPtr<ossimPredatorVideo::FrameInfo> thePredatorVideoFrameInfo;
       ossimFilename                              theExternalVideoGeometryFile;
@@ -508,7 +507,7 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
       }
       else
       {
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
          if(canCheckVideo(file) )
          {
             thePrivateData->theFilename = file;
@@ -766,7 +765,7 @@ void appendDateRange(std::string& outputString, const ossimDate& startDate,
                     + indentation + "</TimeSpan>" + separator);
    
 }
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
 
 void appendToMultiGeometry(std::string& /*result*/,
                            ossimRefPtr<ossimPredatorKlvTable> /*klvTable*/,
@@ -1022,7 +1021,7 @@ std::string oms::DataInfo::getInfo() const
          result += "   </dataSets>\n";
          result += "</oms>\n";
       }
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
       else if(!thePrivateData->theExternalVideoGeometryFile.empty()&&
               thePrivateData->theExternalVideoGeometryFile.exists())
       {
@@ -1171,7 +1170,7 @@ std::string oms::DataInfo::getInfo() const
 bool oms::DataInfo::isVideo()const
 {
    if(!thePrivateData) return false;
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
    return thePrivateData->thePredatorVideo.valid();
 #else
    return false;
@@ -1232,7 +1231,7 @@ std::string oms::DataInfo::getImageInfo(int entry)
 std::string oms::DataInfo::getVideoInfo()
 {
    std::string result;
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
    if(!thePrivateData->theExternalVideoGeometryFile.empty()&&
            thePrivateData->theExternalVideoGeometryFile.exists())
    {
@@ -1938,7 +1937,7 @@ void oms::DataInfo::appendRasterDataSetMetadata(std::string& outputString,
 void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
                                                const std::string& indentation, const std::string& separator) const
 {
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
    if(thePrivateData->thePredatorVideoFrameInfo.valid()&&
       thePrivateData->thePredatorVideoFrameInfo->klvTable())
    {
