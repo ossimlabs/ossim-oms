@@ -98,6 +98,12 @@ namespace oms
        */
       void clearMap();
 
+      /**
+       *  Reads file and adds keywords to the KeywordMap.
+       *  Returns true if file was parsed, false on error.
+       */
+      bool addFile(const std::string& file);
+
    private:
       ossimKeywordlist* m_kwl;
    };

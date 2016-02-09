@@ -14,13 +14,9 @@
 
     <!-- Module Name -->
     <property name="module.name" value="joms" />
-
-
-    <!--
-        <property name="jdk.home" value="${env.JAVA_HOME}" />
-        <property name="oms.home" value="${OSSIM_DEV_HOME}/oms" />
-        <property name="ossim.home" value="${OSSIM_DEV_HOME}/ossim" />
-    -->
+    <property name="java.home" value="${env.JAVA_HOME}" />
+    <property name="oms.home" value="${OSSIM_DEV_HOME}/ossim-oms" />
+    <property name="ossim.home" value="${OSSIM_DEV_HOME}/ossim" />
 
     <echo message="module.name = ${module.name}" />
     <echo message="jdk.home = ${jdk.home}" />
