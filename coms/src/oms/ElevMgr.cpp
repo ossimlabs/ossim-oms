@@ -48,7 +48,7 @@ void oms::ElevMgr::getCellsForBounds( const std::string& connectionString,
                                       const double& minLon,
                                       const double& maxLat,
                                       const double& maxLon,
-                                      std::vector<std::string>& cells,
+                                      std::vector<ossimFilename>& cells,
                                       ossim_uint32 maxNumberOfCells )
 {
    ossimElevManager::instance()->getCellsForBounds( connectionString,
@@ -64,7 +64,7 @@ void oms::ElevMgr::getCellsForBounds( const double& minLat,
                                       const double& minLon,
                                       const double& maxLat,
                                       const double& maxLon,
-                                      std::vector<std::string>& cells,
+                                      std::vector<ossimFilename>& cells,
                                       ossim_uint32 maxNumberOfCells )
 {
    ossimElevManager::instance()->getCellsForBounds( minLat,

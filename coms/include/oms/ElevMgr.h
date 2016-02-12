@@ -14,6 +14,7 @@
 #define omsElevMgr_HEADER 1
 
 #include <oms/Constants.h>
+#include <ossim/base/ossimFilename.h>
 #include <string>
 #include <vector>
 
@@ -69,7 +70,7 @@ namespace oms
                               const double& minLon,
                               const double& maxLat,
                               const double& maxLon,
-                              std::vector<std::string>& cells,
+                              std::vector<ossimFilename>& cells,
                               ossim_uint32 maxNumberOfCells=0 );      
 
       /**
@@ -91,7 +92,7 @@ namespace oms
                               const double& minLon,
                               const double& maxLat,
                               const double& maxLon,
-                              std::vector<std::string>& cells,
+                              std::vector<ossimFilename>& cells,
                               ossim_uint32 maxNumberOfCells=0 );      
 
   private:
