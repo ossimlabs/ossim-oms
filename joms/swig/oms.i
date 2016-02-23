@@ -109,7 +109,7 @@
 
 #include <exception>
 
-#include "Viewshed.h"
+//#include "Viewshed.h"
 
 #if 0
 #include <cstdio>
@@ -2201,5 +2201,5 @@ public:
 %include <ossim/util/ossimChipProcUtil.h>
 %include <ossim/util/ossimViewshedUtil.h>
 
-%include "Viewshed.h"
+//%include "Viewshed.h"
 
