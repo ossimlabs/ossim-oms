@@ -218,6 +218,7 @@
                         <!--
                         <include name="*.cpp" />
                         -->
+                        <include name="Viewshed.cpp" />                        
                         <include name="*.cxx" />
                     </fileset>
                     <linkerarg value="-dynamiclib" />
@@ -265,6 +266,7 @@
                   <!--
                             <include name="*.cpp" />
                             -->
+                  <include name="Viewshed.cpp" />                                                    
                   <include name="*.cxx" />
                 </fileset>
                 <linkerarg value="-Wall" />
@@ -389,7 +391,7 @@
         <echo message="${package.dir}"/-->
     </target>
 
-    <target name="install" depends="initialize-environment,dist">
+    <target name="install" depends="initialize-environment,dist,mvn-install">
         <!-- Note: "copy changing library perms to 664. -->
         <copy file="${library.name}" todir="${ossim.install_prefix}/lib${lib_suffix}"/>
         <copy file="../lib/${module.name}-${ossim.version}.jar" todir="${ossim.install_prefix}/share/java"/>
@@ -400,9 +402,10 @@
                 <copy file="${library.name}" todir="${user.home}/Library/Java/Extensions"/>
             </then>
         </if>
+        <delete dir="${user.home}/.groovy/grapes/org.ossim"/>
     </target>
 
-    <target name="mvn-install" depends="dist">
+    <target name="mvn-install">
         <exec executable="mvn">
             <arg value="install:install-file"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}.jar"/>
