@@ -99,10 +99,17 @@
 #include <oms/Envelope.h>
 #include <oms/TileCacheSupport.h>
 
+#include <ossim/util/ossimUtility.h>
+#include <ossim/util/ossimUtilityFactory.h>
+#include <ossim/util/ossimUtilityRegistry.h>
+#include <ossim/util/ossimChipProcUtil.h>
+#include <ossim/util/ossimViewshedUtil.h>
+
 //#include "RasterEngine.h"
 
 #include <exception>
 
+#include "Viewshed.h"
 
 #if 0
 #include <cstdio>
@@ -2184,8 +2191,15 @@ public:
 
 //%include "RasterEngine.h"
 
+%feature("director", assumeoverride=1) ossim::ossimUtility;
+%feature("director", assumeoverride=1) ossim::ossimChipProcUtil;
+%feature("director", assumeoverride=1) ossim::ossimViewshedUtil;
 
+%include <ossim/util/ossimUtility.h>
+%include <ossim/util/ossimUtilityFactory.h>
+%include <ossim/util/ossimUtilityRegistry.h>
+%include <ossim/util/ossimChipProcUtil.h>
+%include <ossim/util/ossimViewshedUtil.h>
 
-
-
+%include "Viewshed.h"
 
