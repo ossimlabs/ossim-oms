@@ -208,7 +208,7 @@
                         <path location="${jdk.home}/include" />                        
                         <path location="${jdk.home}/include/darwin" />
                         <path location="/Developer/SDKs/MacOSX${mac.sdk_version}.sdk/System/Library/Frameworks/JavaVM.framework/Headers" />
-                        <path location="${ossim.install_prefix}" />
+                        <path location="${ossim.install_prefix}/include" />
                         <path location="${ossim.dependencies}/Frameworks" />
                         <path location="${ossim.dependencies}/include" />
                         <path location="/usr/local/include" />
@@ -218,7 +218,6 @@
                         <!--
                         <include name="*.cpp" />
                         -->
-                        <include name="Viewshed.cpp" />                        
                         <include name="*.cxx" />
                     </fileset>
                     <linkerarg value="-dynamiclib" />
@@ -266,7 +265,6 @@
                   <!--
                             <include name="*.cpp" />
                             -->
-                  <include name="Viewshed.cpp" />                                                    
                   <include name="*.cxx" />
                 </fileset>
                 <linkerarg value="-Wall" />
