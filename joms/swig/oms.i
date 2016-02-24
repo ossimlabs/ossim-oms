@@ -98,12 +98,7 @@
 #include <oms/MapProjection.h>
 #include <oms/Envelope.h>
 #include <oms/TileCacheSupport.h>
-
-#include <ossim/util/ossimUtility.h>
-#include <ossim/util/ossimUtilityFactory.h>
-#include <ossim/util/ossimUtilityRegistry.h>
-#include <ossim/util/ossimChipProcUtil.h>
-#include <ossim/util/ossimViewshedUtil.h>
+#include <oms/OssimTools.h>
 
 //#include "RasterEngine.h"
 
@@ -2195,11 +2190,4 @@ public:
 %feature("director", assumeoverride=1) ossim::ossimChipProcUtil;
 %feature("director", assumeoverride=1) ossim::ossimViewshedUtil;
 
-%include <ossim/util/ossimUtility.h>
-%include <ossim/util/ossimUtilityFactory.h>
-%include <ossim/util/ossimUtilityRegistry.h>
-%include <ossim/util/ossimChipProcUtil.h>
-%include <ossim/util/ossimViewshedUtil.h>
-
-//%include "Viewshed.h"
 
