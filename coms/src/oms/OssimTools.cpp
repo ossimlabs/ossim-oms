@@ -12,9 +12,8 @@ using namespace std;
 OssimTools::OssimTools(string name)
 :  m_chipProcUtil(0)
 {
-   if ((name.compare("hlz") == 0) || (name.compare("viewshed") == 0))
-      m_chipProcUtil = (ossimChipProcUtil*) ossimUtilityRegistry::instance()->createUtility(name);
-   else
+   m_chipProcUtil = (ossimChipProcUtil*) ossimUtilityRegistry::instance()->createUtility(name);
+   if (m_chipProcUtil == 0)
       cerr<<"OssimTools() Bad opeation requested: <"<<name<<">. Ignoring."<<endl;
 }
 
@@ -65,8 +64,6 @@ bool OssimTools::getChip(char* data, map<string,string> hints)
       max_lon = atof(value->second.c_str());
 
    ossimGrect bbox (max_lat, min_lon, min_lat, max_lat);
-   if (bbox.hasNans())
-      return OSSIM_NULL;
 
    // Need the ossimImageData buffer returned from native call as a char buffer:
    try
