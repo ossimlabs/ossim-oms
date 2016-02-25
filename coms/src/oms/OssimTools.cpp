@@ -22,7 +22,7 @@ OssimTools::~OssimTools()
 	delete m_chipProcUtil;
 }
 
-bool OssimTools::initialize(map<string, string> params)
+bool OssimTools::initialize(const map<string, string> params)
 {
    if (m_chipProcUtil == 0)
       return false;
@@ -41,7 +41,7 @@ bool OssimTools::initialize(map<string, string> params)
 	return true;
 }
 
-bool OssimTools::getChip(char* data, map<string,string> hints)
+bool OssimTools::getChip(char* data, const map<string,string> hints)
 {
    int status = OSSIM_STATUS_UNKNOWN;
    if ((m_chipProcUtil == 0) || (data == 0))
@@ -49,7 +49,7 @@ bool OssimTools::getChip(char* data, map<string,string> hints)
 
    // Expect only geographic bounding rect in hints.
    double min_lat=ossim::nan(), max_lat=ossim::nan(), min_lon=ossim::nan(), max_lon=ossim::nan();
-   map<string,string>::iterator value;
+   map<string,string>::const_iterator value;
    value = hints.find("min_lat");
    if (value != hints.end())
       min_lat = atof(value->second.c_str());
