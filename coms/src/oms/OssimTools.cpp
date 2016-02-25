@@ -14,6 +14,8 @@ OssimTools::OssimTools(string name)
 {
    if ((name.compare("hlz") == 0) || (name.compare("viewshed") == 0))
       m_chipProcUtil = (ossimChipProcUtil*) ossimUtilityRegistry::instance()->createUtility(name);
+   else
+      cerr<<"OssimTools() Bad opeation requested: <"<<name<<">. Ignoring."<<endl;
 }
 
 OssimTools::~OssimTools()
@@ -33,6 +35,7 @@ bool OssimTools::initialize(map<string, string> params)
    }
    catch (...)
    {
+      cerr<<"Caught exception in OssimTools::initialize(). Operation aborted."<<endl;
       return false;
    }
 
@@ -79,6 +82,7 @@ bool OssimTools::getChip(char* data, map<string,string> hints)
    }
    catch ( ... )
    {
+      cerr<<"Caught exception in OssimTools::getChip(). Operation aborted."<<endl;
    }
 
    return status;

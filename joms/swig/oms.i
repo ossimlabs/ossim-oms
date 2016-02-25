@@ -2084,6 +2084,7 @@ namespace std
 %include <oms/MapProjection.h>
 %include <oms/Envelope.h>
 %include <oms/TileCacheSupport.h>
+%include <oms/OssimTools.h>
 
 //---
 // Begin std::map
