@@ -1,6 +1,7 @@
 #include <oms/OssimTools.h>
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossim/base/ossimGrect.h>
+#include <ossim/base/ossimException.h>
 #include <ossim/util/ossimUtilityRegistry.h>
 #include <ossim/util/ossimViewshedUtil.h>
 #include <ossim/util/ossimHlzUtil.h>
@@ -22,26 +23,34 @@ OssimTools::~OssimTools()
 	delete m_chipProcUtil;
 }
 
-bool OssimTools::initialize(const map<string, string> params)
+bool OssimTools::initialize(const map<string, string>& params)
 {
    if (m_chipProcUtil == 0)
       return false;
+
+   // Accept map from service and translate to KWL expected by native code:
+   ossimKeywordlist kwl;
 
    try
    {
       ossimKeywordlist kwl (params);
       m_chipProcUtil->initialize(kwl);
    }
+   catch (ossimException& e)
+   {
+      cerr<<"Caught OSSIM exception in OssimTools::initialize():\n"<<e.what()<<endl;
+      return false;
+   }
    catch (...)
    {
-      cerr<<"Caught exception in OssimTools::initialize(). Operation aborted."<<endl;
+      cerr<<"Caught unknown exception in OssimTools::initialize()."<<endl;
       return false;
    }
 
 	return true;
 }
 
-bool OssimTools::getChip(char* data, const map<string,string> hints)
+bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
 {
    int status = OSSIM_STATUS_UNKNOWN;
    if ((m_chipProcUtil == 0) || (data == 0))
@@ -76,6 +85,11 @@ bool OssimTools::getChip(char* data, const map<string,string> hints)
          if ( !rect.hasNans() && (status != (int) OSSIM_NULL))
             chip->unloadTile( (void*)data, rect, OSSIM_BIP );
       }
+   }
+   catch (ossimException& e)
+   {
+      cerr<<"Caught OSSIM exception in OssimTools::getChip():\n"<<e.what()<<endl;
+      return false;
    }
    catch ( ... )
    {

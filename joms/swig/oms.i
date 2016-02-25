@@ -104,8 +104,6 @@
 
 #include <exception>
 
-//#include "Viewshed.h"
-
 #if 0
 #include <cstdio>
 #include <stdexcept>
@@ -2084,7 +2082,6 @@ namespace std
 %include <oms/MapProjection.h>
 %include <oms/Envelope.h>
 %include <oms/TileCacheSupport.h>
-%include <oms/OssimTools.h>
 
 //---
 // Begin std::map
@@ -2105,6 +2102,7 @@ namespace std
 %template(MapType) std::map<std::string, std::string>;
 // End: std::map
 
+%include <oms/OssimTools.h>
 %include <oms/Chipper.h>
 %include <oms/GpkgWriter.h>
 
