@@ -83,7 +83,11 @@ bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
          status = chip->getDataObjectStatus();
          ossimIrect rect = chip->getImageRectangle();
          if ( !rect.hasNans() && (status != (int) OSSIM_NULL))
-            chip->unloadTile( (void*)data, rect, OSSIM_BIP );
+         {
+            chip->computeAlphaChannel();
+            chip->unloadTileToBipAlpha((void*)data, rect, rect);
+
+         }
       }
    }
    catch (ossimException& e)
