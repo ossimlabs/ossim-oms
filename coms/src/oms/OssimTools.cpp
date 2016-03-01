@@ -110,28 +110,37 @@ bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
    }
 
    ossimDrect map_bbox (min_x, max_y, max_x, min_y);
-   double gsd_x = fabs(max_x - min_x)/(double) width;
-   double gsd_y = fabs(max_y - min_y)/(double) height;
+   double gsd_x = fabs(max_x - min_x)/(double) (width-1);
+   double gsd_y = fabs(max_y - min_y)/(double) (height-1);
    ossimDpt gsd (gsd_x, gsd_y);
 
    // Need the ossimImageData buffer returned from native call as a char buffer:
-   cerr<<"HELLO WORLD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+   cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
+   cerr<<"\nOssimTools: map_bbox"<<map_bbox<<endl;//TODO:remove debug
+   cerr<<"\nOssimTools: gsd"<<gsd<<endl;//TODO:remove debug
    try
    {
       ossimRefPtr<ossimImageData> chip = m_chipProcUtil->getChip(map_bbox, gsd);
+      cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
       if ( chip.valid() )
       {
+         cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
          ossimDataObjectStatus status = chip->getDataObjectStatus();
          ossimIrect rect = chip->getImageRectangle();
          if ( !rect.hasNans() && (status != (int) OSSIM_NULL))
          {
-            chip->computeAlphaChannel();
-            chip->unloadTileToBipAlpha((void*)data, rect, rect);
+            cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
+            //chip->computeAlphaChannel();
+            cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
+            chip->unloadTile((void*)data, rect, OSSIM_BIP);
+            cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
             chip->write("/tmp/getChip.ras");//TODO:remove debug
          }
          else
             throw ossimException("Bad chip returned from native getChip call.");
       }
+      else
+         throw ossimException("Null chip returned from native getChip call.");
    }
    catch (ossimException& e)
    {
