@@ -20,6 +20,8 @@ public:
 
 private:
    ossimChipProcUtil* m_chipProcUtil;
+   static bool m_locked;
+
 };
 
 }

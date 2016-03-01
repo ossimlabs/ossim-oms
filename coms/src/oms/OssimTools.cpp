@@ -5,10 +5,13 @@
 #include <ossim/util/ossimUtilityRegistry.h>
 #include <ossim/util/ossimViewshedUtil.h>
 #include <ossim/util/ossimHlzUtil.h>
+#include <ossim/projection/ossimMapProjection.h>
 #include <cstdlib>
 
 using namespace oms;
 using namespace std;
+
+bool OssimTools::m_locked = false;
 
 OssimTools::OssimTools(string name)
 :  m_chipProcUtil(0)
@@ -33,8 +36,15 @@ bool OssimTools::initialize(const map<string, string>& params)
 
    try
    {
-      ossimKeywordlist kwl (params);
-      m_chipProcUtil->initialize(kwl);
+      if (!m_locked)
+      {
+         m_locked = true;
+         ossimKeywordlist kwl (params);
+         cout<<"\nOssimTools::initialize() -- KWL:\n"<<kwl<<endl;//TODO:remove debug
+         m_chipProcUtil->initialize(kwl);
+         m_locked = false;
+
+      }
    }
    catch (ossimException& e)
    {
@@ -52,42 +62,75 @@ bool OssimTools::initialize(const map<string, string>& params)
 
 bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
 {
-   int status = OSSIM_STATUS_UNKNOWN;
    if ((m_chipProcUtil == 0) || (data == 0))
-      return OSSIM_NULL;
+      return false;
 
    // Expect only geographic bounding rect in hints.
-   double min_lat=ossim::nan(), max_lat=ossim::nan(), min_lon=ossim::nan(), max_lon=ossim::nan();
+   double min_x, max_x, min_y, max_y;
+   int width=0, height=0;
    map<string,string>::const_iterator value;
-   value = hints.find("min_lat");
-   if (value != hints.end())
-      min_lat = atof(value->second.c_str());
-   value = hints.find("max_lat");
-   if (value != hints.end())
-      max_lat = atof(value->second.c_str());
-   value = hints.find("min_lon");
-   if (value != hints.end())
-      min_lon = atof(value->second.c_str());
-   value = hints.find("max_lon");
-   if (value != hints.end())
-      max_lon = atof(value->second.c_str());
+   do
+   {
+      value = hints.find("min_x");
+      if (value == hints.end())
+         break;
+      min_x = atof(value->second.c_str());
 
-   ossimGrect bbox (max_lat, min_lon, min_lat, max_lat);
+      value = hints.find("max_x");
+      if (value == hints.end())
+         break;
+      max_x = atof(value->second.c_str());
+
+      value = hints.find("min_y");
+      if (value == hints.end())
+         break;
+      min_y = atof(value->second.c_str());
+
+      value = hints.find("max_y");
+      if (value == hints.end())
+         break;
+      max_y = atof(value->second.c_str());
+
+      value = hints.find("width");
+      if (value == hints.end())
+         break;
+      width = atoi(value->second.c_str());
+
+      value = hints.find("height");
+      if (value == hints.end())
+         break;
+      height = atoi(value->second.c_str());
+
+   } while (0);
+
+   if (width == 0)
+   {
+      cerr<<"OssimTools ["<<__LINE__<<"] -- Bad parse of hints map."<<endl;
+      return false;
+   }
+
+   ossimDrect map_bbox (min_x, max_y, max_x, min_y);
+   double gsd_x = fabs(max_x - min_x)/(double) width;
+   double gsd_y = fabs(max_y - min_y)/(double) height;
+   ossimDpt gsd (gsd_x, gsd_y);
 
    // Need the ossimImageData buffer returned from native call as a char buffer:
+   cerr<<"HELLO WORLD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
    try
    {
-      ossimRefPtr<ossimImageData> chip = m_chipProcUtil->getChip(bbox);
+      ossimRefPtr<ossimImageData> chip = m_chipProcUtil->getChip(map_bbox, gsd);
       if ( chip.valid() )
       {
-         status = chip->getDataObjectStatus();
+         ossimDataObjectStatus status = chip->getDataObjectStatus();
          ossimIrect rect = chip->getImageRectangle();
          if ( !rect.hasNans() && (status != (int) OSSIM_NULL))
          {
             chip->computeAlphaChannel();
             chip->unloadTileToBipAlpha((void*)data, rect, rect);
-
+            chip->write("/tmp/getChip.ras");//TODO:remove debug
          }
+         else
+            throw ossimException("Bad chip returned from native getChip call.");
       }
    }
    catch (ossimException& e)
@@ -98,7 +141,8 @@ bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
    catch ( ... )
    {
       cerr<<"Caught exception in OssimTools::getChip(). Operation aborted."<<endl;
+      return false;
    }
 
-   return status;
+   return true;
 }
