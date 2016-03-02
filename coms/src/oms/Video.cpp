@@ -1,7 +1,7 @@
 #include <oms/Video.h>
 
 
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
 #include <ossim/base/ossimRefPtr.h>
 #include <ossim/imaging/ossimImageData.h>
 #include <ossim/imaging/ossimMemoryImageSource.h>

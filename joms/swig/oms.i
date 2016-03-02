@@ -98,11 +98,11 @@
 #include <oms/MapProjection.h>
 #include <oms/Envelope.h>
 #include <oms/TileCacheSupport.h>
+#include <oms/OssimTools.h>
 
 //#include "RasterEngine.h"
 
 #include <exception>
-
 
 #if 0
 #include <cstdio>
@@ -2102,6 +2102,7 @@ namespace std
 %template(MapType) std::map<std::string, std::string>;
 // End: std::map
 
+%include <oms/OssimTools.h>
 %include <oms/Chipper.h>
 %include <oms/GpkgWriter.h>
 
@@ -2184,8 +2185,8 @@ public:
 
 //%include "RasterEngine.h"
 
-
-
-
+%feature("director", assumeoverride=1) ossim::ossimUtility;
+%feature("director", assumeoverride=1) ossim::ossimChipProcUtil;
+%feature("director", assumeoverride=1) ossim::ossimViewshedUtil;
 
 

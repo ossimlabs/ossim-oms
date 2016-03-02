@@ -122,3 +122,11 @@ void oms::Keywordlist::clearMap()
    }
 }
 
+bool oms::Keywordlist::addFile(const std::string& file)
+{   bool status = false;
+  if ( m_kwl )
+  {
+     status = m_kwl->addFile( file.c_str() );
+  }
+  return status;
+}

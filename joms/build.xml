@@ -14,13 +14,9 @@
 
     <!-- Module Name -->
     <property name="module.name" value="joms" />
-
-
-    <!--
-        <property name="jdk.home" value="${env.JAVA_HOME}" />
-        <property name="oms.home" value="${OSSIM_DEV_HOME}/oms" />
-        <property name="ossim.home" value="${OSSIM_DEV_HOME}/ossim" />
-    -->
+    <property name="java.home" value="${env.JAVA_HOME}" />
+    <property name="oms.home" value="${OSSIM_DEV_HOME}/ossim-oms" />
+    <property name="ossim.home" value="${OSSIM_DEV_HOME}/ossim" />
 
     <echo message="module.name = ${module.name}" />
     <echo message="jdk.home = ${jdk.home}" />
@@ -212,7 +208,7 @@
                         <path location="${jdk.home}/include" />                        
                         <path location="${jdk.home}/include/darwin" />
                         <path location="/Developer/SDKs/MacOSX${mac.sdk_version}.sdk/System/Library/Frameworks/JavaVM.framework/Headers" />
-                        <path location="${ossim.install_prefix}" />
+                        <path location="${ossim.install_prefix}/include" />
                         <path location="${ossim.dependencies}/Frameworks" />
                         <path location="${ossim.dependencies}/include" />
                         <path location="/usr/local/include" />
@@ -393,7 +389,7 @@
         <echo message="${package.dir}"/-->
     </target>
 
-    <target name="install" depends="initialize-environment,dist">
+    <target name="install" depends="initialize-environment,dist,mvn-install">
         <!-- Note: "copy changing library perms to 664. -->
         <copy file="${library.name}" todir="${ossim.install_prefix}/lib${lib_suffix}"/>
         <copy file="../lib/${module.name}-${ossim.version}.jar" todir="${ossim.install_prefix}/share/java"/>
@@ -404,9 +400,10 @@
                 <copy file="${library.name}" todir="${user.home}/Library/Java/Extensions"/>
             </then>
         </if>
+        <delete dir="${user.home}/.groovy/grapes/org.ossim"/>
     </target>
 
-    <target name="mvn-install" depends="dist">
+    <target name="mvn-install">
         <exec executable="mvn">
             <arg value="install:install-file"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}.jar"/>

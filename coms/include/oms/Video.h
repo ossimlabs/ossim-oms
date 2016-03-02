@@ -5,7 +5,7 @@
 #include <ossim/base/ossimConstants.h>
 #include <ossim/base/ossimReferenced.h>
 #include <string>
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
 #  include <ossimPredator/ossimPredatorVideo.h>
 #endif
 
@@ -21,7 +21,7 @@ namespace oms
       bool open(const std::string& file);
       bool nextFrame();
       bool nextKlv();
-#ifdef OSSIM_PREDATOR_VIDEO_ENABLED
+#ifdef OSSIM_VIDEO_ENABLED
       
       ossimPredatorVideo::FrameInfo* currentFrame();
       ossimPredatorVideo::KlvInfo*   currentKlv();
