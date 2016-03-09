@@ -14,21 +14,21 @@ using namespace std;
 bool OssimTools::m_locked = false;
 
 OssimTools::OssimTools(string name)
-:  m_chipProcUtil(0)
+:  m_utility(0)
 {
-   m_chipProcUtil = (ossimChipProcUtil*) ossimUtilityRegistry::instance()->createUtility(name);
-   if (m_chipProcUtil == 0)
+   m_utility = ossimUtilityRegistry::instance()->createUtility(name);
+   if (m_utility == 0)
       cerr<<"OssimTools() Bad opeation requested: <"<<name<<">. Ignoring."<<endl;
 }
 
 OssimTools::~OssimTools()
 {
-	delete m_chipProcUtil;
+	delete m_utility;
 }
 
 bool OssimTools::initialize(const map<string, string>& params)
 {
-   if (m_chipProcUtil == 0)
+   if (m_utility == 0)
       return false;
 
    // Accept map from service and translate to KWL expected by native code:
@@ -41,7 +41,7 @@ bool OssimTools::initialize(const map<string, string>& params)
          m_locked = true;
          ossimKeywordlist kwl (params);
          cout<<"\nOssimTools::initialize() -- KWL:\n"<<kwl<<endl;//TODO:remove debug
-         m_chipProcUtil->initialize(kwl);
+         m_utility->initialize(kwl);
          m_locked = false;
 
       }
@@ -60,10 +60,16 @@ bool OssimTools::initialize(const map<string, string>& params)
 	return true;
 }
 
+bool OssimTools::execute()
+{
+}
+
 bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
 {
-   if ((m_chipProcUtil == 0) || (data == 0))
+   if ((m_utility == 0) || !m_utility->isChipProcessor() || (data == 0))
       return false;
+
+   ossimChipProcUtil* chipper = (ossimChipProcUtil*) m_utility;
 
    // Expect only geographic bounding rect in hints.
    double min_x, max_x, min_y, max_y;
@@ -120,7 +126,7 @@ bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
    cerr<<"\nOssimTools: gsd"<<gsd<<endl;//TODO:remove debug
    try
    {
-      ossimRefPtr<ossimImageData> chip = m_chipProcUtil->getChip(map_bbox, gsd);
+      ossimRefPtr<ossimImageData> chip = chipper->getChip(map_bbox, gsd);
       cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
       if ( chip.valid() )
       {
