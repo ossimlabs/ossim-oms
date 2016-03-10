@@ -62,6 +62,8 @@ bool OssimTools::initialize(const map<string, string>& params)
 
 bool OssimTools::execute()
 {
+   bool status = false;
+   return status;
 }
 
 bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
