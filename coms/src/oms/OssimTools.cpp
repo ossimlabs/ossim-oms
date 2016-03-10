@@ -2,6 +2,7 @@
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossim/base/ossimGrect.h>
 #include <ossim/base/ossimException.h>
+#include <ossim/util/ossimUtility.h>
 #include <ossim/util/ossimUtilityRegistry.h>
 #include <ossim/util/ossimViewshedUtil.h>
 #include <ossim/util/ossimHlzUtil.h>
