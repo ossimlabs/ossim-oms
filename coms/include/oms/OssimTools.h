@@ -3,9 +3,10 @@
 
 #include <oms/Constants.h>
 #include <string>
+#include <iostream>
 #include <map>
 
-class ossimChipProcUtil;
+class ossimUtility;
 
 namespace oms
 {
@@ -16,10 +17,13 @@ public:
    OssimTools(std::string name);
    ~OssimTools();
    bool initialize(const std::map<std::string,std::string>& params);
+   bool execute();
    bool getChip(ossim_int8* buffer, const std::map<std::string, std::string>& hints);
 
 private:
-   ossimChipProcUtil* m_chipProcUtil;
+   ossimUtility* m_utility;
+   static bool m_locked;
+
 };
 
 }
