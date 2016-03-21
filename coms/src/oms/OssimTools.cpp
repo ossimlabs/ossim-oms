@@ -2,6 +2,7 @@
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossim/base/ossimGrect.h>
 #include <ossim/base/ossimException.h>
+#include <ossim/util/ossimUtility.h>
 #include <ossim/util/ossimUtilityRegistry.h>
 #include <ossim/util/ossimViewshedUtil.h>
 #include <ossim/util/ossimHlzUtil.h>
@@ -62,6 +63,8 @@ bool OssimTools::initialize(const map<string, string>& params)
 
 bool OssimTools::execute()
 {
+   bool status = false;
+   return status;
 }
 
 bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
