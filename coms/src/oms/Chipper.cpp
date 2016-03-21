@@ -28,6 +28,7 @@ oms::Chipper::Chipper() :
 
 // Private/hidden from use.
 oms::Chipper::Chipper( const Chipper& /* obj */ )
+: m_chipper(0)
 {
 }
 
