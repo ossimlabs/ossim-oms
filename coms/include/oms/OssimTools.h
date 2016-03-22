@@ -17,7 +17,7 @@ public:
    OssimTools(std::string name);
    ~OssimTools();
    bool initialize(const std::map<std::string,std::string>& params);
-   bool execute();
+   bool execute(char* outstreambuf);
    bool getChip(ossim_int8* buffer, const std::map<std::string, std::string>& hints);
 
 private:

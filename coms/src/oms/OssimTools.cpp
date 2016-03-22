@@ -2,7 +2,6 @@
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossim/base/ossimGrect.h>
 #include <ossim/base/ossimException.h>
-#include <ossim/util/ossimUtility.h>
 #include <ossim/util/ossimUtilityRegistry.h>
 #include <ossim/util/ossimViewshedUtil.h>
 #include <ossim/util/ossimHlzUtil.h>
@@ -61,9 +60,22 @@ bool OssimTools::initialize(const map<string, string>& params)
 	return true;
 }
 
-bool OssimTools::execute()
+bool OssimTools::execute(char* outstreambuf)
 {
-   bool status = false;
+   if (m_utility == 0)
+      return false;
+
+   ostringstream outputStream;
+   m_utility->setOutputStream(&outputStream);
+
+   bool status = m_utility->execute();
+
+   // Copy the output stream to string array:
+   size_t bufsize = outputStream.width();
+   outstreambuf = new char[bufsize+1];
+
+   memcpy(outstreambuf, outputStream.str().c_str(), bufsize);
+
    return status;
 }
 
