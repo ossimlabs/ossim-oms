@@ -2,10 +2,10 @@
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossim/base/ossimGrect.h>
 #include <ossim/base/ossimException.h>
-#include <ossim/util/ossimUtilityRegistry.h>
-#include <ossim/util/ossimViewshedUtil.h>
-#include <ossim/util/ossimHlzUtil.h>
 #include <ossim/projection/ossimMapProjection.h>
+#include <ossim/util/ossimHlzTool.h>
+#include <ossim/util/ossimToolRegistry.h>
+#include <ossim/util/ossimViewshedTool.h>
 #include <cstdlib>
 
 using namespace oms;
@@ -16,7 +16,7 @@ bool OssimTools::m_locked = false;
 OssimTools::OssimTools(string name)
 :  m_utility(0)
 {
-   m_utility = ossimUtilityRegistry::instance()->createUtility(name);
+   m_utility = ossimToolRegistry::instance()->createUtility(name);
    if (m_utility == 0)
       cerr<<"OssimTools() Bad opeation requested: <"<<name<<">. Ignoring."<<endl;
 }
@@ -84,7 +84,7 @@ bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
    if ((m_utility == 0) || !m_utility->isChipProcessor() || (data == 0))
       return false;
 
-   ossimChipProcUtil* chipper = (ossimChipProcUtil*) m_utility;
+   ossimChipProcTool* chipper = (ossimChipProcTool*) m_utility;
 
    // Expect only geographic bounding rect in hints.
    double min_x, max_x, min_y, max_y;

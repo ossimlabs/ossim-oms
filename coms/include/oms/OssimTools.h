@@ -6,7 +6,7 @@
 #include <iostream>
 #include <map>
 
-class ossimUtility;
+class ossimTool;
 
 namespace oms
 {
@@ -21,7 +21,7 @@ public:
    bool getChip(ossim_int8* buffer, const std::map<std::string, std::string>& hints);
 
 private:
-   ossimUtility* m_utility;
+   ossimTool* m_utility;
    static bool m_locked;
 
 };
