@@ -23,7 +23,54 @@ class ossimChipperUtil;
 namespace oms
 {
    class Keywordlist;
-   
+
+   /**
+    * @class Chipper
+    *
+    * Typical usage would be:
+    *
+    * oms::Chipper* chipper = new oms::Chipper();
+    *
+    * Write to a file:
+    * chipper->initialize( options );
+    * chipper->execute();
+    *
+    * Or write to a buffer:
+    * chipper->initialize( options );
+    * if ( chipper->getChip( buffer, options ) )
+    * {
+    *    ...
+    * }
+    * else
+    * {
+    *    ...
+    * }
+    *
+    * delete chipper;
+    *
+    * Example options, key:value or std::map of strings for ortho:
+    *   cut_height: 1024
+    *   cut_width:  1024
+    *   cut_wms_bbox: "<minx>,<miny>,<maxx>,<maxy>"
+    *   hist_op: auto-minmax
+    *   image0.file: absolute_path_to_image
+    *   image0.entry: 0
+    *   operation: ortho
+    *   output_radiometry: U8
+    *   srs: "epsg:4326"
+    *   three_band_out: true
+    *
+    * Example options, key:value or std::map of strings for chip or
+    * image space operation:
+    *   ccut_bbox_xywh: "<x>,<y>,<width>,<height>"
+    *   hist_op: auto-minmax
+    *   image0.file: absolute_path_to_image
+    *   image0.entry: 0
+    *   operation: chip
+    *   output_radiometry: U8
+    *   rrds: 0
+    *   three_band_out: true
+    */
    class OMSDLL Chipper
    {
    public:
