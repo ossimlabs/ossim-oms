@@ -1,8 +1,8 @@
 #!/bin/bash
 pushd `dirname $0` >/dev/null
 export SCRIPT_DIR=`pwd -P`
-popd >/dev/null
 . $SCRIPT_DIR/env.sh
+popd >/dev/null
 
 pushd $JOMS_HOME > /dev/null
 if [ ! -a local.properties ]
