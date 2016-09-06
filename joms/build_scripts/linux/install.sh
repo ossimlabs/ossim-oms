@@ -1,3 +1,4 @@
+#!/bin/bash
 pushd `dirname $0` >/dev/null
 export SCRIPT_DIR=`pwd -P`
 . $SCRIPT_DIR/env.sh

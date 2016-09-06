@@ -1,3 +1,4 @@
+#!/bin/bash
 pushd `dirname $0` >/dev/null
 export SCRIPT_DIR=`pwd -P`
 popd >/dev/null
@@ -10,6 +11,7 @@ if [ ! -a local.properties ]
 fi
 
 if [ -z "$GROOVY_HOME" ]; then
+   echo "HOME Location: ${HOME}"
    source "$HOME/.sdkman/bin/sdkman-init.sh"
    if [ ! -z "$GROOVY_VERSION" ]; then
       sdk use groovy $GROOVY_VERSION
