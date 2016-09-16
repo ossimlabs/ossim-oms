@@ -5,6 +5,7 @@
 #include <ossim/base/ossimDpt.h>
 #include <ossim/projection/ossimUtmProjection.h>
 #include <ossim/projection/ossimTransMercatorProjection.h>
+#include <ossim/projection/ossimProjectionFactoryRegistry.h>
 #include <ossim/base/ossimEllipsoidFactory.h>
 
 class oms::MapProjection::PrivateData
@@ -45,6 +46,16 @@ void oms::MapProjection::createTransMercProjection(const ossimGpt& worldPt)
 																										   worldPt);
 
 	m_privateData->m_mapProjection = proj.get();
+}
+
+bool oms::MapProjection::createEpsgProjection(const ossimGpt& worldPt,
+							                         const std::string& epsgCode)
+{
+	ossimRefPtr<ossimProjection> proj = ossimProjectionFactoryRegistry::instance()->createProjection(epsgCode);
+	
+	m_privateData->m_mapProjection = dynamic_cast<ossimMapProjection*>(proj.get());
+
+	return m_privateData->m_mapProjection.valid();
 }
 
 bool oms::MapProjection::worldToLocal(const ossimGpt& worldPt, ossimDpt& localPt)const
