@@ -175,7 +175,9 @@ void oms::Chipper::abort()
    }
 }
 
-int oms::Chipper::getChip( ossim_int8* data, bool alpha,const std::map<std::string,std::string>& options)
+int oms::Chipper::getChip( ossim_int8* data, 
+                           ossim_int64 dataSize,
+                           bool alpha,const std::map<std::string,std::string>& options)
 {
    int status = OSSIM_STATUS_UNKNOWN;
    try
