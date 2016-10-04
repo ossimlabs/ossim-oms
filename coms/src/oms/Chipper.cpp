@@ -225,3 +225,31 @@ int oms::Chipper::getChip( ossim_int8* data,
    }
    return status;
 }
+
+ ossimRefPtr<ossimImageData> oms::Chipper::getChip( const std::map<std::string,std::string>& options)
+ {
+   int status = OSSIM_STATUS_UNKNOWN;
+   ossimRefPtr<ossimImageData> result;
+   try
+   {   
+      result = m_chipper->getChip(options);
+   }
+   catch ( const ossimException& e )
+   {
+      if(traceDebug())
+      {
+         ossimNotify(ossimNotifyLevel_WARN)
+            << "Chipper::initialize caught exception: " << e.what() << std::endl;
+      }
+   }
+   catch ( ... )
+   {
+      if(traceDebug())
+      {
+         ossimNotify(ossimNotifyLevel_WARN)
+            << "Chipper::initialize caught exception!" << std::endl;
+      }
+   }
+
+   return result;
+}

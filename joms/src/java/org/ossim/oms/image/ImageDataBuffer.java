@@ -23,15 +23,15 @@ public class ImageDataBuffer
 	private DataBuffer dataBuffer;
    private ossimInterleaveType interleaveType = ossimInterleaveType.OSSIM_BSQ;
    
-   public ImageDataBuffer(ossimInterleaveType interleaveType)
+   public ImageDataBuffer(ossimInterleaveType interleaveType= ossimInterleaveType.OSSIM_BSQ)
    {
       this.interleaveType = interleaveType;
    }
-	public ImageDataBuffer( ossimImageDataRefPtr imageData )
+	public ImageDataBuffer( ossimImageDataRefPtr imageData = ossimInterleaveType.OSSIM_BSQ)
 	{
 		setImageData( imageData );
 	}
-	public ImageDataBuffer( ossimImageDataRefPtr imageData, ossimInterleaveType interleaveType )
+	public ImageDataBuffer( ossimImageDataRefPtr imageData, ossimInterleaveType interleaveType = ossimInterleaveType.OSSIM_BSQ )
 	{
       this.interleaveType = interleaveType;
 		setImageData( imageData );

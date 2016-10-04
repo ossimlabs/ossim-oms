@@ -153,6 +153,9 @@ namespace oms
                   const std::map<std::string,
                   std::string>& options=std::map<std::string,std::string>());
 
+      ossimRefPtr<ossimImageData> getChip(const std::map<std::string,
+                              std::string>& options=std::map<std::string,std::string>());
+
    private:
 
       /** @brief Hidden from use copy constructor. */
