@@ -27,7 +27,7 @@ public class ImageDataBuffer
    {
       this.interleaveType = interleaveType;
    }
-	public ImageDataBuffer( ossimImageDataRefPtr imageData )
+	public ImageDataBuffer( ossimImageDataRefPtr imageData)
 	{
 		setImageData( imageData );
 	}

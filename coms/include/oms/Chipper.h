@@ -17,6 +17,7 @@
 #include <oms/Constants.h>
 #include <map>
 #include <string>
+#include <ossim/imaging/ossimImageData.h>
 
 class ossimChipperUtil;
 
@@ -130,6 +131,8 @@ namespace oms
        * 
        * @param data Buffer to initialize.   Assumed "data" to be large
        * enough to hold aoi and alpha channel if turned on.
+       * 
+       * @param dataSize.  Size of the buffer being passed.
        *
        * @param alpha If true the alpha channel is computed and added.
        *
@@ -145,8 +148,14 @@ namespace oms
        * OSSIM_PARTIAL        = 3, contains some null/invalid values
        * OSSIM_FULL           = 4  all valid data
        */
-      int getChip(ossim_int8* data, bool alpha, 
-            const std::map<std::string,std::string>& options=std::map<std::string, std::string>());
+      int getChip(ossim_int8* data, 
+                  ossim_int64 dataSize, 
+                  bool alpha, 
+                  const std::map<std::string,
+                  std::string>& options=std::map<std::string,std::string>());
+
+      ossimRefPtr<ossimImageData> getChip(const std::map<std::string,
+                                                         std::string>& options=std::map<std::string,std::string>());
 
    private:
 
@@ -157,6 +166,7 @@ namespace oms
       const Chipper& operator=( const Chipper& rhs );
       
       ossimChipperUtil* m_chipper;
+
    };
 
 } // End of namespace oms.

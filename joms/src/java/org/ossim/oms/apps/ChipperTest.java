@@ -79,7 +79,7 @@ public class ChipperTest
                // OSSIM_PARTIAL        = 3, contains some null/invalid values
                // OSSIM_FULL           = 4  all valid data
                //---
-               int status = chipper.getChip( buffer, false );
+               int status = chipper.getChip( buffer, buffer.length, false );
                if ( ( status == 3 ) || ( status == 4 ) )
                {
                   System.out.println( "No problems" );
