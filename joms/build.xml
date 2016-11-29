@@ -254,7 +254,7 @@
             <then>
               <cc outtype="shared" objdir="swig" outfile="${module.name}">
                   <compilerarg value="-D__STDC_CONSTANT_MACROS"/>
-                  <compilerarg value="-std=c++11"/>
+                  <compilerarg value="--std=c++11"/>
                   <includepath>
                   <path location="swig" />
                   <path location="${jdk.home}/include" />
