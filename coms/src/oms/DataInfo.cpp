@@ -37,6 +37,7 @@
 #endif
 
 #include <sstream>
+#include <memory>
 #include <ctype.h>
 #if 0
 static ossimString monthToNumericString(const ossimString& month)
@@ -2327,8 +2328,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
    ossimString dateValue = "";
    outputString += indentation + "<metadata>" + separator;
    
-   ossimRefPtr<ossimInfoBase> info = ossimInfoFactoryRegistry::instance()->create(thePrivateData->theFilename);
-   if(info.valid())
+   std::shared_ptr<ossimInfoBase> info = ossimInfoFactoryRegistry::instance()->create(thePrivateData->theFilename);
+   if(info)
    {
       ossimKeywordlist kwl;
       ossimKeywordlist kwl2;
