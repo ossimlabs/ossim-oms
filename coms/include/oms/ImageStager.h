@@ -36,6 +36,8 @@ namespace oms
       
       bool setEntry(ossim_uint32 entryId);
       
+      void setQuietFlag(bool flag);
+      bool getQuietFlag()const;
       /**
        * Returns the information for the current entry
        */

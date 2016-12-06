@@ -20,14 +20,16 @@ class oms::ImageStager::PrivateData : public ossimProcessListener
 {
 public:
    PrivateData()
-      : theUseFastHistogramStagingFlag(false),
+      : 
+        theQuietFlag(false),
+        theUseFastHistogramStagingFlag(false),
         theStageHistogramFlag(false),
         theOverviewType("ossim_tiff_box"),
         theCompressionType("NONE"),
         theCompressionQuality(100),
-	theStageOverviewFlag(false),
-	theCurrentProcessInterface(0),
-	theCancelFlag(false),
+	     theStageOverviewFlag(false),
+	     theCurrentProcessInterface(0),
+	     theCancelFlag(false),
         theEntryId(-1)
    {
          
@@ -140,7 +142,17 @@ public:
       builderProp->setProperty(ossimKeywordNames::COMPRESSION_TYPE_KW, theCompressionType);
       builderProp->setProperty(ossimKeywordNames::COMPRESSION_QUALITY_KW, ossimString::toString(theCompressionQuality));
       builder->setInputSource(theHandler.get());
-      builder->addListener((ossimProcessListener*)this);
+      
+      if(!theQuietFlag)
+      {
+         builder->addListener((ossimProcessListener*)this);
+      }
+      else
+      {
+     //    ossimPushNotifyFlags();
+      //   ossimDisableNotify();
+      }
+
       if(theUseFastHistogramStagingFlag)
       {
          builder->setHistogramMode(OSSIM_HISTO_MODE_FAST);
@@ -157,7 +169,14 @@ public:
          builder->execute();
       }
 		
-      builder->removeListener((ossimProcessListener*)this);	
+      if(!theQuietFlag) 
+      {
+        builder->removeListener((ossimProcessListener*)this);	
+      }
+      else
+      {
+       //  ossimPopNotifyFlags();
+      }
       theCurrentProcessInterface = 0;
       
       return result;
@@ -177,10 +196,25 @@ public:
       writer->connectMyInputTo(0, histoSource.get());
       
       writer->setFilename(theHistogramFilename);
-      writer->addListener((ossimProcessListener*)this);
+      if(!theQuietFlag)
+      {
+        writer->addListener((ossimProcessListener*)this); 
+      } 
+      else
+      {
+         //ossimPushNotifyFlags();
+         //ossimDisableNotify();
+      }
       theCurrentProcessInterface = writer.get();
       writer->execute();
-      writer->removeListener((ossimProcessListener*)this);
+      if(!theQuietFlag)
+      {
+         writer->removeListener((ossimProcessListener*)this);
+      }
+      else
+      {
+         //ossimPopNotifyFlags();
+      }
       writer->disconnect();
       histoSource->disconnect();
       theCurrentProcessInterface = 0;
@@ -222,6 +256,7 @@ public:
    ossimRefPtr<ossimImageHandler> theHandler;
    ossimFilename theFilename;
    ossimFilename theHistogramFilename;
+   bool theQuietFlag;
    bool theUseFastHistogramStagingFlag;
    bool theStageHistogramFlag;
    ossimFilename theOverviewFilename;
@@ -277,6 +312,16 @@ bool oms::ImageStager::setEntry(ossim_uint32 entryId)
 int oms::ImageStager::getCurrentEntry()const
 {
    return thePrivateData->getCurrentEntry();
+}
+
+void oms::ImageStager::setQuietFlag(bool flag)
+{
+   thePrivateData->theQuietFlag = flag;
+}
+
+bool oms::ImageStager::getQuietFlag()const
+{
+   return thePrivateData->theQuietFlag;
 }
 
 std::string oms::ImageStager::getInfo(bool failIfNoGeometryFlag)const
