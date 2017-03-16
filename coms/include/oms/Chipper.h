@@ -149,6 +149,7 @@ namespace oms
        * OSSIM_FULL           = 4  all valid data
        */
       int getChip(ossim_int8* data, 
+                  ossim_int64 dataSize, 
                   bool alpha, 
                   const std::map<std::string,
                   std::string>& options=std::map<std::string,std::string>());
