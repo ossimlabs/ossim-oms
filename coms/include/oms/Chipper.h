@@ -78,7 +78,7 @@ namespace oms
 
       /** @brief default constructor. */
       Chipper();
-      
+
       /** @brief destructor */
       ~Chipper();
 
@@ -87,7 +87,7 @@ namespace oms
        *
        * Typically called from application prior to execute.  This parses
        * all options and put in keyword list m_kwl.
-       * 
+       *
        * @param ap Arg parser to initialize from.
        * @return true, indicating process should continue with execute.
        * @note A throw with an error message of "usage" is used to get out when
@@ -114,7 +114,7 @@ namespace oms
        *
        * Performs the actual dump of information.  This executes any options
        * set including image operations, i.e. -i -p --dno and so on.
-       * 
+       *
        * @note Throws ossimException on error.
        */
       bool execute();
@@ -128,10 +128,10 @@ namespace oms
        * @brief Initializes data with area of interest(aoi) from chain. If
        * alpha flag is true the alpha channel is computed and added. Has
        * has coded interleave by pixel or BIP.
-       * 
+       *
        * @param data Buffer to initialize.   Assumed "data" to be large
        * enough to hold aoi and alpha channel if turned on.
-       * 
+       *
        * @param dataSize.  Size of the buffer being passed.
        *
        * @param alpha If true the alpha channel is computed and added.
@@ -148,23 +148,23 @@ namespace oms
        * OSSIM_PARTIAL        = 3, contains some null/invalid values
        * OSSIM_FULL           = 4  all valid data
        */
-      int getChip(ossim_int8* data, 
-                  ossim_int64 dataSize, 
-                  bool alpha, 
-                  const std::map<std::string,
-                  std::string>& options=std::map<std::string,std::string>());
+      int getChip(ossim_int8* data,
+                  ossim_int64 dataSize,
+                  bool alpha,
+                  const std::map<std::string, std::string>& options=std::map<std::string,std::string>());
 
+/*
       ossimRefPtr<ossimImageData> getChip(const std::map<std::string,
                                                          std::string>& options=std::map<std::string,std::string>());
-
+*/
    private:
 
       /** @brief Hidden from use copy constructor. */
       Chipper( const Chipper& obj );
-      
+
       /** @brief Hidden from use assignment operator. */
       const Chipper& operator=( const Chipper& rhs );
-      
+
       ossimChipperUtil* m_chipper;
 
    };
