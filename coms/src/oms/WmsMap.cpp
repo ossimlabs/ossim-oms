@@ -366,7 +366,7 @@ void oms::WmsMap::setChainParameters(const ossimKeywordlist& value, int idx)
          thePrivateData->inputChains[chainIdx]->setNullPixelFlipEnableFlag(nullFlipEnabled);
       }
    }
-   else if(idx < thePrivateData->inputChains.size())
+   else if(idx < (int)thePrivateData->inputChains.size())
    {
       std::vector<ossim_uint32> bandListForChain(bandList);
       ossim_uint32 numberOfBands = thePrivateData->inputChains[idx]->getImageChain()->getNumberOfInputBands();
@@ -546,7 +546,7 @@ void oms::WmsMap::getMap(const std::string& srsCode,
       // now cut the rectangle and put in the buffer
       ossimIrect rect = thePrivateData->eightBitThreeBandChain->getImageChain()->getBoundingRect();
       ossimDpt midPoint = rect.midPoint();
-      ossimIpt origin = ossimDpt(midPoint.x - width/2.0, midPoint.y - height/2.0);
+      // ossimIpt origin = ossimDpt(midPoint.x - width/2.0, midPoint.y - height/2.0);
       ossimIrect rectCut = ossimDrect(0.0,
                                       0.0,
                                       (width-1),
