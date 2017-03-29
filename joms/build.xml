@@ -425,7 +425,7 @@
             <arg value="-DgeneratePom=true"/>
         </exec>
     </target>
-    <target name="mvn-deploy" depends="initialize-environment,install">
+    <target name="mvn-deploy" depends="install">
         <exec executable="mvn">
             <arg value="deploy:deploy-file"/>
             <arg value="-Durl=${artifactory.url}/ossim-local"/>
