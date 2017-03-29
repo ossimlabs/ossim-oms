@@ -62,6 +62,16 @@
                 <antcall target="missing-required-properties" />
             </then>
         </if>
+        <if>
+            <not>
+                <isset property="ossim.versionTag" />
+            </not>
+            <then>
+              <property name="ossim.versionTag" value="SNAPSHOT"/>
+          </then>
+
+        </if>
+
     </target>
 
     <target name="missing-required-properties" unless="properties.set">
@@ -69,6 +79,7 @@
         <echo message="JAVA_HOME=${jdk.home}" />
         <echo message="OSSIM_HOME=${ossim.home}" />
         <echo message="OSSIM_VERSION=${ossim.version}" />
+        <echo message="OSSIM_VERSION_TAG=${ossim.versionTag}" />
         <echo message="OMS_HOME=${oms.home}" />
         <echo message="GROOVY_HOME=${groovy.home}" />
 
@@ -197,6 +208,8 @@
                 <cc outtype="shared" objdir="swig" outfile="${module.name}">
                     <compilerarg value="-F${ossim.build}"/>
                     <compilerarg value="-F${ossim.install_prefix}/Frameworks" />
+                    <compilerarg value="-I${ossim.install_prefix}/include" />
+                    <compilerarg value="-L${ossim.install_prefix}/lib64" />
                     <!--
                     <compilerarg value="-F${ossim.dependencies}/Frameworks" />
                     -->
@@ -343,7 +356,7 @@
 		<copy todir="bin/META-INF">
 			<fileset dir="src/java/META-INF"/>
 		</copy>
-        <jar destfile="${oms.home}/lib/${module.name}-${ossim.version}.jar" basedir="bin" />
+        <jar destfile="${oms.home}/lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar" basedir="bin" />
     </target>
 <!--
     <target name="deploy" depends="dist">
@@ -396,7 +409,7 @@
     <target name="install" depends="initialize-environment,dist,mvn-install">
         <!-- Note: "copy changing library perms to 664. -->
         <copy file="${library.name}" todir="${ossim.install_prefix}/lib${lib_suffix}"/>
-        <copy file="../lib/${module.name}-${ossim.version}.jar" todir="${ossim.install_prefix}/share/java"/>
+        <copy file="../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar" todir="${ossim.install_prefix}/share/java"/>
         
         <if>
             <equals arg1="${os.name}" arg2="Mac OS X" />
@@ -411,10 +424,23 @@
         <exec executable="mvn">
             <arg value="install:install-file"/>
             <arg value="-Dmaven.repo.remote=${env.OSSIM_MAVEN_PROXY}"/>
-            <arg value="-Dfile=../lib/${module.name}-${ossim.version}.jar"/>
+            <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
             <arg value="-DgroupId=org.ossim"/>
             <arg value="-DartifactId=${module.name}"/>
-            <arg value="-Dversion=${ossim.version}"/>
+            <arg value="-Dversion=${ossim.version}-${ossim.versionTag}"/>
+            <arg value="-Dpackaging=jar"/>
+            <arg value="-DgeneratePom=true"/>
+        </exec>
+    </target>
+    <target name="mvn-deploy" depends="initialize-environment,dist">
+        <exec executable="mvn">
+            <arg value="deploy:deploy-file"/>
+            <arg value="-Durl=${artifactory.url}/ossim-local"/>
+            <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
+            <arg value="-DrepositoryId=${artifactory.repoId}"/>
+            <arg value="-DgroupId=org.ossim"/>
+            <arg value="-DartifactId=${module.name}"/>
+            <arg value="-Dversion=${ossim.version}-${ossim.versionTag}"/>
             <arg value="-Dpackaging=jar"/>
             <arg value="-DgeneratePom=true"/>
         </exec>
