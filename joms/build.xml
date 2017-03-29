@@ -358,13 +358,6 @@
 		</copy>
         <jar destfile="${oms.home}/lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar" basedir="bin" />
     </target>
-<!--
-    <target name="deploy" depends="dist">
-        <copy file="${oms.home}/lib/lib${module.name}.so" todir="${catalina.home}/shared/lib" />
-        <copy file="${oms.home}/lib/liboms.so" todir="${catalina.home}/shared/lib" />
-        <copy file="${oms.home}/lib/${module.name}.jar" todir="${catalina.home}/common/lib" />
-    </target>
--->
 
     <target name="clean" depends="initialize-environment">
         <delete dir="bin" />
@@ -406,7 +399,7 @@
         <echo message="${package.dir}"/-->
     </target>
 
-    <target name="install" depends="initialize-environment,dist,mvn-install">
+    <target name="install" depends="initialize-environment,dist">
         <!-- Note: "copy changing library perms to 664. -->
         <copy file="${library.name}" todir="${ossim.install_prefix}/lib${lib_suffix}"/>
         <copy file="../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar" todir="${ossim.install_prefix}/share/java"/>
@@ -420,7 +413,7 @@
         <delete dir="${user.home}/.groovy/grapes/org.ossim"/>
     </target>
 
-    <target name="mvn-install">
+    <target name="mvn-install" depends="install">
         <exec executable="mvn">
             <arg value="install:install-file"/>
             <arg value="-Dmaven.repo.remote=${env.OSSIM_MAVEN_PROXY}"/>
@@ -432,7 +425,7 @@
             <arg value="-DgeneratePom=true"/>
         </exec>
     </target>
-    <target name="mvn-deploy" depends="initialize-environment,dist">
+    <target name="mvn-deploy" depends="initialize-environment,install">
         <exec executable="mvn">
             <arg value="deploy:deploy-file"/>
             <arg value="-Durl=${artifactory.url}/ossim-local"/>
