@@ -28,7 +28,6 @@ ossim.build=${env.OSSIM_BUILD_DIR}
 ossim.dependencies=${env.OSSIM_DEPENDENCIES}
 ossim.version=${env.OSSIM_VERSION}
 ossim.versionTag=${env.OSSIM_VERSION_TAG}
-artifactory.url=${env.OSSIM_MAVEN_PROXY}
 artifactory.repoId=remote.repo
 
 <!-- Home of ossimPredator. -->
