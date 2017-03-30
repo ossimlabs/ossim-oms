@@ -565,7 +565,7 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
          thePrivateData->clear();
       }
    }
-   catch ( const ossimException& e )
+   catch ( const std::exception& e )
    {
       ossimNotify(ossimNotifyLevel_WARN)
          << "oms::DataInfo::open caught exception: " << e.what() << std::endl;
@@ -776,14 +776,14 @@ void appendToMultiGeometry(std::string& /*result*/,
    
 }
 
-geos::geom::Geometry*  createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
+geos::geom::Geometry* createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
 {
    ossimGpt wgs84;
    ossimGpt ul;
    ossimGpt ur;
    ossimGpt lr;
    ossimGpt ll;
-    if(!klvTable->getCornerPoints(ul, ur, lr, ll))
+   if(!klvTable->getCornerPoints(ul, ur, lr, ll))
    {
 #if 1
       ossim_float64 lat, lon, elev;
@@ -820,24 +820,33 @@ geos::geom::Geometry*  createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvT
    geos::geom::Geometry* result = 0;
 
 
-   try{
+   try
+   {
       result = reader.read("MULTIPOLYGON((("
-                       +ossimString::toString(ul.lond())+" "
-                       +ossimString::toString(ul.latd())+","
-                       +ossimString::toString(ur.lond())+" "
-                       +ossimString::toString(ur.latd())+","
-                       +ossimString::toString(lr.lond())+" "
-                       +ossimString::toString(lr.latd())+","
-                       +ossimString::toString(ll.lond())+" "
-                       +ossimString::toString(ll.latd())+","
-                       +ossimString::toString(ul.lond())+" "
-                       +ossimString::toString(ul.latd())+" "
-                       +")))");
+                           +ossimString::toString(ul.lond())+" "
+                           +ossimString::toString(ul.latd())+","
+                           +ossimString::toString(ur.lond())+" "
+                           +ossimString::toString(ur.latd())+","
+                           +ossimString::toString(lr.lond())+" "
+                           +ossimString::toString(lr.latd())+","
+                           +ossimString::toString(ll.lond())+" "
+                           +ossimString::toString(ll.latd())+","
+                           +ossimString::toString(ul.lond())+" "
+                           +ossimString::toString(ul.latd())+" "
+                           +")))");
 
+   }
+   catch ( const std::exception& e )
+   {
+      ossimNotify(ossimNotifyLevel_WARN)
+         << "oms createGeomFromKlv caught ossim exception: " << e.what() << std::endl;
+      result = 0;
    }
    catch(...)
    {
-
+      ossimNotify(ossimNotifyLevel_WARN)
+         << "oms createGeomFromKlv caught ossim exception!" << std::endl;
+      result = 0;
    }
 
    return result;
@@ -1101,8 +1110,17 @@ std::string oms::DataInfo::getInfo() const
 
                   }
                }
+               catch ( const std::exception& e )
+               {
+                  ossimNotify(ossimNotifyLevel_WARN)
+                     << "oms::DataInfo::getInfo caught ossim exception: " << e.what() << std::endl;
+                  if(geom) delete geom;
+                  geom = 0;
+               }
                catch(...)
                {
+                  ossimNotify(ossimNotifyLevel_WARN)
+                     << "oms::DataInfo::getInfo caught ossim exception!" << std::endl;
                   if(geom) delete geom;
                   geom = 0;
                }
@@ -1123,10 +1141,17 @@ std::string oms::DataInfo::getInfo() const
                result += "\" srs=\"epsg:4326\"";
                result += ">" + tempGeom + "</groundGeom>";
             }
+            catch ( const std::exception& e )
+            {
+               ossimNotify(ossimNotifyLevel_WARN)
+                  << "oms::DataInfo::getInfo caught ossim exception: " << e.what() << std::endl;
+            }
             catch(...)
             {
-
+               ossimNotify(ossimNotifyLevel_WARN)
+                  << "oms::DataInfo::getInfo caught ossim exception!" << std::endl;
             }
+
             delete composite;
             composite = 0;
          }
@@ -1151,10 +1176,10 @@ std::string oms::DataInfo::getInfo() const
       }
 #endif
    }
-   catch ( const ossimException& e )
+   catch ( const std::exception& e )
    {
       ossimNotify(ossimNotifyLevel_WARN)
-         << "oms::DataInfo::getInfo caught exception: " << e.what() << std::endl;
+         << "oms::DataInfo::getInfo caught ossim exception: " << e.what() << std::endl;
       result = "";
    }
    catch ( ... )
@@ -1289,14 +1314,25 @@ std::string oms::DataInfo::getVideoInfo()
          } 
          else if(geom)
          {
-            try{
+            try
+            {
                geos::geom::Geometry* newGeom = composite->Union(geom);
                if(geom) delete geom;
                delete composite;
                composite = newGeom;
-           }
+            }
+            catch ( const std::exception& e )
+            {
+               ossimNotify(ossimNotifyLevel_WARN)
+                  << "oms::DataInfo::getVideoInfo caught exception: " << e.what() << std::endl;
+               if(geom) delete geom;
+               geom = 0;
+               
+            }
             catch(...)
             {
+               ossimNotify(ossimNotifyLevel_WARN)
+                  << "oms::DataInfo::getVideoInfo caught exception!" << std::endl;
                if(geom) delete geom;
                geom = 0;
             }
@@ -1308,16 +1344,23 @@ std::string oms::DataInfo::getVideoInfo()
       {
          geos::io::WKTWriter writer;
          std::string tempGeom;
-         try{
+         try
+         {
             tempGeom = writer.write(composite);
             result += "<groundGeom area=\"";
             result += (ossimString::toString(composite->getArea()*ossimGpt().metersPerDegree().y)).string();
             result += "\" srs=\"epsg:4326\"";
             result += ">" + tempGeom + "</groundGeom>";
          }
+         catch ( const std::exception& e )
+         {
+            ossimNotify(ossimNotifyLevel_WARN)
+               << "oms::DataInfo::getVideoInfo caught exception: " << e.what() << std::endl;
+         }
          catch(...)
          {
-
+            ossimNotify(ossimNotifyLevel_WARN)
+               << "oms::DataInfo::getVideoInfo caught exception!" << std::endl;
          }
          delete composite;
          composite = 0;

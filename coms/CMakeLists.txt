@@ -72,6 +72,9 @@ IF(BUILD_OSSIM_TEST_APPS)
     OSSIM_SETUP_APPLICATION(oms-image-info COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES apps/oms-image-info.cpp)
    
 ENDIF(BUILD_OSSIM_TEST_APPS)
+set(TARGET_COMMON_LIBRARIES ossim oms)
+OSSIM_SETUP_APPLICATION(image-info INSTALL COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES apps/image-info.cpp)
+OSSIM_SETUP_APPLICATION(image-thumbnail INSTALL COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES apps/image-thumbnail.cpp)
 
 ####################################### SETUP THE UNINSTALL #################################
 #OSSIM_ADD_COMMON_MAKE_UNINSTALL()

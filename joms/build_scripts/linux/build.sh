@@ -18,7 +18,7 @@ if [ -z "$GROOVY_HOME" ]; then
    fi
 fi
 
-ant clean dist mvn-install
+ant clean mvn-deploy
 antReturnCode=$?
 if [ $antReturnCode -ne 0 ];then
     echo "BUILD ERROR: ant failed dist mvn-install build..."
