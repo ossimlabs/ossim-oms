@@ -1,20 +1,16 @@
-//----------------------------------------------------------------------------
-// License:  See top level LICENSE.txt file.
-//
-// Author:  David Burken
-//
-// Description:  Simple container class to encapsulate image info.
-//
-//----------------------------------------------------------------------------
-// $Id: ImageInfo.h 12991 2008-06-04 19:14:59Z gpotts $
-#ifndef omsImageInfo_HEADER
-#define omsImageInfo_HEADER 1
+//---
+// License: MIT
+//---
+// $Id$
 
-#include <vector>
-#include <string>
+#ifndef omsDataInfo_HEADER
+#define omsDataInfo_HEADER 1
+
 #include <oms/Constants.h>
 #include <oms/Object.h>
 #include <ossim/base/ossimGpt.h>
+#include <vector>
+#include <string>
 
 class ossimImageGeometry;
 class ossimImageHandler;
@@ -120,6 +116,14 @@ namespace oms
        * @param kwl Keyword list to query.
        * @param countryCode Initialized by this.
        */
+      void getCloudCover( const ossimKeywordlist& kwl,
+                          std::string& cloudCover ) const;
+ 
+      /**
+       * @brief Gets country code from keyword list.
+       * @param kwl Keyword list to query.
+       * @param countryCode Initialized by this.
+       */
       void getCountryCode( const ossimKeywordlist& kwl,
                            std::string& countryCode ) const;
       
@@ -208,7 +212,7 @@ namespace oms
        */
       void getProductId( const ossimKeywordlist& kwl,
                          std::string& productId ) const;
-       
+
       /**
        * @brief Gets sensor ID from keyword list.
        * @param kwl Keyword list to query.
@@ -224,6 +228,14 @@ namespace oms
       void getSecurityClassification(
          const ossimKeywordlist& kwl,
          std::string& securityClassification ) const;
+
+      /**
+       * @brief Gets stip ID from keyword list.
+       * @param kwl Keyword list to query.
+       * @param stripId Initialized by this.
+       */
+      void getStripId( const ossimKeywordlist& kwl,
+                       std::string& stripId ) const;
 
       /**
        * @brief Gets sun azimuth from keyword list.
