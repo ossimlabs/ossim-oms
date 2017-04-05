@@ -2402,6 +2402,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          ossimString imageId;
          ossimString beNumber;
+         ossimString cloudCover;
          ossimString imageRepresentation;
          ossimString isorce;
          ossimString targetId;
@@ -2413,6 +2414,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString azimuthAngle;
          ossimString grazingAngle;
          ossimString securityClassification;
+         ossimString stripId;
          ossimString sunElevation;
          ossimString sunAzimuth;
          ossimString title;
@@ -2437,6 +2439,9 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          // BE number:
          getBeNumber( kwl3, beNumber.string() );
+
+         // Cloud cover:
+         getCloudCover( kwl3, cloudCover.string() );
 
          // Country code:
          getCountryCode( kwl3, countryCode.string() );
@@ -2473,13 +2478,16 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          
          // Product:
          getProductId( kwl3, productId.string() );
-        
+
          // Security classification:
          getSecurityClassification( kwl3, securityClassification.string() );
 
          // Sensor:
          getSensorId( kwl3, sensorId.string() );
 
+         // Strip ID:
+         getStripId( kwl3, stripId.string() );
+         
          // Sun azimuth:
          getSunAzimuth( kwl3, sunAzimuth.string() );
           
@@ -2512,6 +2520,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             separator; 
          outputString += indentation + "   <beNumber>" + beNumber.string() + "</beNumber>" +
             separator; 
+         outputString += indentation + "   <cloudCover>" + cloudCover.string() + "</cloudCover>" +
+            separator; 
          outputString += indentation + "   <sensorId>" + sensorId.string() + "</sensorId>" +
             separator; 
          outputString += indentation + "   <missionId>" + missionId.string() + "</missionId>" +
@@ -2532,6 +2542,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          outputString += indentation + "   <description>" + description.string() +
             "</description>" + separator;
          outputString += indentation + "   <niirs>" + niirs.string() + "</niirs>" + separator;
+         outputString += indentation + "   <stripId>" + stripId.string() +
+            "</stripId>" + separator;
          outputString += indentation + "   <sunAzimuth>" + sunAzimuth.string() +
             "</sunAzimuth>" + separator;
          outputString += indentation + "   <sunElevation>" + sunElevation.string() +
@@ -2748,7 +2760,31 @@ void oms::DataInfo::getBeNumber( const ossimKeywordlist& kwl,
       beNumber = ossimString( beNumber ).trim().string();
    }
 }
- 
+
+void oms::DataInfo::getCloudCover( const ossimKeywordlist& kwl,
+                                   std::string& cloudCover ) const
+{
+   cloudCover = kwl.findKey( std::string("cloud_cover") ); // omd file
+   if ( cloudCover.empty() )
+   {
+      // Normalized:
+      std::vector<ossimString> keys;
+      ossimString regExp = "common\\.cloud_cover$";
+      kwl.findAllKeysThatMatch( keys, regExp );
+      if ( keys.size() )
+      {
+         // Taking first one...
+         cloudCover = kwl.findKey( keys[0].string() );
+      }
+
+      if ( cloudCover.empty() )
+      {
+         cloudCover = kwl.findKey( std::string("tiff.gdalmetadata.cloud_cover") );
+      }
+   }
+   
+} // End: getCloudCover( ... )
+                                   
 void oms::DataInfo::getCountryCode( const ossimKeywordlist& kwl,
                                     std::string& countryCode ) const
 {
@@ -2947,6 +2983,10 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
       if ( imageId.empty() )
       {
          imageId = kwl.findKey( std::string("nitf.iid") );
+         if ( imageId.empty() )
+         {
+            imageId = kwl.findKey( std::string("tiff.gdalmetadata.id") ); 
+         }
       }
    }
 
@@ -3001,6 +3041,11 @@ void oms::DataInfo::getImageRepresentation( const ossimKeywordlist& kwl,
       if ( imageRepresentation.empty() )
       {
          imageRepresentation = kwl.findKey( std::string("nitf.irep") );
+
+         if ( imageRepresentation.empty() )
+         {
+            imageRepresentation = kwl.findKey( std::string("tiff.gdalmetadata.item_type") );
+         }
       }
    }
 
@@ -3087,6 +3132,11 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
             {
                missionId = isorce.string();
             }
+
+            if ( missionId.empty() )
+            {
+              missionId = kwl.findKey( std::string("tiff.gdalmetadata.satellite_id") );
+            }
          }
       }
    }
@@ -3141,6 +3191,11 @@ void oms::DataInfo::getOrganization( const ossimKeywordlist& kwl,
    if ( organization.empty())
    {
       organization = kwl.findKey( std::string("nitf.oname") );
+
+      if ( organization.empty())
+      {
+         organization = kwl.findKey( std::string("tiff.gdalmetadata.provider") );
+      }
    }
 
    if ( organization.size() )
@@ -3286,12 +3341,35 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
       if ( sensorId.empty() )
       {
          sensorId = kwl.findKey( std::string("tfrd.common.sensor_id") );
+         if ( sensorId.empty() )
+         {
+            sensorId = kwl.findKey( std::string("tiff.gdalmetadata.instrument") );
+         }
       }
    }
 
    if ( sensorId.size() )
    {
       sensorId = ossimString( sensorId ).trim().string();
+   }
+}
+
+void oms::DataInfo::getStripId( const ossimKeywordlist& kwl,
+                       std::string& stripId ) const
+{
+   stripId = kwl.findKey( std::string("strip_id") ); // omd file
+   if ( stripId.empty())
+   {
+      stripId = kwl.findKey( std::string("nitf.common.strip_id") );
+      if ( stripId.empty() )
+      {
+         stripId = kwl.findKey( std::string("tiff.gdalmetadata.strip_id") );
+      }
+   }
+
+   if ( stripId.size() )
+   {
+      stripId = ossimString( stripId ).trim().string();
    }
 }
 
@@ -3309,17 +3387,22 @@ void oms::DataInfo::getSunAzimuth( const ossimKeywordlist& kwl,
       {
          // Taking first one...
          sunAzimuth = kwl.findKey( keys[0].string() );
-      }      
+      }
 
       if ( sunAzimuth.empty())
       {
-         keys.clear();
-         ossimString regExp = "\\.sun_az$"; // any tag ending in: ".sun_az"
-         kwl.findAllKeysThatMatch( keys, regExp );
-         if ( keys.size() )
+         sunAzimuth = kwl.findKey( std::string("tiff.gdalmetadata.sun_azimuth") );
+
+         if ( sunAzimuth.empty() )
          {
-            // Taking first one...
-            sunAzimuth = kwl.findKey( keys[0].string() );
+            keys.clear();
+            ossimString regExp = "\\.sun_az$"; // any tag ending in: ".sun_az"
+            kwl.findAllKeysThatMatch( keys, regExp );
+            if ( keys.size() )
+            {
+               // Taking first one...
+               sunAzimuth = kwl.findKey( keys[0].string() );
+            }
          }
       }
    }
@@ -3338,7 +3421,7 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
    if ( sunElevation.empty())
    {
       // Normalized:
-      std::vector<ossimString> keys;
+      std::vector<ossimString> keys; 
       ossimString regExp = "common\\.sunel$";
       kwl.findAllKeysThatMatch( keys, regExp );
       if ( keys.size() )
@@ -3349,13 +3432,18 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
       
       if ( sunElevation.empty())
       {
-         keys.clear();
-         ossimString regExp = "\\.sun_el$"; // any tag ending in ".sun_el"
-         kwl.findAllKeysThatMatch( keys, regExp );
-         if ( keys.size() )
+         sunElevation = kwl.findKey( std::string("tiff.gdalmetadata.sun_elevation") );
+         
+         if ( sunElevation.empty() )
          {
-            // Taking first one...
-            sunElevation = kwl.findKey( keys[0].string() );
+            keys.clear();
+            ossimString regExp = "\\.sun_el$"; // any tag ending in ".sun_el"
+            kwl.findAllKeysThatMatch( keys, regExp );
+            if ( keys.size() )
+            {
+               // Taking first one...
+               sunElevation = kwl.findKey( keys[0].string() );
+            }
          }
       }
    }
