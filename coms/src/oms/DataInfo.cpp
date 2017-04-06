@@ -500,7 +500,7 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
       thePrivateData->clear();
    
       ossimRefPtr<ossimImageHandler> handler =
-         ossimImageHandlerRegistry::instance()->open(ossimFilename(file));
+         ossimImageHandlerRegistry::instance()->openConnection(file, true);
    
       if (handler.valid() == true)
       {
