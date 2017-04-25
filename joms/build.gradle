@@ -92,6 +92,8 @@ task cpptasksCompile(dependsOn: 'createJar') {
         // compilerarg( value: "-L${ossimInstallPrefix}/lib64" )
 //        compilerarg( value: "-F${ossim.dependencies}/Frameworks" )
         compilerarg( value: "-D__STDC_CONSTANT_MACROS" )
+        compilerarg( value: "--std=c++11" )
+
         includepath {
             path( location: "swig" )
             path( location: "${javaHome}/include" )
@@ -124,6 +126,7 @@ task cpptasksCompile(dependsOn: 'createJar') {
         <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
         */
         linkerarg( value: "-lOpenThreads" )
+        linkerarg( value: "-Wall" )
         syslibset( libs: "c,stdc++" )
     }
 
