@@ -16,7 +16,7 @@ bool OssimTools::m_locked = false;
 OssimTools::OssimTools(string name)
 :  m_utility(0)
 {
-   m_utility = ossimToolRegistry::instance()->createUtility(name);
+   m_utility = ossimToolRegistry::instance()->createTool(name);
    if (m_utility == 0)
       cerr<<"OssimTools() Bad opeation requested: <"<<name<<">. Ignoring."<<endl;
 }

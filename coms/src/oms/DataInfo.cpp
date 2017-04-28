@@ -1538,6 +1538,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    thePrivateData->theImageHandler->createDefaultOverviewFilename();
    ossimFilename overview2File =
    thePrivateData->theImageHandler->getFilename() + ".ovr";
+   ossimFilename hdrFile =
+   thePrivateData->theImageHandler->getFilename() + ".hdr";
    ossimFilename navData =
    thePrivateData->theImageHandler->getFilename().path().dirCat("NavData");
    ossimFilename histogramFile =
@@ -1634,6 +1636,14 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       outputString += indentation
          + "   <RasterEntryFile type=\"kml\">" + separator
          + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(kmlFile).string() + "</name>"
+         + separator + indentation + "   </RasterEntryFile>"
+         + separator;
+   }
+   if(hdrFile.exists())
+   {
+      outputString += indentation
+         + "   <RasterEntryFile type=\"hdr\">" + separator
+         + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(hdrFile).string() + "</name>"
          + separator + indentation + "   </RasterEntryFile>"
          + separator;
    }
