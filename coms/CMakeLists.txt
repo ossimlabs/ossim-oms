@@ -62,9 +62,9 @@ SOURCE_FILES ${OMS_SRCS}
 ##################################### SETUP TEST APPLICATION BUILDS #############################
 IF(BUILD_OSSIM_TEST_APPS)
    IF(OSSIMVIDEO_FOUND AND BUILD_OSSIMVIDEO)
-       set(TARGET_COMMON_LIBRARIES ossim oms ossimPredator)
+       set(TARGET_COMMON_LIBRARIES ossim ossimPredator)
    ELSE()
-       set(TARGET_COMMON_LIBRARIES ossim oms)
+       set(TARGET_COMMON_LIBRARIES ossim)
    ENDIF()
     IF(BUILD_OSSIMVIDEO)
        OSSIM_SETUP_APPLICATION(oms-video-test COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES test/oms-video-test.cpp)
@@ -73,7 +73,7 @@ IF(BUILD_OSSIM_TEST_APPS)
     OSSIM_SETUP_APPLICATION(oms-image-info COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES apps/oms-image-info.cpp)
    
 ENDIF(BUILD_OSSIM_TEST_APPS)
-set(TARGET_COMMON_LIBRARIES ossim oms)
+set(TARGET_COMMON_LIBRARIES ossim)
 OSSIM_SETUP_APPLICATION(image-info INSTALL COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES apps/image-info.cpp)
 OSSIM_SETUP_APPLICATION(image-thumbnail INSTALL COMMAND_LINE COMPONENT_NAME ossim SOURCE_FILES apps/image-thumbnail.cpp)
 
