@@ -16,11 +16,7 @@
 #include <oms/Constants.h>
 #include <map>
 #include <string>
-
-namespace OpenThreads
-{
-   class Mutex;
-}
+#include <mutex>
 
 namespace oms
 {
@@ -100,7 +96,7 @@ namespace oms
       
       Keywordlist*            m_kwl;
       StringPairMap::iterator m_iter;
-      OpenThreads::Mutex*      m_mutex;
+      mutable std::mutex      m_mutex;
    };
 
 } // End of namespace oms.

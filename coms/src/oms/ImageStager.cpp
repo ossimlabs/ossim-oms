@@ -3,8 +3,6 @@
 #include <ossim/base/ossimRefPtr.h>
 #include <ossim/imaging/ossimImageHandlerRegistry.h>
 #include <ossim/imaging/ossimImageHandler.h>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include <ossim/base/ossimProcessListener.h>
 #include <ossim/base/ossimKeywordNames.h>
 #include <ossim/base/ossimProcessInterface.h>
@@ -42,19 +40,19 @@ public:
 
    void cancel()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theCancelFlag = true;
    }
 
    bool isCanceled()const
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       return theCancelFlag;
    }
 
    void setCancelFlag(bool flag)
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theCancelFlag = flag;
    }
 
@@ -266,7 +264,7 @@ public:
    bool theStageOverviewFlag;
    ossimProcessInterface* theCurrentProcessInterface;
    bool theCancelFlag;
-   mutable OpenThreads::Mutex theMutex;
+   mutable std::mutex theMutex;
    ossimIpt theOverviewTileSize;
    ossim_int32 theEntryId;
    
