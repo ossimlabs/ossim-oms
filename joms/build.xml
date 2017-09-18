@@ -214,6 +214,7 @@
                     <compilerarg value="-F${ossim.dependencies}/Frameworks" />
                     -->
                     <compilerarg value="-D__STDC_CONSTANT_MACROS"/>
+                    <compilerarg value="-std=c++11"/>
                     <!--
                         <compilerarg value="-isysroot" />
                         <compilerarg value="/Developer/SDKs/MacOSX${mac.sdk_version}.sdk"/>
