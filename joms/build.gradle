@@ -130,8 +130,8 @@ task cpptasksCompile(dependsOn: 'createJar') {
        /*
         <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
         */
-        linkerarg( value: "-lOpenThreads" )
-        linkerarg( value: "-Wall" )
+        //linkerarg( value: "-lOpenThreads" )
+        //linkerarg( value: "-Wall" )
         syslibset( libs: "c,stdc++" )
     }
 
