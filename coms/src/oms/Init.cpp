@@ -16,7 +16,7 @@
 #include <ossim/base/ossimEnvironmentUtility.h>
 #include <ossim/init/ossimInit.h>
 #include <ossim/base/ossimNotify.h>
-
+#include <mutex>
 
 oms::Init* oms::Init::theInstance = 0;
 static std::mutex initMutex;
