@@ -2937,6 +2937,11 @@ void oms::DataInfo::getGrazingAngle( const ossimKeywordlist& kwl,
             grazingAngle = kwl.findKey( keys[0].string() );
          }
 
+         if ( grazingAngle.empty() )
+         {
+            grazingAngle = kwl.findKey( std::string("tiff.gdalmetadata.view_angle") );
+         }
+
 #if 0 /* Removed 11 Sep 2015 (drb) */
          if ( grazingAngle.empty() )
          {

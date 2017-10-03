@@ -11,6 +11,7 @@
 #include <ossim/imaging/ossimHistogramWriter.h>
 #include <ossim/imaging/ossimImageHistogramSource.h>
 #include <iostream>
+#include <mutex>
 #include <oms/DataInfo.h>
 
 class oms::ImageStager::PrivateData : public ossimProcessListener
