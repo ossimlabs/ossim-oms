@@ -1,20 +1,18 @@
-//----------------------------------------------------------------------------
+//---
 //
-// License:  LGPL
+// License: MIT
 // 
-// See LICENSE.txt file in the top level directory for more details.
-//
 // Author:  David Burken
 //
 // Description: OMS image info application.
 // 
-//----------------------------------------------------------------------------
+//---
 // $Id$
 
-#include <iostream>
-#include <string>
 #include <oms/Init.h>
 #include <oms/DataInfo.h>
+#include <iostream>
+#include <string>
 
 int main(int argc, char *argv[])
 {
