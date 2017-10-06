@@ -40,7 +40,7 @@ bool OssimTools::initialize(const map<string, string>& params)
       {
          m_locked = true;
          ossimKeywordlist kwl (params);
-         cout<<"\nOssimTools::initialize() -- KWL:\n"<<kwl<<endl;//TODO:remove debug
+         //cout<<"\nOssimTools::initialize() -- KWL:\n"<<kwl<<endl;//TODO:remove debug
          m_utility->initialize(kwl);
          m_locked = false;
 
@@ -136,26 +136,16 @@ bool OssimTools::getChip(ossim_int8* data, const map<string,string>& hints)
    ossimDpt gsd (gsd_x, gsd_y);
 
    // Need the ossimImageData buffer returned from native call as a char buffer:
-   cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
-   cerr<<"\nOssimTools: map_bbox"<<map_bbox<<endl;//TODO:remove debug
-   cerr<<"\nOssimTools: gsd"<<gsd<<endl;//TODO:remove debug
    try
    {
       ossimRefPtr<ossimImageData> chip = chipper->getChip(map_bbox, gsd);
-      cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
       if ( chip.valid() )
       {
-         cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
          ossimDataObjectStatus status = chip->getDataObjectStatus();
          ossimIrect rect = chip->getImageRectangle();
          if ( !rect.hasNans() && (status != (int) OSSIM_NULL))
          {
-            cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
-            //chip->computeAlphaChannel();
-            cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
             chip->unloadTile((void*)data, rect, OSSIM_BIP);
-            cerr<<"\nOssimTools:"<<__LINE__<<endl;//TODO:remove debug
-            chip->write("/tmp/getChip.ras");//TODO:remove debug
          }
          else
             throw ossimException("Bad chip returned from native getChip call.");
