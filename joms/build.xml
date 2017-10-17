@@ -255,7 +255,6 @@
                     <linkerarg value="ossim" />
                     <linkerarg value="-framework" />
                     <linkerarg value="oms" />
-                    <linkerarg value="-lOpenThreads" />
                    <!--
                     <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
                     -->

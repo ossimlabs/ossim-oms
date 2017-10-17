@@ -784,7 +784,7 @@ ossimImageSource* oms::Util::newEightBitImageSpaceThumbnailChain(ossimImageSourc
       result->add(histoRemapper);
       histoRemapper->setEnableFlag(true);
       histoRemapper->openHistogram(ossimFilename(histoFile));
-      histoRemapper->setStretchModeAsString(stretchType, false);
+      histoRemapper->setStretchModeAsString(stretchType);
    }
    double imageScaleX=1.0;
    double imageScaleY=1.0;

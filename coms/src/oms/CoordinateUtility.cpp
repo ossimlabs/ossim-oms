@@ -4,9 +4,8 @@
 #include <ossim/base/ossimEllipsoidFactory.h>
 #include <ossim/base/ossimEllipsoid.h>
 #include <ossim/base/ossimDms.h>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include <iostream>
+#include <mutex>
 
 class oms::CoordinateUtility::PrivateData
 {
@@ -83,10 +82,10 @@ public:
    }
    void clearError()
    {
-      OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theMutex);
+      std::lock_guard<std::mutex> lock(theMutex);
       theLastError = "";
    }
-   OpenThreads::Mutex theMutex;
+   std::mutex theMutex;
    std::string theLastError;
 };
 
@@ -115,7 +114,7 @@ std::string oms::CoordinateUtility::convertLatLonToMgrs(double lat,
 {
    theData->clearError();
    std::string result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theData->theMutex);
+   std::lock_guard<std::mutex> lock(theData->theMutex);
    char mgrsResult[1024];
    const ossimEllipsoid* wgs84Ellipsoid = ossimEllipsoidFactory::instance()->wgs84();
    Set_OSSIM_MGRS_Parameters(wgs84Ellipsoid->a(),
@@ -137,7 +136,7 @@ ossimGpt oms::CoordinateUtility::convertMgrsToLatLon(const std::string& mgrsStri
 {
    theData->clearError();
    std::string result;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(theData->theMutex);
+   std::lock_guard<std::mutex> lock(theData->theMutex);
    const ossimEllipsoid* wgs84Ellipsoid = ossimEllipsoidFactory::instance()->wgs84();
    Set_OSSIM_MGRS_Parameters(wgs84Ellipsoid->a(),
                              wgs84Ellipsoid->flattening(),

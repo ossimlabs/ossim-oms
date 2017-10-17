@@ -16,20 +16,18 @@
 #include <ossim/base/ossimEnvironmentUtility.h>
 #include <ossim/init/ossimInit.h>
 #include <ossim/base/ossimNotify.h>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-
+#include <mutex>
 
 oms::Init* oms::Init::theInstance = 0;
-
+static std::mutex initMutex;
 oms::Init::~Init()
 {
 }
 
 oms::Init* oms::Init::instance()
 {
-   static OpenThreads::Mutex m;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m);
+   static std::mutex m;
+   std::lock_guard<std::mutex> lock(m);
 
    if (!theInstance)
    {
@@ -40,8 +38,7 @@ oms::Init* oms::Init::instance()
 
 int oms::Init::initialize(int argc, char* argv[])
 {
-   static OpenThreads::Mutex m;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m);
+   std::lock_guard<std::mutex> lock(initMutex);
 
    int result = argc;
    if(!theInitCalledFlag)
@@ -63,8 +60,7 @@ int oms::Init::initialize(int argc, char* argv[])
 
 void oms::Init::initialize()
 {
-   static OpenThreads::Mutex m;
-   OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m);
+   std::lock_guard<std::mutex> lock(initMutex);
    if(!theInitCalledFlag)
    {
       theInitCalledFlag = true;

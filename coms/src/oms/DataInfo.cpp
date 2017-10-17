@@ -2789,7 +2789,14 @@ void oms::DataInfo::getCloudCover( const ossimKeywordlist& kwl,
 
       if ( cloudCover.empty() )
       {
-         cloudCover = kwl.findKey( std::string("tiff.gdalmetadata.cloud_cover") );
+         // Profile for Imagery Access Image:
+         std::string key = "nitf.piaimc.cloudcvr";
+         cloudCover = kwl.findKey( key );
+         if ( cloudCover.empty() )
+         {
+            key = "tiff.gdalmetadata.cloud_cover";
+            cloudCover = kwl.findKey( key );
+         }
       }
    }
    
@@ -2937,6 +2944,11 @@ void oms::DataInfo::getGrazingAngle( const ossimKeywordlist& kwl,
             grazingAngle = kwl.findKey( keys[0].string() );
          }
 
+         if ( grazingAngle.empty() )
+         {
+            grazingAngle = kwl.findKey( std::string("tiff.gdalmetadata.view_angle") );
+         }
+
 #if 0 /* Removed 11 Sep 2015 (drb) */
          if ( grazingAngle.empty() )
          {
@@ -2989,13 +3001,20 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
       {
          imageId = kwl.findKey( keys[0].string() );
       }
-
+      
       if ( imageId.empty() )
       {
-         imageId = kwl.findKey( std::string("nitf.iid") );
+         std::string key = "nitf.iid2";
+         imageId = kwl.findKey( key );
          if ( imageId.empty() )
          {
-            imageId = kwl.findKey( std::string("tiff.gdalmetadata.id") ); 
+            key = "nitf.iid";
+            imageId = kwl.findKey( key );
+            if ( imageId.empty() )
+            {
+               key = "tiff.gdalmetadata.id";
+               imageId = kwl.findKey( key );
+            }
          }
       }
    }
