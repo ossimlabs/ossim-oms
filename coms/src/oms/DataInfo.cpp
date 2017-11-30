@@ -1556,6 +1556,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename navData =
    thePrivateData->theImageHandler->getFilename().path();
    ossimFilename metaData = navData.dirCat("Metadata");
+   navData = navData.dirCat("NavData");
    ossimFilename histogramFile =
    thePrivateData->theImageHandler->createDefaultHistogramFilename();
    ossimFilename
@@ -1569,7 +1570,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    thePrivateData->theImageHandler->createDefaultMetadataFilename();
    ossimFilename aDotToc = thePrivateData->theImageHandler->getFilename().file();
    ossimFilename baseName = thePrivateData->theImageHandler->getFilename();
-   navData = navData.dirCat("NavData");
+   
    coarseGridFile = coarseGridFile.setExtension("ocg");
    // we will only support for now kml files associated at the entire file level and
    // not individual entries.
