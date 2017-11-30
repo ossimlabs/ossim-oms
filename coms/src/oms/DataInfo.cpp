@@ -1556,7 +1556,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename navData =
    thePrivateData->theImageHandler->getFilename().path();
    ossimFilename metaData = navData.dirCat("Metadata");
-   ossimFilename navData2 = navData.path().dirCat("NavData");
    ossimFilename histogramFile =
    thePrivateData->theImageHandler->createDefaultHistogramFilename();
    ossimFilename
@@ -1669,14 +1668,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       outputString += indentation
          + "   <RasterEntryFile type=\"NavData\">" + separator
          + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(navData).string() + "</name>"
-         + separator + indentation + "   </RasterEntryFile>"
-         + separator;
-   }
-   if(navData2.exists())
-   {
-      outputString += indentation
-         + "   <RasterEntryFile type=\"NavData\">" + separator
-         + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(navData2).string() + "</name>"
          + separator + indentation + "   </RasterEntryFile>"
          + separator;
    }
