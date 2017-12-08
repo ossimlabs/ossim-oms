@@ -456,6 +456,19 @@ namespace oms
    };
 }
 
+void replaceSpacesInKeys(ossimKeywordlist& kwl)
+{
+   ossimKeywordlist newKwl;
+
+   for(auto entry:kwl.getMap())
+   {
+      newKwl.addPair(ossimString(entry.first).substitute(" ", "_", true).c_str(),
+                 entry.second);
+   }
+
+   kwl = newKwl;
+}
+
 oms::DataInfo::DataInfo() :
 thePrivateData(new oms::DataInfoPrivateData)
 {
@@ -1541,7 +1554,9 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename hdrFile =
    thePrivateData->theImageHandler->getFilename() + ".hdr";
    ossimFilename navData =
-   thePrivateData->theImageHandler->getFilename().path().dirCat("NavData");
+   thePrivateData->theImageHandler->getFilename().path();
+   ossimFilename metaData = navData.dirCat("Metadata");
+   navData = navData.dirCat("NavData");
    ossimFilename histogramFile =
    thePrivateData->theImageHandler->createDefaultHistogramFilename();
    ossimFilename
@@ -1560,6 +1575,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    // we will only support for now kml files associated at the entire file level and
    // not individual entries.
    //
+//std::cout <<"PATH1:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path() << "\n";
+//std::cout <<"PATH2:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path().path() << "\n";
 
    kmlFile = kmlFile.setExtension("kml");
    ossimFilename thumbnailFile = checkAndGetThumbnail(baseName);
@@ -1652,6 +1669,14 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       outputString += indentation
          + "   <RasterEntryFile type=\"NavData\">" + separator
          + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(navData).string() + "</name>"
+         + separator + indentation + "   </RasterEntryFile>"
+         + separator;
+   }
+   if(metaData.exists())
+   {
+      outputString += indentation
+         + "   <RasterEntryFile type=\"Metadata\">" + separator
+         + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(metaData).string() + "</name>"
          + separator + indentation + "   </RasterEntryFile>"
          + separator;
    }
@@ -2387,11 +2412,13 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       ossimKeywordlist kwl;
       ossimKeywordlist kwl2;
       ossimXmlOutputKeywordList kwl3;
+     // ossimKeywordlist kwl3;
       
       //info->print(std::cout);
       //      kwl.removeKeysThatMatch("[^.*image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) +
       //                              "]");
       info->getKeywordlist(kwl);
+      replaceSpacesInKeys(kwl);
       //std::cout << "___________________________\n";
       //std::cout << kwl << std::endl;
       //std::cout << "___________________________\n";
@@ -2887,10 +2914,10 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
          }
          if( dateValue.empty() )
          {
-            dateValue = kwl.findKey( std::string("envi.collection.start"));
+            dateValue = kwl.findKey( std::string("envi.collection_start"));
             if ( dateValue.empty() )
             {
-               dateValue = kwl.findKey(std::string("envi.collection.end"));
+               dateValue = kwl.findKey(std::string("envi.collection_end"));
             }
          }
       }
@@ -2910,6 +2937,11 @@ void oms::DataInfo::getDescription( const ossimKeywordlist& kwl,
    if ( description.empty() )
    {
       getIsorce( kwl, description ); // Not sure about this? (drb)
+   }
+
+   if(description.empty())
+   {
+      description = kwl.findKey( std::string("envi.description"));
    }
    
    if ( description.size() )
@@ -3376,7 +3408,10 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
          }
       }
    }
-
+   if(sensorId.empty())
+   {
+      sensorId = kwl.findKey( std::string("envi.sensor_type"));
+   }
    if ( sensorId.size() )
    {
       sensorId = ossimString( sensorId ).trim().string();
