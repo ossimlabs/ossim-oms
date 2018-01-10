@@ -3227,13 +3227,19 @@ void oms::DataInfo::getNiirs( const ossimKeywordlist& kwl,
 
       if ( niirs.empty())
       {
-         keys.clear();
-         ossimString regExp = "\\.niirs$"; // any tag ending in .niirs.
-         kwl.findAllKeysThatMatch( keys, regExp );
-         if ( keys.size() )
+         // NITF Exploitation Reference Data(CSEXRA): 
+         niirs = kwl.findKey( std::string("nitf.csexra.predicted_niirs") );
+         
+         if ( niirs.empty())
          {
-            // Taking first one...
-            niirs = kwl.findKey( keys[0].string() );
+            keys.clear();
+            ossimString regExp = "\\.niirs$"; // any tag ending in .niirs.
+            kwl.findAllKeysThatMatch( keys, regExp );
+            if ( keys.size() )
+            {
+               // Taking first one...
+               niirs = kwl.findKey( keys[0].string() );
+            }
          }
       }
    }
