@@ -6,6 +6,6 @@ The COMS half of this repository is built as part of the OSSIM suite of reposito
 
 ## Build Instructions for JOMS (the Java side)
 * cd oms/joms
-* (ontime setup)  cp local.properties.template local.properties
+* (one time setup)  cp local.properties.template local.properties
 * ant mvn-install
 * Should produce: $M2_REPO/org/ossim/joms/${OSSIM_VERSION}/joms-${OSSIM_VERSION}.jar and oms/joms/libjoms.${jnilib|so|dll}
