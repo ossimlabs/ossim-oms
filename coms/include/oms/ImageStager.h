@@ -65,18 +65,36 @@ namespace oms
 		 * override and force a true or false setting.
 		 */
 		void setHistogramStagingFlag(bool flag);
-		
+
 		/**
 		 * You can set the staging flag for overviews.  This allows you to manual override and
 		 * force a true or false setting.
 		 */
 		void setOverviewStagingFlag(bool flag);
 
+		/**
+		 * You can set the staging flag for thumbnail generation.  This allows you to manual override and
+		 * force a true or false setting.
+		 */
+		void setThumbnailStagingFlag(bool flag, int size = 512);
+
+		/**
+		 *  @param type can be jpeg or png.  If it's png it will output an alpha
+		 */ 
+		void setThumbnailType(const std::string& type="jpeg");
+
+		/**
+		 * @param type can be of type "none", "auto_minmax", "auto_percentile", "std-stretch-1",
+		 *        "std-stretch-2", "std-stretch-3"
+		 */
+		void setThumbnailStretchType(const std::string& type="auto_minmax");
+
 		void setOverviewType(const std::string& overviewType);
 		
 		void setCompressionType(const std::string& compressionType);
 
 		void setCompressionQuality(int compressionQuality);
+
 		/**
 		 * When setDaults is called it will automatically init the histogram filename to a default location.
 		 * if you want to override that location you can manually set the histogram filename.
@@ -98,9 +116,19 @@ namespace oms
 		 * @return the current histogram filename
 		 */
 		std::string getOverviewFilename()const;
-		
+
+		/**
+		 * Will set the thumbnail filename 
+		 */
+		void setThumbnailFilename(const std::string &file);
+
+		/**
+		 * @return the current thumbnail filename
+		 */
+		std::string getThumbnailFilename() const;
+
 		void disableAll();
-		
+
 		/**
 		 * Will look at the input file and try to determine what needs to be staged and enable the flag automatically.  It will also 
 		 * set the default locations to put the histogram file and opverview files, ... etc.
@@ -127,13 +155,15 @@ namespace oms
       bool buildAllOverviews();
       bool buildHistograms();
       bool buildAllHistograms();
+		bool buildThumbnail();
+		bool buildAllThumbnails();
 		/**
 		 * This will allow you to cancel the staging process
 		 */
 		void cancel();
 		
 	protected:
-		PrivateData* thePrivateData;
+		PrivateData* m_privateData;
 	};
 }
 
