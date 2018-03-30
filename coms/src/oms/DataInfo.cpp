@@ -1409,7 +1409,6 @@ void oms::DataInfo::appendRasterEntry( std::string& outputString,
                                        const std::string& indentation,
                                        const std::string& separator ) const
 {
-   
    ossimIrect rect = thePrivateData->theImageHandler->getBoundingRect();
    outputString += indentation + "<RasterEntry>" + separator;
    appendAssociatedRasterEntryFileObjects(outputString, indentation
@@ -1454,19 +1453,28 @@ void oms::DataInfo::appendRasterEntries(std::string& outputString,
       }
    }
 }
-std::string oms::DataInfo::checkAndGetThumbnail(const std::string& baseName)const
-{
-   ossimFilename baseNoExtension = ossimFilename(baseName).noExtension();
 
+std::string oms::DataInfo::checkAndGetThumbnail(const std::string &baseNoExtension) const
+{
    ossimFilename thumnailTest = baseNoExtension + "thumb.jpg";
-   if(thumnailTest.exists())
+   if (thumnailTest.exists())
    {
       return thumnailTest.string();
    }
    thumnailTest = baseNoExtension + "thumbnail.jpg";
-   if(thumnailTest.exists())
+   if (thumnailTest.exists())
    {
-      return thumnailTest.string();
+         return thumnailTest.string();
+   }
+   thumnailTest = baseNoExtension + "thumbnail.png";
+   if (thumnailTest.exists())
+   {
+         return thumnailTest.string();
+   }
+   thumnailTest = baseNoExtension + "thumb.png";
+   if (thumnailTest.exists())
+   {
+         return thumnailTest.string();
    }
    return "";
 }
@@ -1569,8 +1577,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename metadataFile =
    thePrivateData->theImageHandler->createDefaultMetadataFilename();
    ossimFilename aDotToc = thePrivateData->theImageHandler->getFilename().file();
-   ossimFilename baseName = thePrivateData->theImageHandler->getFilename();
-   
+   ossimFilename baseNoExtension = thePrivateData->theImageHandler->getFilenameWithThisExtension("");
+
    coarseGridFile = coarseGridFile.setExtension("ocg");
    // we will only support for now kml files associated at the entire file level and
    // not individual entries.
@@ -1579,7 +1587,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
 //std::cout <<"PATH2:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path().path() << "\n";
 
    kmlFile = kmlFile.setExtension("kml");
-   ossimFilename thumbnailFile = checkAndGetThumbnail(baseName);
+   ossimFilename thumbnailFile = checkAndGetThumbnail(baseNoExtension);
    //bool associatedFilesFlag = (thumbnailFile.exists() || overviewFile.exists() || overview2File.exists() || histogramFile.exists()
    //                            || validVerticesFile.exists() || geomFile.exists()
    //                            || metadataFile.exists()||kmlFile.exists()||navData.exists());
@@ -1587,7 +1595,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    //{
    outputString += indentation + "<fileObjects>" + separator;
       
-   if(thumbnailFile.exists())
+   if(!thumbnailFile.empty())
    {
       outputString += indentation
          + "   <RasterEntryFile type=\"thumbnail\">" + separator
