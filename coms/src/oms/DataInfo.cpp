@@ -8,6 +8,7 @@
 #include <ossim/base/ossimContainerProperty.h>
 #include <ossim/imaging/ossimImageHandlerRegistry.h>
 #include <ossim/imaging/ossimImageHandler.h>
+#include <ossim/imaging/ossimNitfTileSource.h>
 #include <ossim/projection/ossimProjectionFactoryRegistry.h>
 #include <ossim/projection/ossimProjection.h>
 #include <ossim/base/ossimGpt.h>
@@ -454,19 +455,6 @@ namespace oms
       ossimFilename                              theExternalVideoGeometryFile;
 #endif
    };
-}
-
-void replaceSpacesInKeys(ossimKeywordlist& kwl)
-{
-   ossimKeywordlist newKwl;
-
-   for(auto entry:kwl.getMap())
-   {
-      newKwl.addPair(ossimString(entry.first).substitute(" ", "_", true).c_str(),
-                 entry.second);
-   }
-
-   kwl = newKwl;
 }
 
 oms::DataInfo::DataInfo() :
@@ -1409,6 +1397,7 @@ void oms::DataInfo::appendRasterEntry( std::string& outputString,
                                        const std::string& indentation,
                                        const std::string& separator ) const
 {
+   
    ossimIrect rect = thePrivateData->theImageHandler->getBoundingRect();
    outputString += indentation + "<RasterEntry>" + separator;
    appendAssociatedRasterEntryFileObjects(outputString, indentation
@@ -1453,28 +1442,19 @@ void oms::DataInfo::appendRasterEntries(std::string& outputString,
       }
    }
 }
-
-std::string oms::DataInfo::checkAndGetThumbnail(const std::string &baseNoExtension) const
+std::string oms::DataInfo::checkAndGetThumbnail(const std::string& baseName)const
 {
+   ossimFilename baseNoExtension = ossimFilename(baseName).noExtension();
+
    ossimFilename thumnailTest = baseNoExtension + "thumb.jpg";
-   if (thumnailTest.exists())
+   if(thumnailTest.exists())
    {
       return thumnailTest.string();
    }
    thumnailTest = baseNoExtension + "thumbnail.jpg";
-   if (thumnailTest.exists())
+   if(thumnailTest.exists())
    {
-         return thumnailTest.string();
-   }
-   thumnailTest = baseNoExtension + "thumbnail.png";
-   if (thumnailTest.exists())
-   {
-         return thumnailTest.string();
-   }
-   thumnailTest = baseNoExtension + "thumb.png";
-   if (thumnailTest.exists())
-   {
-         return thumnailTest.string();
+      return thumnailTest.string();
    }
    return "";
 }
@@ -1562,9 +1542,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename hdrFile =
    thePrivateData->theImageHandler->getFilename() + ".hdr";
    ossimFilename navData =
-   thePrivateData->theImageHandler->getFilename().path();
-   ossimFilename metaData = navData.dirCat("Metadata");
-   navData = navData.dirCat("NavData");
+   thePrivateData->theImageHandler->getFilename().path().dirCat("NavData");
    ossimFilename histogramFile =
    thePrivateData->theImageHandler->createDefaultHistogramFilename();
    ossimFilename
@@ -1577,17 +1555,15 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename metadataFile =
    thePrivateData->theImageHandler->createDefaultMetadataFilename();
    ossimFilename aDotToc = thePrivateData->theImageHandler->getFilename().file();
-   ossimFilename baseNoExtension = thePrivateData->theImageHandler->getFilenameWithThisExtension("");
-
+   ossimFilename baseName = thePrivateData->theImageHandler->getFilename();
+   
    coarseGridFile = coarseGridFile.setExtension("ocg");
    // we will only support for now kml files associated at the entire file level and
    // not individual entries.
    //
-//std::cout <<"PATH1:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path() << "\n";
-//std::cout <<"PATH2:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path().path() << "\n";
 
    kmlFile = kmlFile.setExtension("kml");
-   ossimFilename thumbnailFile = checkAndGetThumbnail(baseNoExtension);
+   ossimFilename thumbnailFile = checkAndGetThumbnail(baseName);
    //bool associatedFilesFlag = (thumbnailFile.exists() || overviewFile.exists() || overview2File.exists() || histogramFile.exists()
    //                            || validVerticesFile.exists() || geomFile.exists()
    //                            || metadataFile.exists()||kmlFile.exists()||navData.exists());
@@ -1595,7 +1571,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    //{
    outputString += indentation + "<fileObjects>" + separator;
       
-   if(!thumbnailFile.empty())
+   if(thumbnailFile.exists())
    {
       outputString += indentation
          + "   <RasterEntryFile type=\"thumbnail\">" + separator
@@ -1677,14 +1653,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       outputString += indentation
          + "   <RasterEntryFile type=\"NavData\">" + separator
          + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(navData).string() + "</name>"
-         + separator + indentation + "   </RasterEntryFile>"
-         + separator;
-   }
-   if(metaData.exists())
-   {
-      outputString += indentation
-         + "   <RasterEntryFile type=\"Metadata\">" + separator
-         + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(metaData).string() + "</name>"
          + separator + indentation + "   </RasterEntryFile>"
          + separator;
    }
@@ -1819,12 +1787,13 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
       lr.changeDatum(wgs84.datum());
       ll.changeDatum(wgs84.datum());
 
-      std::string polyString;
+
       //std::cout <<"----------------GETTING FOOTPRINT--------------------\n";
       outputString += indentation + "<gsd unit=\"meters\" dx=\"" +
          ossimString::toString(gsd.x,15).string() + "\" dy=\"" +
          ossimString::toString(gsd.y,15).string() + "\"/>" + separator;
 
+      std::string polyString;
       if ( getWktFootprint( geom.get(), polyString ) )
       {
          groundGeometry += polyString;
@@ -2420,13 +2389,11 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       ossimKeywordlist kwl;
       ossimKeywordlist kwl2;
       ossimXmlOutputKeywordList kwl3;
-     // ossimKeywordlist kwl3;
       
       //info->print(std::cout);
       //      kwl.removeKeysThatMatch("[^.*image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) +
       //                              "]");
       info->getKeywordlist(kwl);
-      replaceSpacesInKeys(kwl);
       //std::cout << "___________________________\n";
       //std::cout << kwl << std::endl;
       //std::cout << "___________________________\n";
@@ -2450,6 +2417,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString cloudCover;
          ossimString imageRepresentation;
          ossimString isorce;
+         ossimString offNadirAngle;
          ossimString targetId;
          ossimString productId;
          ossimString sensorId;
@@ -2518,6 +2486,9 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // NIIRS:
          getNiirs( kwl3, niirs.string() );
 
+         // Off nadir angle:
+         getOffNadirAngle( kwl3, offNadirAngle.string() );
+
          // Organization:
          getOrganization( kwl3, organization.string() );
          
@@ -2578,7 +2549,9 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() +
             "</azimuthAngle>" + separator; 
          outputString += indentation + "   <grazingAngle>" + grazingAngle.string() +
-            "</grazingAngle>" + separator; 
+            "</grazingAngle>" + separator;
+                  outputString += indentation + "   <offNadirAngle>" + offNadirAngle.string() +
+            "</offNadirAngle>" + separator;
          outputString += indentation + "   <securityClassification>" +
             securityClassification.string() + "</securityClassification>" + separator; 
          outputString += indentation + "   <title>" + title.string() + "</title>" + separator; 
@@ -2649,11 +2622,28 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
 } // End:  oms::DataInfo::appendRasterEntryMetadata( ... )
 
-
 bool oms::DataInfo::getWktFootprint( const ossimImageGeometry* geom, std::string& s ) const
 {
    bool status = false;
-   if ( geom &&geom->getProjection())
+
+   //---
+   // Open the dot omd file if present as it can now have metadata in it.
+   // Takes precedent over footpring from geometry.
+   //
+   // TODO: Re-wire so we don't have to open the omd file in multiple places.
+   //---
+   ossimFilename omdFile;
+   getOmdFile( omdFile );
+   if ( omdFile.exists() )
+   {
+      ossimKeywordlist kwl(omdFile);
+      s = kwl.findKey( std::string("wkt_footprint") ); // omd file
+      if ( s.size() )
+      {
+         status = true;
+      }
+   }
+   if ( !status && geom && geom->getProjection())
    {
       ossimPolyArea2d polyArea;
 
@@ -2674,31 +2664,6 @@ bool oms::DataInfo::getWktFootprint( const ossimImageGeometry* geom, std::string
          s = polyArea.toString();
          status = true;
       }
-      // ossimKeywordlist kwl;
-      // if ( geom->saveState( kwl ) )
-      // {
-      //    s = kwl.findKey( std::string("projection.wkt_footprint") );
-      //    if ( s.size() )
-      //    {
-      //       status = true;
-      //    }
-      //    else
-      //    {
-      //       std::vector<ossimGpt> poly;
-      //       geom->localToWorld(ossimDpt(0,0), gpt);
-      //       poly.push_back(gpt);
-      //       geom->localToWorld(ossimDpt(w1, 0), gpt);
-      //       poly.push_back(gpt);
-      //       geom->localToWorld(ossimDpt(w1, h1), gpt);
-      //       poly.push_back(gpt);
-      //       geom->localToWorld(ossimDpt(0, h1), gpt);
-      //       poly.push_back(gpt);
-      //       poly.push_back(poly[0]);
-      //       ossimPolyArea2d polyArea(poly);
-      //       s = polyArea.toMultiPolygon().toString();
-      //       status = !s.empty();
-      //    }
-      // }
    }
    return status;
 }
@@ -2831,6 +2796,30 @@ void oms::DataInfo::getCloudCover( const ossimKeywordlist& kwl,
          {
             key = "tiff.gdalmetadata.cloud_cover";
             cloudCover = kwl.findKey( key );
+
+#if 0 /* tmp drb */
+            if ( cloudCover.empty() )
+            {
+               if( thePrivateData->theImageHandler.valid() )
+               {
+                  ossimNitfTileSource* obj =
+                     dynamic_cast<ossimNitfTileSource*>( thePrivateData->theImageHandler.get() );
+                  if ( obj )
+                  {
+                     //---
+                     // If the image handler is NITF:
+                     // NITF reader will compute cloud cover from CLOUD entry
+                     // if present. Returns -1.0 if not computed.
+                     //---
+                     ossim_float32 cc = obj->getComputedCloudCover();
+                     if ( cc != -1.0 )
+                     {
+                        cloudCover = ossimString::toString(cc).string();
+                     }
+                  }
+               }
+            }
+#endif
          }
       }
    }
@@ -2900,32 +2889,54 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
 
       if ( dateValue.empty() )
       {
-         ossimString tiffDate(kwl.find("tiff.date_time"));
-         if ( tiffDate.size() )
+         //---
+         // STDIDC Acquisition date:
+         // Have seen two forms: ACQUISITION_DATE(SPEC) and ACQDATE(DG data):
+         // test for both.
+         //---
+         dateValue = kwl.findKey( std::string("nitf.stdidc.acquisition_date") );
+         if ( dateValue.empty() )
          {
-            std::vector<ossimString> splitArray;
-            tiffDate.split(splitArray, " ");
-            if(splitArray.size() > 0)
+            dateValue = kwl.findKey( std::string("nitf.stdidc.acqdate") );
+         }
+         if ( dateValue.size() )
+         {
+            //---
+            // Convert from numeric form of: "CCYYMMDDhhmmss" to ISO 8601 form.
+            // This is in the same form as the IDATIM image header field.
+            // E.g.: 20180316051853 to 2018-03-16T05:18:53Z
+            //---
+            dateValue = convertIdatimToXmlDate( dateValue );
+         }
+         else
+         {
+            ossimString tiffDate(kwl.find("tiff.date_time"));
+            if ( tiffDate.size() )
             {
-               dateValue = splitArray[0].substitute(":", "-", true).string();
-               if(splitArray.size() > 1)
+               std::vector<ossimString> splitArray;
+               tiffDate.split(splitArray, " ");
+               if(splitArray.size() > 0)
                {
-                  dateValue += "T";
-                  dateValue += splitArray[1].string();
-                  dateValue += "Z";
-               }
-               else 
-               {
-                  dateValue += "T00:00:00Z";
+                  dateValue = splitArray[0].substitute(":", "-", true).string();
+                  if(splitArray.size() > 1)
+                  {
+                     dateValue += "T";
+                     dateValue += splitArray[1].string();
+                     dateValue += "Z";
+                  }
+                  else 
+                  {
+                     dateValue += "T00:00:00Z";
+                  }
                }
             }
          }
          if( dateValue.empty() )
          {
-            dateValue = kwl.findKey( std::string("envi.collection_start"));
+            dateValue = kwl.findKey( std::string("envi.collection.start"));
             if ( dateValue.empty() )
             {
-               dateValue = kwl.findKey(std::string("envi.collection_end"));
+               dateValue = kwl.findKey(std::string("envi.collection.end"));
             }
          }
       }
@@ -2934,7 +2945,7 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
    if ( dateValue.size() )
    {
       dateValue = ossimString( dateValue ).trim().string();
-   }   
+   }
    
 } // End: oms::DataInfo::getDate( ... )
 
@@ -2945,11 +2956,6 @@ void oms::DataInfo::getDescription( const ossimKeywordlist& kwl,
    if ( description.empty() )
    {
       getIsorce( kwl, description ); // Not sure about this? (drb)
-   }
-
-   if(description.empty())
-   {
-      description = kwl.findKey( std::string("envi.description"));
    }
    
    if ( description.size() )
@@ -2986,38 +2992,29 @@ void oms::DataInfo::getGrazingAngle( const ossimKeywordlist& kwl,
 
          if ( grazingAngle.empty() )
          {
-            grazingAngle = kwl.findKey( std::string("tiff.gdalmetadata.view_angle") );
-         }
-
-#if 0 /* Removed 11 Sep 2015 (drb) */
-         if ( grazingAngle.empty() )
-         {
-            keys.clear();
-            regExp = "common\\.obliquity_angle$";
-            kwl.findAllKeysThatMatch( keys, regExp );
-            if ( keys.size() )
+            // Exploitation Reference Data TRE(CSEXRA):
+            grazingAngle = kwl.findKey( std::string("nitf.csexra.obliquity_angle") );
+            if ( grazingAngle.empty() )
             {
-               grazingAngle = kwl.findKey( keys[0].string() );
+               // EXPLOITATION USABILITY TRE(USE00A)
+               grazingAngle = kwl.findKey( std::string("nitf.use00a.obl_ang") );
+               if ( grazingAngle.empty() )
+               {
+                  // Not to STDI-0002 Table D-2 spec but seen it in DG WV data...
+                  grazingAngle = kwl.findKey( std::string("nitf.use00a.oblang") );
+               }
             }
 
-            
-            // From old code that was commented out.
-            // ossimString tempAngleString =
-            // kwl.findKey( std::string("nitf.use00a.angletonorth") );
-            // if(!tempAngleString.empty())
-            // {
-            //    double tempAngle = tempAngleString.toDouble();
-            //    azimuthAngle = ossimString::toString(fmod(tempAngle+90.0, 360.0));
-            // }
-            grazingAngle = kwl.findKey( std::string("nitf.use00a.oblang") );
-            if ( grazingAngle.size() )
+            if ( grazingAngle.size() ) // grazing = 90 - obliquity;
             {
-               // ???
                double d = 90.0 - ossimString( grazingAngle ).toDouble();
                grazingAngle = ossimString::toString( d ).string();
             }
+            else
+            {
+               grazingAngle = kwl.findKey( std::string("tiff.gdalmetadata.view_angle") );
+            }
          }
-#endif 
       }
    }
    
@@ -3052,8 +3049,26 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
             imageId = kwl.findKey( key );
             if ( imageId.empty() )
             {
-               key = "tiff.gdalmetadata.id";
+               key = "nitf.ftitle";
                imageId = kwl.findKey( key );
+               if ( imageId.size() )
+               {
+                  ossimFilename f = imageId;
+                  imageId = f.fileNoExtension().string();
+               }
+               else
+               {
+                  key = "tiff.gdalmetadata.id";
+                  imageId = kwl.findKey( key );
+                  if ( imageId.empty() )
+                  {
+                     // Lastly use the filename:
+                     if ( thePrivateData )
+                     {
+                        imageId = thePrivateData->theFilename.fileNoExtension().string();
+                     }
+                  }
+               }
             }
          }
       }
@@ -3062,7 +3077,7 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
    if ( imageId.size() )
    {
       imageId = ossimString( imageId ).trim().string();
-   } 
+   }
 }
 
 void oms::DataInfo::getImageCategory( const ossimKeywordlist& kwl,
@@ -3231,8 +3246,8 @@ void oms::DataInfo::getNiirs( const ossimKeywordlist& kwl,
       {
          // Taking first one...
          niirs = kwl.findKey( keys[0].string() );
-      }      
-
+      }
+      
       if ( niirs.empty())
       {
          // NITF Exploitation Reference Data(CSEXRA): 
@@ -3258,6 +3273,30 @@ void oms::DataInfo::getNiirs( const ossimKeywordlist& kwl,
    }
    
 } // End: getNiirs( ... )
+
+void oms::DataInfo::getOffNadirAngle( const ossimKeywordlist& kwl,
+                                      std::string& offNadirAngle ) const
+{
+   offNadirAngle = kwl.findKey( std::string("off_nadir_angle") ); // omd file
+   if ( offNadirAngle.empty() )
+   {
+      // Normalized:
+      std::vector<ossimString> keys;
+      ossimString regExp = "common\\.off_nadir_angle$";
+      kwl.findAllKeysThatMatch( keys, regExp );
+      if ( keys.size() )
+      {
+         // Taking first one...
+         offNadirAngle = kwl.findKey( keys[0].string() );
+      }
+   }
+
+   if ( offNadirAngle.size() )
+   {
+      offNadirAngle = ossimString( offNadirAngle ).trim().string();
+   }
+
+} // End: getOffNadiAngle(...)
 
 void oms::DataInfo::getOrganization( const ossimKeywordlist& kwl,
                                   std::string& organization ) const
@@ -3422,10 +3461,7 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
          }
       }
    }
-   if(sensorId.empty())
-   {
-      sensorId = kwl.findKey( std::string("envi.sensor_type"));
-   }
+
    if ( sensorId.size() )
    {
       sensorId = ossimString( sensorId ).trim().string();
@@ -3469,17 +3505,31 @@ void oms::DataInfo::getSunAzimuth( const ossimKeywordlist& kwl,
 
       if ( sunAzimuth.empty())
       {
-         sunAzimuth = kwl.findKey( std::string("tiff.gdalmetadata.sun_azimuth") );
-
-         if ( sunAzimuth.empty() )
+         // Exploitation Reference Data TRE(CSEXRA):
+         sunAzimuth = kwl.findKey( std::string("nitf.csexra.sun_azimuth") );
+         if ( sunAzimuth.empty())
          {
-            keys.clear();
-            ossimString regExp = "\\.sun_az$"; // any tag ending in: ".sun_az"
-            kwl.findAllKeysThatMatch( keys, regExp );
-            if ( keys.size() )
+            // EXPLOITATION USABILITY TRE(USE00A)
+            sunAzimuth = kwl.findKey( std::string("nitf.use00a.sun_az") );
+            if ( sunAzimuth.empty())
             {
-               // Taking first one...
-               sunAzimuth = kwl.findKey( keys[0].string() );
+               // Not to STDI-0002 Table D-2 spec but seen it in DG WV data...
+               sunAzimuth = kwl.findKey( std::string("nitf.use00a.sunaz") );
+               if ( sunAzimuth.empty())
+               {
+                  sunAzimuth = kwl.findKey( std::string("tiff.gdalmetadata.sun_azimuth") );
+                  if ( sunAzimuth.empty() )
+                  {
+                     keys.clear();
+                     ossimString regExp = "\\.sun_az$"; // any tag ending in: ".sun_az"
+                     kwl.findAllKeysThatMatch( keys, regExp );
+                     if ( keys.size() )
+                     {
+                        // Taking first one...
+                        sunAzimuth = kwl.findKey( keys[0].string() );
+                     }
+                  }
+               }
             }
          }
       }
@@ -3508,19 +3558,33 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
          sunElevation = kwl.findKey( keys[0].string() );
       }      
       
-      if ( sunElevation.empty())
+      if ( sunElevation.empty() )
       {
-         sunElevation = kwl.findKey( std::string("tiff.gdalmetadata.sun_elevation") );
-         
+         // Exploitation Reference Data TRE(CSEXRA):
+         sunElevation = kwl.findKey( std::string("nitf.csexra.sun_elevation") );
          if ( sunElevation.empty() )
          {
-            keys.clear();
-            ossimString regExp = "\\.sun_el$"; // any tag ending in ".sun_el"
-            kwl.findAllKeysThatMatch( keys, regExp );
-            if ( keys.size() )
+            // EXPLOITATION USABILITY TRE(USE00A)
+            sunElevation = kwl.findKey( std::string("nitf.use00a.sun_el") );
+            if ( sunElevation.empty())
             {
-               // Taking first one...
-               sunElevation = kwl.findKey( keys[0].string() );
+               // Not to STDI-0002 Table D-2 spec but seen it in DG WV data...
+               sunElevation = kwl.findKey( std::string("nitf.use00a.sunel") );
+               if ( sunElevation.empty())
+               {
+                  sunElevation = kwl.findKey( std::string("tiff.gdalmetadata.sun_elevation") );
+                  if ( sunElevation.empty() )
+                  {
+                     keys.clear();
+                     ossimString regExp = "\\.sun_el$"; // any tag ending in ".sun_el"
+                     kwl.findAllKeysThatMatch( keys, regExp );
+                     if ( keys.size() )
+                     {
+                        // Taking first one...
+                        sunElevation = kwl.findKey( keys[0].string() );
+                     }
+                  }
+               }
             }
          }
       }
