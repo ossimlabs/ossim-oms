@@ -2450,6 +2450,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString cloudCover;
          ossimString imageRepresentation;
          ossimString isorce;
+         ossimString offNadirAngle;
          ossimString targetId;
          ossimString productId;
          ossimString sensorId;
@@ -2518,6 +2519,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // NIIRS:
          getNiirs( kwl3, niirs.string() );
 
+         getOffNadirAngle( kwl3, offNadirAngle.string() );
+         
          // Organization:
          getOrganization( kwl3, organization.string() );
          
@@ -2579,6 +2582,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             "</azimuthAngle>" + separator; 
          outputString += indentation + "   <grazingAngle>" + grazingAngle.string() +
             "</grazingAngle>" + separator; 
+         outputString += indentation + "   <offNadirAngle>" + offNadirAngle.string() + 
+            "</offNadirAngle>" + separator;
          outputString += indentation + "   <securityClassification>" +
             securityClassification.string() + "</securityClassification>" + separator; 
          outputString += indentation + "   <title>" + title.string() + "</title>" + separator; 
@@ -3279,6 +3284,31 @@ void oms::DataInfo::getOrganization( const ossimKeywordlist& kwl,
    }
    
 } // End: getOrganization( ... )
+
+void oms::DataInfo::getOffNadirAngle( const ossimKeywordlist& kwl,
+                                      std::string& offNadirAngle ) const
+{
+   offNadirAngle = kwl.findKey( std::string("off_nadir_angle") ); // omd file
+   if ( offNadirAngle.empty() )
+   {
+      // Normalized:
+      std::vector<ossimString> keys;
+      ossimString regExp = "common\\.off_nadir_angle$";
+      kwl.findAllKeysThatMatch( keys, regExp );
+      if ( keys.size() )
+      {
+         // Taking first one...
+         offNadirAngle = kwl.findKey( keys[0].string() );
+      }
+   }
+
+   if ( offNadirAngle.size() )
+   {
+      offNadirAngle = ossimString( offNadirAngle ).trim().string();
+   }
+
+} // End: getOffNadiAngle(...)
+
 
 void oms::DataInfo::getProductId( const ossimKeywordlist& kwl,
                                   std::string& productId ) const
