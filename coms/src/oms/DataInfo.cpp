@@ -2905,32 +2905,54 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
 
       if ( dateValue.empty() )
       {
-         ossimString tiffDate(kwl.find("tiff.date_time"));
-         if ( tiffDate.size() )
+         //---
+         // STDIDC Acquisition date:
+         // Have seen two forms: ACQUISITION_DATE(SPEC) and ACQDATE(DG data):
+         // test for both.
+         //---
+         dateValue = kwl.findKey( std::string("nitf.stdidc.acquisition_date") );
+         if ( dateValue.empty() )
          {
-            std::vector<ossimString> splitArray;
-            tiffDate.split(splitArray, " ");
-            if(splitArray.size() > 0)
+            dateValue = kwl.findKey( std::string("nitf.stdidc.acqdate") );
+         }
+         if ( dateValue.size() )
+         {
+            //---
+            // Convert from numeric form of: "CCYYMMDDhhmmss" to ISO 8601 form.
+            // This is in the same form as the IDATIM image header field.
+            // E.g.: 20180316051853 to 2018-03-16T05:18:53Z
+            //---
+            dateValue = convertIdatimToXmlDate( dateValue );
+         }
+         else
+         {
+            ossimString tiffDate(kwl.find("tiff.date_time"));
+            if ( tiffDate.size() )
             {
-               dateValue = splitArray[0].substitute(":", "-", true).string();
-               if(splitArray.size() > 1)
+               std::vector<ossimString> splitArray;
+               tiffDate.split(splitArray, " ");
+               if(splitArray.size() > 0)
                {
-                  dateValue += "T";
-                  dateValue += splitArray[1].string();
-                  dateValue += "Z";
-               }
-               else 
-               {
-                  dateValue += "T00:00:00Z";
+                  dateValue = splitArray[0].substitute(":", "-", true).string();
+                  if(splitArray.size() > 1)
+                  {
+                     dateValue += "T";
+                     dateValue += splitArray[1].string();
+                     dateValue += "Z";
+                  }
+                  else 
+                  {
+                     dateValue += "T00:00:00Z";
+                  }
                }
             }
          }
          if( dateValue.empty() )
          {
-            dateValue = kwl.findKey( std::string("envi.collection_start"));
+            dateValue = kwl.findKey( std::string("envi.collection.start"));
             if ( dateValue.empty() )
             {
-               dateValue = kwl.findKey(std::string("envi.collection_end"));
+               dateValue = kwl.findKey(std::string("envi.collection.end"));
             }
          }
       }
@@ -2939,7 +2961,7 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
    if ( dateValue.size() )
    {
       dateValue = ossimString( dateValue ).trim().string();
-   }   
+   }
    
 } // End: oms::DataInfo::getDate( ... )
 
