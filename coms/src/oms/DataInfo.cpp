@@ -2581,8 +2581,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() +
             "</azimuthAngle>" + separator; 
          outputString += indentation + "   <grazingAngle>" + grazingAngle.string() +
-            "</grazingAngle>" + separator; 
-         outputString += indentation + "   <offNadirAngle>" + offNadirAngle.string() + 
+            "</grazingAngle>" + separator;
+                  outputString += indentation + "   <offNadirAngle>" + offNadirAngle.string() +
             "</offNadirAngle>" + separator;
          outputString += indentation + "   <securityClassification>" +
             securityClassification.string() + "</securityClassification>" + separator; 
@@ -3057,8 +3057,26 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
             imageId = kwl.findKey( key );
             if ( imageId.empty() )
             {
-               key = "tiff.gdalmetadata.id";
+               key = "nitf.ftitle";
                imageId = kwl.findKey( key );
+               if ( imageId.size() )
+               {
+                  ossimFilename f = imageId;
+                  imageId = f.fileNoExtension().string();
+               }
+               else
+               {
+                  key = "tiff.gdalmetadata.id";
+                  imageId = kwl.findKey( key );
+                  if ( imageId.empty() )
+                  {
+                     // Lastly use the filename:
+                     if ( thePrivateData )
+                     {
+                        imageId = thePrivateData->theFilename.fileNoExtension().string();
+                     }
+                  }
+               }
             }
          }
       }
@@ -3067,7 +3085,7 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
    if ( imageId.size() )
    {
       imageId = ossimString( imageId ).trim().string();
-   } 
+   }
 }
 
 void oms::DataInfo::getImageCategory( const ossimKeywordlist& kwl,
