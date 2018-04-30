@@ -2450,6 +2450,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString cloudCover;
          ossimString imageRepresentation;
          ossimString isorce;
+         ossimString offNadirAngle;
          ossimString targetId;
          ossimString productId;
          ossimString sensorId;
@@ -2518,6 +2519,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // NIIRS:
          getNiirs( kwl3, niirs.string() );
 
+         getOffNadirAngle( kwl3, offNadirAngle.string() );
+         
          // Organization:
          getOrganization( kwl3, organization.string() );
          
@@ -2578,7 +2581,9 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() +
             "</azimuthAngle>" + separator; 
          outputString += indentation + "   <grazingAngle>" + grazingAngle.string() +
-            "</grazingAngle>" + separator; 
+            "</grazingAngle>" + separator;
+                  outputString += indentation + "   <offNadirAngle>" + offNadirAngle.string() +
+            "</offNadirAngle>" + separator;
          outputString += indentation + "   <securityClassification>" +
             securityClassification.string() + "</securityClassification>" + separator; 
          outputString += indentation + "   <title>" + title.string() + "</title>" + separator; 
@@ -2900,32 +2905,54 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
 
       if ( dateValue.empty() )
       {
-         ossimString tiffDate(kwl.find("tiff.date_time"));
-         if ( tiffDate.size() )
+         //---
+         // STDIDC Acquisition date:
+         // Have seen two forms: ACQUISITION_DATE(SPEC) and ACQDATE(DG data):
+         // test for both.
+         //---
+         dateValue = kwl.findKey( std::string("nitf.stdidc.acquisition_date") );
+         if ( dateValue.empty() )
          {
-            std::vector<ossimString> splitArray;
-            tiffDate.split(splitArray, " ");
-            if(splitArray.size() > 0)
+            dateValue = kwl.findKey( std::string("nitf.stdidc.acqdate") );
+         }
+         if ( dateValue.size() )
+         {
+            //---
+            // Convert from numeric form of: "CCYYMMDDhhmmss" to ISO 8601 form.
+            // This is in the same form as the IDATIM image header field.
+            // E.g.: 20180316051853 to 2018-03-16T05:18:53Z
+            //---
+            dateValue = convertIdatimToXmlDate( dateValue );
+         }
+         else
+         {
+            ossimString tiffDate(kwl.find("tiff.date_time"));
+            if ( tiffDate.size() )
             {
-               dateValue = splitArray[0].substitute(":", "-", true).string();
-               if(splitArray.size() > 1)
+               std::vector<ossimString> splitArray;
+               tiffDate.split(splitArray, " ");
+               if(splitArray.size() > 0)
                {
-                  dateValue += "T";
-                  dateValue += splitArray[1].string();
-                  dateValue += "Z";
-               }
-               else 
-               {
-                  dateValue += "T00:00:00Z";
+                  dateValue = splitArray[0].substitute(":", "-", true).string();
+                  if(splitArray.size() > 1)
+                  {
+                     dateValue += "T";
+                     dateValue += splitArray[1].string();
+                     dateValue += "Z";
+                  }
+                  else 
+                  {
+                     dateValue += "T00:00:00Z";
+                  }
                }
             }
          }
          if( dateValue.empty() )
          {
-            dateValue = kwl.findKey( std::string("envi.collection_start"));
+            dateValue = kwl.findKey( std::string("envi.collection.start"));
             if ( dateValue.empty() )
             {
-               dateValue = kwl.findKey(std::string("envi.collection_end"));
+               dateValue = kwl.findKey(std::string("envi.collection.end"));
             }
          }
       }
@@ -2934,7 +2961,7 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
    if ( dateValue.size() )
    {
       dateValue = ossimString( dateValue ).trim().string();
-   }   
+   }
    
 } // End: oms::DataInfo::getDate( ... )
 
@@ -3052,8 +3079,26 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
             imageId = kwl.findKey( key );
             if ( imageId.empty() )
             {
-               key = "tiff.gdalmetadata.id";
+               key = "nitf.ftitle";
                imageId = kwl.findKey( key );
+               if ( imageId.size() )
+               {
+                  ossimFilename f = imageId;
+                  imageId = f.fileNoExtension().string();
+               }
+               else
+               {
+                  key = "tiff.gdalmetadata.id";
+                  imageId = kwl.findKey( key );
+                  if ( imageId.empty() )
+                  {
+                     // Lastly use the filename:
+                     if ( thePrivateData )
+                     {
+                        imageId = thePrivateData->theFilename.fileNoExtension().string();
+                     }
+                  }
+               }
             }
          }
       }
@@ -3062,7 +3107,7 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
    if ( imageId.size() )
    {
       imageId = ossimString( imageId ).trim().string();
-   } 
+   }
 }
 
 void oms::DataInfo::getImageCategory( const ossimKeywordlist& kwl,
@@ -3279,6 +3324,31 @@ void oms::DataInfo::getOrganization( const ossimKeywordlist& kwl,
    }
    
 } // End: getOrganization( ... )
+
+void oms::DataInfo::getOffNadirAngle( const ossimKeywordlist& kwl,
+                                      std::string& offNadirAngle ) const
+{
+   offNadirAngle = kwl.findKey( std::string("off_nadir_angle") ); // omd file
+   if ( offNadirAngle.empty() )
+   {
+      // Normalized:
+      std::vector<ossimString> keys;
+      ossimString regExp = "common\\.off_nadir_angle$";
+      kwl.findAllKeysThatMatch( keys, regExp );
+      if ( keys.size() )
+      {
+         // Taking first one...
+         offNadirAngle = kwl.findKey( keys[0].string() );
+      }
+   }
+
+   if ( offNadirAngle.size() )
+   {
+      offNadirAngle = ossimString( offNadirAngle ).trim().string();
+   }
+
+} // End: getOffNadiAngle(...)
+
 
 void oms::DataInfo::getProductId( const ossimKeywordlist& kwl,
                                   std::string& productId ) const

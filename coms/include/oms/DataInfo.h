@@ -198,6 +198,15 @@ namespace oms
        */
       void getNiirs( const ossimKeywordlist& kwl,
                      std::string& niirs ) const;
+
+      /**
+       * @brief Gets off nadir angle from keyword list.
+       * @param kwl Keyword list to query.
+       * @param offNadirAngle Initialized by this.
+       */
+      void getOffNadirAngle( const ossimKeywordlist& kwl,
+                             std::string& offNadirAngle ) const;
+
       /**
        * @brief Gets organization from keyword list.
        * @param kwl Keyword list to query.
