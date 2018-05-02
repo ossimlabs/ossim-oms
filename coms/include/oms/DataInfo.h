@@ -238,6 +238,15 @@ namespace oms
          const ossimKeywordlist& kwl,
          std::string& securityClassification ) const;
 
+      
+      /**
+       * @brief Gets the security code (fscltx tag for NITF)
+       * @param kwl Keyword list to query
+       * @param securityCode Returned security code.  Empty if not available
+       */
+      void getSecurityCode(const ossimKeywordlist& kwl,
+                           std::string& securityCode)const;
+
       /**
        * @brief Gets stip ID from keyword list.
        * @param kwl Keyword list to query.
