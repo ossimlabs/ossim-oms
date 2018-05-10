@@ -2921,6 +2921,11 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
          {
             dateValue = kwl.findKey( std::string("nitf.stdidc.acqdate") );
          }
+         if(dateValue.empty())
+         {
+            dateValue = kwl.findKey( std::string("nitf.idatim") );
+
+         }
          if ( dateValue.size() )
          {
             //---
