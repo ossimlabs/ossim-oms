@@ -17,14 +17,14 @@ if [ -z "$GROOVY_HOME" ]; then
       sdk use groovy $GROOVY_VERSION
    fi
 fi
-
-ant clean mvn-deploy
+ant clean
+ant mvn-deploy
 antReturnCode=$?
+
 if [ $antReturnCode -ne 0 ];then
     echo "BUILD ERROR: ant failed dist mvn-install build..."
+    popd >/dev/null
     exit 1;
-else
-    exit 0;
 fi
  
 popd >/dev/null

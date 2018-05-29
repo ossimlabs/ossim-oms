@@ -2460,6 +2460,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString azimuthAngle;
          ossimString grazingAngle;
          ossimString securityClassification;
+         ossimString securityCode;
          ossimString stripId;
          ossimString sunElevation;
          ossimString sunAzimuth;
@@ -2530,6 +2531,9 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // Security classification:
          getSecurityClassification( kwl3, securityClassification.string() );
 
+         // Security code
+         getSecurityCode( kwl3, securityCode.string() );
+
          // Sensor:
          getSensorId( kwl3, sensorId.string() );
 
@@ -2586,6 +2590,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             "</offNadirAngle>" + separator;
          outputString += indentation + "   <securityClassification>" +
             securityClassification.string() + "</securityClassification>" + separator; 
+         outputString += indentation + "   <securityCode>" +
+            securityCode.string() + "</securityCode>" + separator; 
          outputString += indentation + "   <title>" + title.string() + "</title>" + separator; 
          outputString += indentation + "   <organization>" + organization.string() +
             "</organization>" + separator; 
@@ -2914,6 +2920,11 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
          if ( dateValue.empty() )
          {
             dateValue = kwl.findKey( std::string("nitf.stdidc.acqdate") );
+         }
+         if(dateValue.empty())
+         {
+            dateValue = kwl.findKey( std::string("nitf.idatim") );
+
          }
          if ( dateValue.size() )
          {
@@ -3475,6 +3486,50 @@ void oms::DataInfo::getSecurityClassification( const ossimKeywordlist& kwl,
       } 
    }
 }
+void oms::DataInfo::getSecurityCode(const ossimKeywordlist& kwl,
+                                    std::string& securityCode)const
+{
+   
+   securityCode.clear();
+   // Look for normalized key first, could be from omd file:
+   std::string key = "security_code";
+   securityCode = kwl.findKey( key );
+   if ( securityCode.empty() )
+   {
+      key = "nitf.fscltx";
+      securityCode = kwl.findKey( key );
+      if(securityCode.empty())
+      {
+         // tfrd common:
+         key = "tfrd.common.securityCode";
+         securityCode = kwl.findKey( key );
+         if ( securityCode.empty() )
+         {  
+            // rpf
+            key = "nitf.rpf.SecurityCode";
+            securityCode = kwl.findKey( key );
+            if ( securityCode.empty() )
+            {
+               // dted:
+               key = "dted.dsi.security_code";
+               securityCode = kwl.findKey( key );
+            }
+         }
+      }
+   }
+   ossimString tempSecurityCode =  securityCode;
+   tempSecurityCode = tempSecurityCode.downcase();
+   // test if it was some kind of SIC code
+   ossimKeywordlist tempKwl;
+   tempKwl.parseString(tempSecurityCode);
+   ossimString sicCode;
+   sicCode = tempKwl.findKey("sic");
+   if(!sicCode.empty())
+   {
+      securityCode = sicCode.string();
+   }     
+}
+
 
 void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
                                  std::string& sensorId ) const

@@ -429,6 +429,9 @@
         <exec executable="mvn">
             <arg value="deploy:deploy-file"/>
             <!-- <arg value="-X"/> -->
+            <arg value="-Dmaven.wagon.http.ssl.insecure=true"/>
+            <arg value="-Dmaven.wagon.http.ssl.allowall=true"/>
+            <arg value="-Dmaven.wagon.http.ssl.ignore.validity.dates=true"/>
             <arg value="-Durl=${artifactory.url}"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
             <arg value="-DrepositoryId=${artifactory.repoId}"/>
