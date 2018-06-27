@@ -157,6 +157,7 @@ public:
     builderProp->setProperty(ossimKeywordNames::COMPRESSION_QUALITY_KW, ossimString::toString(m_compressionQuality));
     builder->setInputSource(m_handler.get());
 
+    m_currentProcessInterface = builder.get();
     builder->addListener((ossimProcessListener *)this);
     if (m_quietFlag)
     {
@@ -175,7 +176,6 @@ public:
     if (m_overviewFilename.path().isWriteable())
     {
       result = true;
-      m_currentProcessInterface = builder.get();
       builder->setOutputFile(m_overviewFilename);
       builder->execute();
     }
