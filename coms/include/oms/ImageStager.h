@@ -165,7 +165,7 @@ namespace oms
 		/**
 		 * This will allow you to test if the process was canceled
 		 */
-		bool isCanceled()const;
+		bool isCancelled()const;
 
 	 protected:
 		PrivateData* m_privateData;

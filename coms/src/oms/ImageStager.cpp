@@ -56,7 +56,7 @@ public:
     m_cancelFlag = true;
   }
 
-  bool isCanceled() const
+  bool isCancelled() const
   {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_cancelFlag;
@@ -337,7 +337,7 @@ public:
   }
   virtual void processProgressEvent(ossimProcessProgressEvent & /* event */)
   {
-    if (isCanceled())
+    if (isCancelled())
     {
       if (m_currentProcessInterface)
       {
@@ -609,7 +609,7 @@ bool oms::ImageStager::stage()
   }
   if (!m_privateData->m_stageOverviewFlag &&
       m_privateData->m_stageHistogramFlag &&
-      !m_privateData->isCanceled())
+      !m_privateData->isCancelled())
   {
     status = m_privateData->buildHistograms();
   }
@@ -653,7 +653,7 @@ bool oms::ImageStager::buildHistograms()
 {
   bool status = false;
 
-  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCanceled())
+  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCancelled())
   {
     status = m_privateData->buildHistograms();
   }
@@ -679,7 +679,7 @@ bool oms::ImageStager::buildThumbnail()
 {
   bool status = false;
 
-  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCanceled())
+  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCancelled())
   {
     status = m_privateData->buildThumbnail();
   }
@@ -719,9 +719,9 @@ void oms::ImageStager::cancel()
   m_privateData->cancel();
 }
 
-bool oms::ImageStager::isCanceled()const
+bool oms::ImageStager::isCancelled()const
 {
-  return m_privateData->isCanceled();
+  return m_privateData->isCancelled();
 }
 
 bool oms::ImageStager::stageAll()
