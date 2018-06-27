@@ -32,7 +32,7 @@
     <echo message="os.name = ${os.name}"/>
     <echo message="osg.home = ${osg.home}"/>
     <echo message="user.home = ${user.home}"/>
-    <artifact:remoteRepository id="remote.repository" url="${env.OSSIM_MAVEN_PROXY}" />
+    <artifact:remoteRepository id="remote.repository" url="${env.ARTIFACTORY_URL}" />
 
     <artifact:dependencies filesetId="dependency.fileset">
       <remoteRepository refid="remote.repository" />
