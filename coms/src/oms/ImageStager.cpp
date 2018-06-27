@@ -157,11 +157,8 @@ public:
     builderProp->setProperty(ossimKeywordNames::COMPRESSION_QUALITY_KW, ossimString::toString(m_compressionQuality));
     builder->setInputSource(m_handler.get());
 
-    if (!m_quietFlag)
-    {
-      builder->addListener((ossimProcessListener *)this);
-    }
-    else
+    builder->addListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //    ossimPushNotifyFlags();
       //   ossimDisableNotify();
@@ -183,11 +180,8 @@ public:
       builder->execute();
     }
 
-    if (!m_quietFlag)
-    {
-      builder->removeListener((ossimProcessListener *)this);
-    }
-    else
+    builder->removeListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //  ossimPopNotifyFlags();
     }
@@ -220,22 +214,16 @@ public:
     writer->connectMyInputTo(0, histoSource.get());
 
     writer->setFilename(m_histogramFilename);
-    if (!m_quietFlag)
-    {
-      writer->addListener((ossimProcessListener *)this);
-    }
-    else
+    writer->addListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //ossimPushNotifyFlags();
       //ossimDisableNotify();
     }
     m_currentProcessInterface = writer.get();
     writer->execute();
-    if (!m_quietFlag)
-    {
-      writer->removeListener((ossimProcessListener *)this);
-    }
-    else
+    writer->removeListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //ossimPopNotifyFlags();
     }
@@ -729,6 +717,11 @@ bool oms::ImageStager::hasHistograms() const
 void oms::ImageStager::cancel()
 {
   m_privateData->cancel();
+}
+
+bool oms::ImageStager::isCanceled()const
+{
+  return m_privateData->isCanceled();
 }
 
 bool oms::ImageStager::stageAll()
