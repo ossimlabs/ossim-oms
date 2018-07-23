@@ -161,8 +161,13 @@ namespace oms
 		 * This will allow you to cancel the staging process
 		 */
 		void cancel();
-		
-	protected:
+
+		/**
+		 * This will allow you to test if the process was canceled
+		 */
+		bool isCancelled()const;
+
+	 protected:
 		PrivateData* m_privateData;
 	};
 }

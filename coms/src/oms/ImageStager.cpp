@@ -56,7 +56,7 @@ public:
     m_cancelFlag = true;
   }
 
-  bool isCanceled() const
+  bool isCancelled() const
   {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_cancelFlag;
@@ -157,11 +157,9 @@ public:
     builderProp->setProperty(ossimKeywordNames::COMPRESSION_QUALITY_KW, ossimString::toString(m_compressionQuality));
     builder->setInputSource(m_handler.get());
 
-    if (!m_quietFlag)
-    {
-      builder->addListener((ossimProcessListener *)this);
-    }
-    else
+    m_currentProcessInterface = builder.get();
+    builder->addListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //    ossimPushNotifyFlags();
       //   ossimDisableNotify();
@@ -178,16 +176,12 @@ public:
     if (m_overviewFilename.path().isWriteable())
     {
       result = true;
-      m_currentProcessInterface = builder.get();
       builder->setOutputFile(m_overviewFilename);
       builder->execute();
     }
 
-    if (!m_quietFlag)
-    {
-      builder->removeListener((ossimProcessListener *)this);
-    }
-    else
+    builder->removeListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //  ossimPopNotifyFlags();
     }
@@ -220,22 +214,16 @@ public:
     writer->connectMyInputTo(0, histoSource.get());
 
     writer->setFilename(m_histogramFilename);
-    if (!m_quietFlag)
-    {
-      writer->addListener((ossimProcessListener *)this);
-    }
-    else
+    writer->addListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //ossimPushNotifyFlags();
       //ossimDisableNotify();
     }
     m_currentProcessInterface = writer.get();
     writer->execute();
-    if (!m_quietFlag)
-    {
-      writer->removeListener((ossimProcessListener *)this);
-    }
-    else
+    writer->removeListener((ossimProcessListener *)this);
+    if (m_quietFlag)
     {
       //ossimPopNotifyFlags();
     }
@@ -349,7 +337,7 @@ public:
   }
   virtual void processProgressEvent(ossimProcessProgressEvent & /* event */)
   {
-    if (isCanceled())
+    if (isCancelled())
     {
       if (m_currentProcessInterface)
       {
@@ -621,7 +609,7 @@ bool oms::ImageStager::stage()
   }
   if (!m_privateData->m_stageOverviewFlag &&
       m_privateData->m_stageHistogramFlag &&
-      !m_privateData->isCanceled())
+      !m_privateData->isCancelled())
   {
     status = m_privateData->buildHistograms();
   }
@@ -665,7 +653,7 @@ bool oms::ImageStager::buildHistograms()
 {
   bool status = false;
 
-  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCanceled())
+  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCancelled())
   {
     status = m_privateData->buildHistograms();
   }
@@ -691,7 +679,7 @@ bool oms::ImageStager::buildThumbnail()
 {
   bool status = false;
 
-  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCanceled())
+  if (m_privateData->m_stageHistogramFlag && !m_privateData->isCancelled())
   {
     status = m_privateData->buildThumbnail();
   }
@@ -729,6 +717,11 @@ bool oms::ImageStager::hasHistograms() const
 void oms::ImageStager::cancel()
 {
   m_privateData->cancel();
+}
+
+bool oms::ImageStager::isCancelled()const
+{
+  return m_privateData->isCancelled();
 }
 
 bool oms::ImageStager::stageAll()
