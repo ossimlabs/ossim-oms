@@ -30,9 +30,9 @@ namespace oms
        *
        * @param filename the file to stage
 		 */
-		bool open(const std::string& filename);
-		
-      unsigned int getNumberOfEntries()const;
+		bool open(const std::string &filename, bool failIfNoGeometryFlag = false);
+
+		unsigned int getNumberOfEntries()const;
       
       bool setEntry(ossim_uint32 entryId);
       
