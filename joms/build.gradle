@@ -1,61 +1,62 @@
 
 plugins {
-  id "net.tribe-seven.swig" version "0.1.1"
+//  id "net.tribe-seven.swig" version "0.1.1"
 }
 
-import net.tribe7.gradle.swig.task.SwigTask
-import org.gradle.internal.os.OperatingSystem
+//import net.tribe7.gradle.swig.task.SwigTask
+//import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'java'
+apply plugin: 'maven'
 
-defaultTasks 'cleanUp', 'cpptasksCompile'
+defaultTasks 'uploadArchives'
 
-task generateWrappers(type: SwigTask) {
-  verbose = true
-  enableCpp = true
-  symbols = ['Wall']
-  module = 'joms'
-  packageName = 'joms.oms'
-  source = 'swig/oms.i' as File
-  wrapperTargetFile = 'swig/oms_wrap.cxx' as File
-  javaSourcesPath = 'gensrc/joms/oms' as File
-  includePaths = [
-    "${System.getenv('OSSIM_DEV_HOME')}/ossim-oms/coms/include" as File,
-    "${System.getenv('OSSIM_HOME')}/include" as File
-  ]
-}
+// task generateWrappers(type: SwigTask) {
+//   verbose = true
+//   enableCpp = true
+//   symbols = ['Wall']
+//   module = 'joms'
+//   packageName = 'joms.oms'
+//   source = 'swig/oms.i' as File
+//   wrapperTargetFile = 'swig/oms_wrap.cxx' as File
+//   javaSourcesPath = 'gensrc/joms/oms' as File
+//   includePaths = [
+//     "${System.getenv('OSSIM_DEV_HOME')}/ossim-oms/coms/include" as File,
+//     "${System.getenv('OSSIM_HOME')}/include" as File
+//   ]
+// }
 
 
-task cleanUp() {
-  doLast {
-    delete 'build', 'gensrc', 'swig/oms_wrap.h', 'swig/oms_wrap.cxx'
-  }
-}
+// task cleanUp() {
+//   doLast {
+//     delete 'build', 'gensrc', 'swig/oms_wrap.h', 'swig/oms_wrap.cxx'
+//   }
+// }
 
-task compileWrappers(type: JavaCompile, dependsOn: 'generateWrappers') {
-  source = fileTree(dir: 'gensrc', include: '**/*.java') + fileTree(dir: 'src', include: '**/*.java', exclude: '**/RasterEngineTest.java')
-  destinationDir = 'build' as File
-  classpath = files('build')
-  sourceCompatibility = '1.6'
-  targetCompatibility = '1.6'
-}
+// task compileWrappers(type: JavaCompile, dependsOn: 'generateWrappers') {
+//   source = fileTree(dir: 'gensrc', include: '**/*.java') + fileTree(dir: 'src', include: '**/*.java', exclude: '**/RasterEngineTest.java')
+//   destinationDir = 'build' as File
+//   classpath = files('build')
+//   sourceCompatibility = '1.6'
+//   targetCompatibility = '1.6'
+// }
 
-task copyResources(type: Copy, dependsOn: 'compileWrappers') {
-  from  'src/java/META-INF'
-  into  'build/META-INF'
-}
+//task copyResources(type: Copy, dependsOn: 'compileWrappers') {
+//  from  'src/java/META-INF'
+//  into  'build/META-INF'
+//}
 
-task createJar(type: Jar, dependsOn: 'copyResources') {
-  version = System.getenv('OSSIM_VERSION') + '-SNAPSHOT'
-  baseName = 'joms'
-  destinationDir = 'build' as File
-  from  fileTree(dir: 'build', include: 'META-INF/**') + fileTree(dir: 'build', include: 'joms/**') + fileTree(dir: 'build', include: 'org/**')
-}
+//task createJar(type: Jar, dependsOn: 'copyResources') {
+ // version = System.getenv('OSSIM_VERSION') + '-SNAPSHOT'
+//  baseName = 'joms'
+//  destinationDir = 'build' as File
+//  from  fileTree(dir: 'build', include: 'META-INF/**') + fileTree(dir: 'build', include: 'joms/**') + fileTree(dir: 'build', include: 'org/**')/
+//}
 
-configurations {
-  antContrib
-  cpptasks
-}
+// configurations {
+//   antContrib
+//   cpptasks
+// }
 
 repositories {
    mavenLocal()
@@ -63,81 +64,104 @@ repositories {
 }
 
 dependencies {
-  antContrib group: 'ant-contrib', name: 'ant-contrib', version: '1.0b3'
-  cpptasks group: 'ant-contrib', name: 'cpptasks', version: '1.0b5'
+//  antContrib group: 'ant-contrib', name: 'ant-contrib', version: '1.0b3'
+//  cpptasks group: 'ant-contrib', name: 'cpptasks', version: '1.0b5'
 }
 
-task cpptasksCompile(dependsOn: 'createJar') {
-  def moduleName = 'joms'
-  def ossimBuildDir = System.getenv('OSSIM_BUILD_DIR')
-  def ossimInstallPrefix = System.getenv('OSSIM_INSTALL_PREFIX')
-  def ossimDependenciesDir = System.getenv('OSSIM_DEPENDENCIES')
-  def javaHome = System.getenv('JAVA_HOME')
-  def platform
+// task cpptasksCompile(dependsOn: 'createJar') {
+//   def moduleName = 'joms'
+//   def ossimBuildDir = System.getenv('OSSIM_BUILD_DIR')
+//   def ossimInstallPrefix = System.getenv('OSSIM_INSTALL_PREFIX')
+//   def ossimDependenciesDir = System.getenv('OSSIM_DEPENDENCIES')
+//   def javaHome = System.getenv('JAVA_HOME')
+//   def platform
 
-  if ( OperatingSystem.current().isMacOsX() ) {
-    platform = 'darwin'
-  } else if ( OperatingSystem.current().isLinux() ) {
-    platform = 'linux'
-  }
+//   if ( OperatingSystem.current().isMacOsX() ) {
+//     platform = 'darwin'
+//   } else if ( OperatingSystem.current().isLinux() ) {
+//     platform = 'linux'
+//   }
 
-  doLast {
-    ant.taskdef(resource: 'net/sf/antcontrib/antcontrib.properties', classpath: configurations.antContrib.asPath)
-    ant.taskdef(resource: 'cpptasks.tasks', classpath: configurations.cpptasks.asPath)
-    ant.typedef(resource: 'cpptasks.types', classpath: configurations.cpptasks.asPath)
+//   doLast {
+//     ant.taskdef(resource: 'net/sf/antcontrib/antcontrib.properties', classpath: configurations.antContrib.asPath)
+//     ant.taskdef(resource: 'cpptasks.tasks', classpath: configurations.cpptasks.asPath)
+//     ant.typedef(resource: 'cpptasks.types', classpath: configurations.cpptasks.asPath)
 
-    ant.cc( outtype: "shared", objdir: "swig", outfile: "${moduleName}" ) {
-        if ( OperatingSystem.current().isMacOsX() ) {
-          compilerarg( value: "-F${ossimBuildDir}" )
-          compilerarg( value: "-F${ossimInstallPrefix}/Frameworks" )
-        }
-        compilerarg( value: "-I${ossimInstallPrefix}/include" )
-        // compilerarg( value: "-L${ossimInstallPrefix}/lib64" )
-//        compilerarg( value: "-F${ossim.dependencies}/Frameworks" )
-        compilerarg( value: "-D__STDC_CONSTANT_MACROS" )
-        compilerarg( value: "--std=c++11" )
+//     ant.cc( outtype: "shared", objdir: "swig", outfile: "${moduleName}" ) {
+//         if ( OperatingSystem.current().isMacOsX() ) {
+//           compilerarg( value: "-F${ossimBuildDir}" )
+//           compilerarg( value: "-F${ossimInstallPrefix}/Frameworks" )
+//         }
+//         compilerarg( value: "-I${ossimInstallPrefix}/include" )
+//         // compilerarg( value: "-L${ossimInstallPrefix}/lib64" )
+// //        compilerarg( value: "-F${ossim.dependencies}/Frameworks" )
+//         compilerarg( value: "-D__STDC_CONSTANT_MACROS" )
+//         compilerarg( value: "--std=c++11" )
 
-        includepath {
-            path( location: "swig" )
-            path( location: "${javaHome}/include" )
-            path( location: "${javaHome}/include/${platform}" )
-            path( location: "${ossimInstallPrefix}/include" )
-            // path( location: "${ossimDependenciesDir}/Frameworks" )
-            // path( location: "${ossimDependenciesDir}/include" )
-            path( location: "/usr/local/include" )
-            path( location: "/opt/local/include" )
-        }
-        fileset( dir: "swig", id: "id" ) {
-            // include( name: "*.cpp" )
-            include( name: "*.cxx" )
-        }
-        linkerarg( value: "-dynamiclib" )
-        if ( OperatingSystem.current().isMacOsX() ) {
-          linkerarg( value: "-rpath,${ossimInstallPrefix}" )
-          linkerarg( value: "-framework" )
-          linkerarg( value: "JavaVM" )
-          linkerarg( value: "-F${ossimBuildDir}" )
-          linkerarg( value: "-F${ossimInstallPrefix}/Frameworks" )
-          linkerarg( value: "-framework" )
-          linkerarg( value: "ossim" )
-          linkerarg( value: "-framework" )
-          linkerarg( value: "oms" )
-        } else if ( OperatingSystem.current().isLinux() ) {
-          linkerarg( value: "-loms" )
-        }
-        linkerarg( value: "-L/usr/local/lib" )
-        linkerarg( value: "-L/opt/local/lib" )
-       /*
-        <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
-        */
-        //linkerarg( value: "-lOpenThreads" )
-        //linkerarg( value: "-Wall" )
-        syslibset( libs: "c,stdc++" )
+//         includepath {
+//             path( location: "swig" )
+//             path( location: "${javaHome}/include" )
+//             path( location: "${javaHome}/include/${platform}" )
+//             path( location: "${ossimInstallPrefix}/include" )
+//             // path( location: "${ossimDependenciesDir}/Frameworks" )
+//             // path( location: "${ossimDependenciesDir}/include" )
+//             path( location: "/usr/local/include" )
+//             path( location: "/opt/local/include" )
+//         }
+//         fileset( dir: "swig", id: "id" ) {
+//             // include( name: "*.cpp" )
+//             include( name: "*.cxx" )
+//         }
+//         linkerarg( value: "-dynamiclib" )
+//         if ( OperatingSystem.current().isMacOsX() ) {
+//           linkerarg( value: "-rpath,${ossimInstallPrefix}" )
+//           linkerarg( value: "-framework" )
+//           linkerarg( value: "JavaVM" )
+//           linkerarg( value: "-F${ossimBuildDir}" )
+//           linkerarg( value: "-F${ossimInstallPrefix}/Frameworks" )
+//           linkerarg( value: "-framework" )
+//           linkerarg( value: "ossim" )
+//           linkerarg( value: "-framework" )
+//           linkerarg( value: "oms" )
+//         } else if ( OperatingSystem.current().isLinux() ) {
+//           linkerarg( value: "-loms" )
+//         }
+//         linkerarg( value: "-L/usr/local/lib" )
+//         linkerarg( value: "-L/opt/local/lib" )
+//        /*
+//         <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
+//         */
+//         //linkerarg( value: "-lOpenThreads" )
+//         //linkerarg( value: "-Wall" )
+//         syslibset( libs: "c,stdc++" )
+//     }
+
+//     if ( OperatingSystem.current().isMacOsX() ) {
+//       copy { from "lib${moduleName}.dylib"; into '.'; rename { "lib${moduleName}.jnilib" } }
+//       delete "lib${moduleName}.dylib"
+//     }
+//   }
+// }
+
+task copyJarToBuildDir(type: Copy){
+  dependsOn jar
+  from "${projectDir}/../lib/joms-${env.OSSIM_VERSION}-${env.OSSIM_VERSION_TAG.toUpperCase()}.jar"
+  into "${projectDir}/build/libs/"
+}
+jar{
+//  baseName = "joms"
+    archiveName = "joms-${env.OSSIM_VERSION}-${env.OSSIM_VERSION_TAG.toUpperCase()}.jar"
+}
+uploadArchives {
+  dependsOn copyJarToBuildDir
+    repositories {
+       mavenDeployer {
+             repository(url: "${env.REPOSITORY_MANAGER_URL}/ossim-local-${env.OSSIM_VERSION_TAG.toLowerCase()}") {
+             authentication(userName: "${env.REPOSITORY_MANAGER_USER}", password: "${env.REPOSITORY_MANAGER_PASSWORD}")
+}
+             pom.version = "${env.OSSIM_VERSION}-${env.OSSIM_VERSION_TAG.toUpperCase()}"
+             pom.artifactId = "joms"
+             pom.groupId = "org.ossim"
+       }
     }
-
-    if ( OperatingSystem.current().isMacOsX() ) {
-      copy { from "lib${moduleName}.dylib"; into '.'; rename { "lib${moduleName}.jnilib" } }
-      delete "lib${moduleName}.dylib"
-    }
-  }
 }
