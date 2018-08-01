@@ -18,7 +18,7 @@ if [ -z "$GROOVY_HOME" ]; then
    fi
 fi
 ant clean
-ant mvn-deploy
+ant build
 antReturnCode=$?
 
 if [ $antReturnCode -ne 0 ];then
