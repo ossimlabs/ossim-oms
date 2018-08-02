@@ -33,10 +33,15 @@ namespace oms
 		bool open(const std::string &filename, bool failIfNoGeometryFlag = false);
 
 		unsigned int getNumberOfEntries()const;
-      
-      bool setEntry(ossim_uint32 entryId);
-      
-      void setQuietFlag(bool flag);
+
+		bool setEntry(ossim_uint32 entryId);
+
+		/**
+       * Returns true if it has a projection and false otherwise
+       */
+		bool hasProjection() const;
+
+		void setQuietFlag(bool flag);
       bool getQuietFlag()const;
       /**
        * Returns the information for the current entry

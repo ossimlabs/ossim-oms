@@ -444,6 +444,20 @@ bool oms::ImageStager::setEntry(ossim_uint32 entryId)
 {
   return m_privateData->changeEntry(entryId);
 }
+
+bool oms::ImageStager::hasProjection() const
+{
+  bool result = false;
+
+  if (m_privateData->m_handler)
+  {
+    ossimRefPtr<ossimImageGeometry> geom = m_privateData->m_handler->getImageGeometry();
+    result = (geom && geom->hasProjection());
+  }
+
+  return result;
+}
+
 int oms::ImageStager::getCurrentEntry() const
 {
   return m_privateData->getCurrentEntry();
