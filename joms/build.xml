@@ -1,5 +1,20 @@
 
 <project name="joms" default="build" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<scriptdef language="javascript" name="upper">
+    <attribute name="string" /> 
+    <attribute name="to" />
+
+    project.setProperty( attributes.get( "to" ),
+                         attributes.get( "string" ).toUpperCase() );
+</scriptdef>
+
+<scriptdef language="javascript" name="lower">
+    <attribute name="string" /> 
+    <attribute name="to" />
+
+    project.setProperty( attributes.get( "to" ),
+                         attributes.get( "string" ).toLowerCase() );
+</scriptdef>
 
     <property environment="env" />
 
@@ -32,7 +47,7 @@
     <echo message="os.name = ${os.name}"/>
     <echo message="osg.home = ${osg.home}"/>
     <echo message="user.home = ${user.home}"/>
-    <artifact:remoteRepository id="remote.repository" url="${env.ARTIFACTORY_URL}" />
+    <artifact:remoteRepository id="remote.repository" url="${env.REPOSITORY_MANAGER_URL}/ossim-deps" />
 
     <artifact:dependencies filesetId="dependency.fileset">
       <remoteRepository refid="remote.repository" />
@@ -71,6 +86,7 @@
           </then>
 
         </if>
+        <lower string="${ossim.versionTag}" to="ossim.versionTagLowerCase" />
 
     </target>
 
@@ -432,9 +448,9 @@
             <arg value="-Dmaven.wagon.http.ssl.insecure=true"/>
             <arg value="-Dmaven.wagon.http.ssl.allowall=true"/>
             <arg value="-Dmaven.wagon.http.ssl.ignore.validity.dates=true"/>
-            <arg value="-Durl=${artifactory.url}"/>
+            <arg value="-Durl=${repository_manager.url}-${ossim.versionTagLowerCase}"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
-            <arg value="-DrepositoryId=${artifactory.repoId}"/>
+            <arg value="-DrepositoryId=${repository_manager.repoId}"/>
             <arg value="-DgroupId=org.ossim"/>
             <arg value="-DartifactId=${module.name}"/>
             <arg value="-Dversion=${ossim.version}-${ossim.versionTag}"/>

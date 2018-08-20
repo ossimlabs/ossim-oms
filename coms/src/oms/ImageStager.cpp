@@ -408,14 +408,31 @@ oms::ImageStager::~ImageStager()
   }
 }
 
-bool oms::ImageStager::open(const std::string &filename)
+bool oms::ImageStager::open(const std::string &filename, bool failIfNoGeom)
 {
+  bool result = true;
   m_privateData->m_filename = ossimFilename(filename);
   m_privateData->m_handler = 0;
   m_privateData->m_entryId = -1;
 
   m_privateData->setDefaults();
-  return m_privateData->m_handler.valid();
+  if(m_privateData->m_handler.valid())
+  {
+    if(failIfNoGeom)
+    {
+      ossimRefPtr<ossimImageGeometry> geom = m_privateData->m_handler->getImageGeometry();
+      if (!(geom && geom->hasProjection()))
+      {
+        result = false;
+      }
+    }
+  }
+  else
+  {
+    result = false;
+  }
+
+  return result;
 }
 
 unsigned int oms::ImageStager::getNumberOfEntries() const
@@ -427,6 +444,20 @@ bool oms::ImageStager::setEntry(ossim_uint32 entryId)
 {
   return m_privateData->changeEntry(entryId);
 }
+
+bool oms::ImageStager::hasProjection() const
+{
+  bool result = false;
+
+  if (m_privateData->m_handler)
+  {
+    ossimRefPtr<ossimImageGeometry> geom = m_privateData->m_handler->getImageGeometry();
+    result = (geom && geom->hasProjection());
+  }
+
+  return result;
+}
+
 int oms::ImageStager::getCurrentEntry() const
 {
   return m_privateData->getCurrentEntry();

@@ -20,7 +20,7 @@ if [ -z "$GROOVY_HOME" ]; then
    fi
 fi
 
-ant install
+ant install mvn-install
 antReturnCode=$?
 if [ $antReturnCode -ne 0 ];then
     echo "BUILD ERROR: ant failed install..."
