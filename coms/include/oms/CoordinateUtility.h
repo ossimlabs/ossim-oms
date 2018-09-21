@@ -50,9 +50,30 @@ namespace oms
        */
       std::string degreesToDms(double value, const std::string& format, bool latFlag)const;
       
-   protected:
+      /**
+       * @param datumCode Datum code to use. The default is a wgs84 datum code
+       */
+      void setDatum(const std::string& datumCode="WGE");
+      std::string getDatumCode()const;
+
+      /**
+       * Expects a 3 coordinateArray of lat lon height values and expects to
+       * write to a 3 coordinate array ecef using the current datum for the ellipsoidal 
+       * definition
+       */
+      bool latLonHeightToEcef(double latLonHeight[],
+                              double ecef[]) const;
+      /**
+       * Expects a 3 coordinateArray of lat lon height values and expects to
+       * write to a 3 coordinate array ecef using the current datum for the ellipsoidal 
+       * definition
+       */
+      bool ecefToLatLonHeight(double ecef[],
+                              double latLonHeight[]) const;
+
+    protected:
       class PrivateData;
-      PrivateData* theData;
+      PrivateData *theData;
    };
 }
 #endif
