@@ -1613,7 +1613,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
   {
 	  ossimFilename dgFile = mainFile;
 	  dgFile.setExtension("TIL");
-	  std::cout << "TEST FILE? " << dgFile << "\n";
 	  if (dgFile.exists())
 	  {
 		  outputString += indentation + "   <RasterEntryFile type=\"dgtil\">" +
