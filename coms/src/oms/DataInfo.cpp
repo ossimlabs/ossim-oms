@@ -3279,7 +3279,7 @@ void oms::DataInfo::getImageRepresentation( const ossimKeywordlist& kwl,
 void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
                                   std::string& missionId ) const
 {
-   missionId = kwl.findKey( std::string("mission_id") ); // omd file
+	missionId = kwl.findKey( std::string("mission_id") ); // omd file
    if ( missionId.empty())
    {
       // Normalized:
@@ -3303,7 +3303,6 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
             // Taking first one...
             missionId = kwl.findKey( keys[0].string() );
          }
-
          if ( missionId.empty() )
          {
             //---
@@ -3689,9 +3688,16 @@ void oms::DataInfo::getSunAzimuth( const ossimKeywordlist& kwl,
 
       if ( sunAzimuth.empty())
       {
-         sunAzimuth = kwl.findKey( std::string("tiff.gdalmetadata.sun_azimuth") );
+			regExp = "\\.sun_azimuth$";
+			kwl.findAllKeysThatMatch(keys, regExp);
 
-         if ( sunAzimuth.empty() )
+			if (keys.size())
+			{
+				// Taking first one...
+				sunAzimuth = kwl.findKey(keys[0].string());
+			}
+
+			if ( sunAzimuth.empty() )
          {
             keys.clear();
             ossimString regExp = "\\.sun_az$"; // any tag ending in: ".sun_az"
@@ -3730,9 +3736,16 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
       
       if ( sunElevation.empty())
       {
-         sunElevation = kwl.findKey( std::string("tiff.gdalmetadata.sun_elevation") );
-         
-         if ( sunElevation.empty() )
+			regExp = "\\.sun_elevation$";
+			kwl.findAllKeysThatMatch(keys, regExp);
+
+			if (keys.size())
+			{
+				// Taking first one...
+				sunElevation = kwl.findKey(keys[0].string());
+			}
+
+			if ( sunElevation.empty() )
          {
             keys.clear();
             ossimString regExp = "\\.sun_el$"; // any tag ending in ".sun_el"
