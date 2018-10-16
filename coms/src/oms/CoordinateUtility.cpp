@@ -1,9 +1,12 @@
 #include <oms/CoordinateUtility.h>
 #include <ossim/base/ossimCommon.h>
 #include <ossim/projection/ossimMgrs.h>
+#include <ossim/base/ossimDatumFactoryRegistry.h>
+#include <ossim/base/ossimDatumFactory.h>
 #include <ossim/base/ossimEllipsoidFactory.h>
 #include <ossim/base/ossimEllipsoid.h>
 #include <ossim/base/ossimDms.h>
+#include <ossim/base/ossimDatum.h>
 #include <iostream>
 #include <mutex>
 
@@ -85,13 +88,23 @@ public:
       std::lock_guard<std::mutex> lock(theMutex);
       theLastError = "";
    }
+   void setDatum(const std::string& datumCode)
+   {
+     m_datum = ossimDatumFactoryRegistry::instance()->create(ossimString(datumCode));
+     if(!m_datum)
+     {
+       m_datum = ossimDatumFactory::instance()->wgs84();
+     }
+   }
    std::mutex theMutex;
    std::string theLastError;
+   const ossimDatum* m_datum;
 };
 
 oms::CoordinateUtility::CoordinateUtility()
 :theData(new PrivateData)
 {
+  theData->m_datum = ossimDatumFactory::instance()->wgs84();
 }
 
 oms::CoordinateUtility::~CoordinateUtility()
@@ -175,4 +188,48 @@ std::string oms::CoordinateUtility::degreesToDms(double value, const std::string
    std::string result = "";
    result = dms.toString(format).string();
    return result;
+}
+
+bool oms::CoordinateUtility::latLonHeightToEcef(double latLonHeight[],
+                                                double ecef[]) const
+{
+  bool result = false;
+
+  if(theData->m_datum)
+  {
+    theData->m_datum->ellipsoid()->latLonHeightToXYZ(latLonHeight[0], latLonHeight[1], latLonHeight[2],
+                                                     ecef[0], ecef[1], ecef[2]);
+    result = true;
+  }
+
+  return result;
+}
+
+bool oms::CoordinateUtility::ecefToLatLonHeight(double ecef[],
+                                                double latLonHeight[]) const
+{
+  bool result = false;
+
+  if (theData->m_datum)
+  {
+    theData->m_datum->ellipsoid()->latLonHeightToXYZ(latLonHeight[0], latLonHeight[1], latLonHeight[2],
+                                                     ecef[0], ecef[1], ecef[2]);
+    result = true;
+  }
+
+  return result;
+}
+
+void oms::CoordinateUtility::setDatum(const std::string &datumCode)
+{
+  theData->setDatum(datumCode);
+}
+
+std::string oms::CoordinateUtility::getDatumCode() const
+{
+  std::string result;
+
+  result = theData->m_datum->code().c_str();
+
+  return result;
 }

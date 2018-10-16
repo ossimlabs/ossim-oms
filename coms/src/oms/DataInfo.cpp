@@ -1553,6 +1553,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                                                            std::string& outputString, const std::string& indentation,
                                                            const std::string& separator) const
 {
+   ossimRegExp dgregex("m1bs|p1bs");
    ossimFilename mainFile = thePrivateData->theImageHandler->getFilename();
    ossimFilename kmlFile(thePrivateData->theImageHandler->getFilename());
    ossimFilename overviewFile =
@@ -1580,28 +1581,122 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    ossimFilename baseNoExtension = thePrivateData->theImageHandler->getFilenameWithThisExtension("");
 
    coarseGridFile = coarseGridFile.setExtension("ocg");
-   // we will only support for now kml files associated at the entire file level and
-   // not individual entries.
-   //
-//std::cout <<"PATH1:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path() << "\n";
-//std::cout <<"PATH2:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path().path() << "\n";
+  bool digitalGlobeFlag = false;
+  ossimString drivePart;
+  ossimString pathPart;
+  ossimString filePart;
+  ossimString extPart;
+  mainFile.split(drivePart, pathPart,
+					  filePart, extPart);
+  ossimString downcaseFilePart = filePart.downcase();
+  if (dgregex.find(downcaseFilePart.c_str()))
+  {
+    // it's digital globe naming so lets check for external files
+	 digitalGlobeFlag = true;
+  }
+  // we will only support for now kml files associated at the entire file level and
+  // not individual entries.
+  //
+  //std::cout <<"PATH1:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path() << "\n";
+  //std::cout <<"PATH2:::::::::::::::: "<< thePrivateData->theImageHandler->getFilename().path().path() << "\n";
 
-   kmlFile = kmlFile.setExtension("kml");
-   ossimFilename thumbnailFile = checkAndGetThumbnail(baseNoExtension);
-   //bool associatedFilesFlag = (thumbnailFile.exists() || overviewFile.exists() || overview2File.exists() || histogramFile.exists()
-   //                            || validVerticesFile.exists() || geomFile.exists()
-   //                            || metadataFile.exists()||kmlFile.exists()||navData.exists());
+  kmlFile = kmlFile.setExtension("kml");
+  ossimFilename thumbnailFile = checkAndGetThumbnail(baseNoExtension);
+  //bool associatedFilesFlag = (thumbnailFile.exists() || overviewFile.exists() || overview2File.exists() || histogramFile.exists()
+  //                            || validVerticesFile.exists() || geomFile.exists()
+  //                            || metadataFile.exists()||kmlFile.exists()||navData.exists());
   // if (associatedFilesFlag)
-   //{
-   outputString += indentation + "<fileObjects>" + separator;
-      
-   if(!thumbnailFile.empty())
-   {
-      outputString += indentation
-         + "   <RasterEntryFile type=\"thumbnail\">" + separator
-         + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(thumbnailFile).string() + "</name>"
-         + separator + indentation + "   </RasterEntryFile>"
-         + separator;
+  //{
+  outputString += indentation + "<fileObjects>" + separator;
+
+  if (digitalGlobeFlag)
+  {
+	  ossimFilename dgFile = mainFile;
+	  dgFile.setExtension("TIL");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgtil\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("IMD");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgimd\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("ATT");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgatt\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("GEO");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dggeo\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("EPH");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgeph\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("STE");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgste\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("TIL");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgtil\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("XML");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgxml\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+	  dgFile.setExtension("RPB");
+	  if (dgFile.exists())
+	  {
+		  outputString += indentation + "   <RasterEntryFile type=\"dgrpb\">" +
+								separator + indentation + "      <name>" +
+								ossimXmlString::wrapCDataIfNeeded(dgFile).string() +
+								"</name>" + separator + indentation +
+								"   </RasterEntryFile>" + separator;
+	  }
+  }
+  if (!thumbnailFile.empty())
+  {
+	  outputString += indentation + "   <RasterEntryFile type=\"thumbnail\">" + separator + indentation + "      <name>" + ossimXmlString::wrapCDataIfNeeded(thumbnailFile).string() + "</name>" + separator + indentation + "   </RasterEntryFile>" + separator;
    }
    if (overviewFile.exists())
    {
@@ -3184,7 +3279,7 @@ void oms::DataInfo::getImageRepresentation( const ossimKeywordlist& kwl,
 void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
                                   std::string& missionId ) const
 {
-   missionId = kwl.findKey( std::string("mission_id") ); // omd file
+	missionId = kwl.findKey( std::string("mission_id") ); // omd file
    if ( missionId.empty())
    {
       // Normalized:
@@ -3208,7 +3303,6 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
             // Taking first one...
             missionId = kwl.findKey( keys[0].string() );
          }
-
          if ( missionId.empty() )
          {
             //---
@@ -3594,9 +3688,16 @@ void oms::DataInfo::getSunAzimuth( const ossimKeywordlist& kwl,
 
       if ( sunAzimuth.empty())
       {
-         sunAzimuth = kwl.findKey( std::string("tiff.gdalmetadata.sun_azimuth") );
+			regExp = "\\.sun_azimuth$";
+			kwl.findAllKeysThatMatch(keys, regExp);
 
-         if ( sunAzimuth.empty() )
+			if (keys.size())
+			{
+				// Taking first one...
+				sunAzimuth = kwl.findKey(keys[0].string());
+			}
+
+			if ( sunAzimuth.empty() )
          {
             keys.clear();
             ossimString regExp = "\\.sun_az$"; // any tag ending in: ".sun_az"
@@ -3635,9 +3736,16 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
       
       if ( sunElevation.empty())
       {
-         sunElevation = kwl.findKey( std::string("tiff.gdalmetadata.sun_elevation") );
-         
-         if ( sunElevation.empty() )
+			regExp = "\\.sun_elevation$";
+			kwl.findAllKeysThatMatch(keys, regExp);
+
+			if (keys.size())
+			{
+				// Taking first one...
+				sunElevation = kwl.findKey(keys[0].string());
+			}
+
+			if ( sunElevation.empty() )
          {
             keys.clear();
             ossimString regExp = "\\.sun_el$"; // any tag ending in ".sun_el"
