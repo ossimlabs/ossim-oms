@@ -91,7 +91,7 @@ static ossimString monthToNumericString(const ossimString& month)
    {
       result =  "12";
    }
-   
+
    return result;
 }
 #endif
@@ -112,7 +112,7 @@ static ossimString blankOutBinary(const ossimString& s)
          result += " ";
       }
    }
-   
+
    return result;
 }
 
@@ -194,7 +194,7 @@ public:
                outputValue = false;
             }
          }
-         
+
          if(outputValue)
          {
             bool tagOk = true;
@@ -227,7 +227,7 @@ public:
          }
          ++iter;
       }
-      
+
       if(!m_includeMetadataTagName)
       {
          const ossimXmlNode::ChildListType& children = metadata->getChildNodes();
@@ -239,16 +239,16 @@ public:
          }
          out << std::endl;
       }
-      else 
+      else
       {
          out << *(metadata.get())<<std::endl;
       }
-      
+
    }
    void replaceSpecialCharacters(ossimString& value)const
    {
       ossimString::iterator iter = value.begin();
-      
+
       while(iter!=value.end())
       {
          if(!(isdigit(*iter) ||
@@ -277,17 +277,17 @@ namespace oms
          theFilename = "";
          theImageHandler = 0;
 #ifdef OSSIM_VIDEO_ENABLED
-         
+
          thePredatorVideo = 0;
          thePredatorVideoFrameInfo = 0;
          theExternalVideoGeometryFile = "";
 #endif
       }
-      
+
       std::string formatName() const
       {
 #ifdef OSSIM_VIDEO_ENABLED
-         
+
          if(thePredatorVideo.valid())
          {
             return "mpeg";
@@ -358,7 +358,7 @@ namespace oms
                {
                   return "ers";
                }
-               
+
                else if (className.contains("landsattile"))
                {
                   ossimString file = theImageHandler->getFilename();
@@ -420,12 +420,12 @@ namespace oms
                {
                   return "tfrd";
                }
-               else 
+               else
                {
                   ossimFilename file(theImageHandler.valid()?theImageHandler->getFilename():"");
-                  
+
                   ossimString ext = file.ext();
-                  ext = ext.downcase();                  
+                  ext = ext.downcase();
                   if(ext == "jp2")
                   {
                      return "jpeg2000";
@@ -511,10 +511,10 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
    try
    {
       thePrivateData->clear();
-   
+
       ossimRefPtr<ossimImageHandler> handler =
          ossimImageHandlerRegistry::instance()->openConnection(file, true);
-   
+
       if (handler.valid() == true)
       {
          result = setHandler(handler.get(), failIfNoGeometryFlag);
@@ -531,13 +531,13 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
             {
                ossimFilename externalGeom = thePrivateData->theFilename;
                externalGeom = externalGeom.setExtension("xml");
-            
+
                if(!externalGeom.exists())
                {
                   // check for the first 10 seconds for a klv.
                   // If no KLV then done
                   //
-               
+
                   ossim_uint32 frameMax = (thePrivateData->thePredatorVideo->videoFrameRate()*
                                            (ossim::min(10.0, thePrivateData->thePredatorVideo->duration())));
                   ossim_uint32 idx = 0;
@@ -570,9 +570,9 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
             }
          }
 #endif
-      
+
       }
-   
+
       if (result == false)
       {
          thePrivateData->clear();
@@ -590,11 +590,11 @@ bool oms::DataInfo::open(const std::string& file, bool failIfNoGeometryFlag)
          << "oms::DataInfo::open caught exception!" << std::endl;
       result = false;
    }
-    
+
    //std::cout << "OPEN FILE? " << result << ", " << file << std::endl;
-   
+
    return result;
-   
+
 } // End: oms::DataInfo::open( ... )
 
 bool oms::DataInfo::setHandler(ossimImageHandler* handler, bool failIfNoGeometryFlag)
@@ -623,7 +623,7 @@ bool oms::DataInfo::setHandler(ossimImageHandler* handler, bool failIfNoGeometry
          result = true;
       }
    }
-   
+
    return result;
 }
 
@@ -671,7 +671,7 @@ double oms::DataInfo::getMetersPerPixel( int entry, int resolution)
       if(geom.valid())
       {
          result = geom->getMetersPerPixel().y;
-         // test if resolution is not 0 and then multiply 
+         // test if resolution is not 0 and then multiply
          if(resolution>0)
          {
             result *= (1<<resolution);
@@ -765,19 +765,19 @@ void appendDateRange(std::string& outputString, const ossimDate& startDate,
    << std::setw(2) << std::setfill('0') << startDate.getHour() << ":"
    << std::setw(2) << std::setfill('0') << startDate.getMin() << ":"
    << std::setw(2) << std::setfill('0') << roundStart << "Z";
-   
+
    outEnd << std::setw(4) << std::setfill('0') << endDate.getYear() << "-"
    << std::setw(2) << std::setfill('0') << endDate.getMonth() << "-"
    << std::setw(2) << std::setfill('0') << endDate.getDay() << "T"
    << std::setw(2) << std::setfill('0') << endDate.getHour() << ":"
    << std::setw(2) << std::setfill('0') << endDate.getMin() << ":"
    << std::setw(2) << std::setfill('0') << roundEnd << "Z";
-   
+
    outputString += (indentation + "<TimeSpan>" + separator + indentation
                     + "   <begin>" + outStart.str() + "</begin>" + separator
                     + indentation + "   <end>" + outEnd.str() + "</end>" + separator
                     + indentation + "</TimeSpan>" + separator);
-   
+
 }
 #ifdef OSSIM_VIDEO_ENABLED
 
@@ -786,7 +786,7 @@ void appendToMultiGeometry(std::string& /*result*/,
                            const std::string& /*indentation*/,
                            const std::string& /*separator*/)
 {
-   
+
 }
 
 geos::geom::Geometry* createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
@@ -883,7 +883,7 @@ void appendVideoGeom(std::string& result,
    ossimString verticalFOV;
    ossimString elevation;
    ossimString sensorDistance;
-   
+
    if(!klvTable->getCornerPoints(ul, ur, lr, ll))
    {
 #if 1
@@ -923,7 +923,7 @@ void appendVideoGeom(std::string& result,
    geoPoly.addPoint(lr);
    geoPoly.addPoint(ll);
    double degarea = ossim::abs(geoPoly.area());
-   
+
    groundGeometry+=("MULTIPOLYGON((("
                     +ossimString::toString(ul.lond())+" "
                     +ossimString::toString(ul.latd())+","
@@ -935,76 +935,76 @@ void appendVideoGeom(std::string& result,
                     +ossimString::toString(ll.latd())+","
                     +ossimString::toString(ul.lond())+" "
                     +ossimString::toString(ul.latd())+" "
-                    +")))"); 
-   
+                    +")))");
+
    ossim_float32 oangle;
-   if(klvTable->getObliquityAngle(oangle)) { 
+   if(klvTable->getObliquityAngle(oangle)) {
       obliquityAngle+=(ossimString::toString(oangle));
    }
    else {
       obliquityAngle = "";
    }
-   
+
    ossim_float32 hfov;
-   if(klvTable->getHorizontalFieldOfView(hfov)) { 
+   if(klvTable->getHorizontalFieldOfView(hfov)) {
       horizontalFOV+=(ossimString::toString(hfov));
    }
    else {
       horizontalFOV = "";
    }
-   
+
    ossim_float32 vfov;
    if(klvTable->getVerticalFieldOfView(vfov)) {
       verticalFOV+=(ossimString::toString(vfov));
-   } 
-   else { 
-      verticalFOV = ""; 
    }
-   
+   else {
+      verticalFOV = "";
+   }
+
    ossim_float64 latsp, lonsp, elevsp;
    ossimGpt llsp;
-   
+
    if (klvTable->getSensorPosition(latsp, lonsp, elevsp))
    {
       llsp.latd(latsp);
       llsp.lond(lonsp);
       llsp.changeDatum(wgs84.datum());
-      sensorPosition+=("POINT(" 
+      sensorPosition+=("POINT("
                        +ossimString::toString(llsp.lond())+" "
                        +ossimString::toString(llsp.latd())
                        +")");
       elevation+=(ossimString::toString(elevsp));
    }
-   // Convert degrees squared area to meters squared based on sensor position 
-   ossimDpt sensormpd = llsp.metersPerDegree(); 
-   ossim_float64 mtrsperlat = sensormpd.y; 
+   // Convert degrees squared area to meters squared based on sensor position
+   ossimDpt sensormpd = llsp.metersPerDegree();
+   ossim_float64 mtrsperlat = sensormpd.y;
    ossim_float64 mtrsperlon = sensormpd.x;
    double mtrssqdperdegsqd = mtrsperlat * mtrsperlon;
    double area = degarea * mtrssqdperdegsqd;
    ossimString geoArea;
    geoArea+=(ossimString::toString(area));
-   
+
    // using the distance from the sensor to the frame to weed out cases where we have absolutely bogus coordinates in the Predator video
    ossimGpt closept;
    // Use the center of the bottom of the frame as the closest point.
    closept.latd(ll.latd() - ((ll.latd() - lr.latd()) * 0.5));
    closept.lond(ll.lond() - ((ll.lond() - lr.lond()) * 0.5));
-   
+
    ossimEcefPoint start(llsp);
    ossimEcefPoint end(closept);
-   
+
    ossim_float64 distance = (end-start).length();
 //   std::cout << "*************************** " << distance/elevation.toDouble() << std::endl;
-#if 0   
-   ossim_float64 distance = std::pow(std::pow(((llsp.lond() - 
+#if 0
+   ossim_float64 distance = std::pow(std::pow(((llsp.lond() -
                                                 closept.lond()) * mtrsperlon), 2) + std::pow(((llsp.latd() -
                                                                                                closept.latd()) * mtrsperlat), 2), 0.5);
-#endif   
+#endif
    sensorDistance+=(ossimString::toString(distance));
    ossimString videostartutc;
-   if (!klvTable->valueAsString(videostartutc, 
-                                KLV_KEY_VIDEO_START_DATE_TIME_UTC)) { 
-      videostartutc = ""; 
+   if (!klvTable->valueAsString(videostartutc,
+                                KLV_KEY_VIDEO_START_DATE_TIME_UTC)) {
+      videostartutc = "";
    }
    result += indentation+"<groundGeom area=\""+geoArea.string()+"\" elevation=\""
       +elevation.string()+"\" klvnumber=\""+klvnumber+"\" horizontalFOV=\""
@@ -1057,7 +1057,7 @@ std::string oms::DataInfo::getInfo() const
             {
                buf.resize(filesize);
                in.read(&buf.front(), filesize);
-            
+
                result = std::string(buf.begin(), buf.end());
             }
          }
@@ -1082,9 +1082,9 @@ std::string oms::DataInfo::getInfo() const
          result += "         </fileObjects>\n";
          result += "         <width>"+ossimString::toString(thePrivateData->thePredatorVideo->imageWidth()).string()+"</width>\n";
          result += "         <height>"+ossimString::toString(thePrivateData->thePredatorVideo->imageHeight()).string()+"</height>\n";
-      
+
          // RPALKO - replaced 1 line with everything to END RPALKO
-         result += "         <spatialMetadata>\n"; 
+         result += "         <spatialMetadata>\n";
          ossim_uint32 idx = 0;
          // safer to rewind
          geos::geom::Geometry* composite = 0;
@@ -1092,7 +1092,7 @@ std::string oms::DataInfo::getInfo() const
          ossimRefPtr<ossimPredatorVideo::KlvInfo> klvInfo = thePrivateData->thePredatorVideo->nextKlv();
 
 // this code does a union of all the polygons
-#if 1 
+#if 1
          while(klvInfo.valid() &&klvInfo->table())
          {
             geos::geom::Geometry* geom = createGeomFromKlv(klvInfo->table());
@@ -1101,9 +1101,9 @@ std::string oms::DataInfo::getInfo() const
             {
                if(geom->isValid())
                {
-                  composite = geom;                
+                  composite = geom;
                }
-            } 
+            }
             else if(geom)
             {
                try
@@ -1139,7 +1139,7 @@ std::string oms::DataInfo::getInfo() const
                }
             }
             klvInfo = thePrivateData->thePredatorVideo->nextKlv();
-            idx++; 
+            idx++;
          }
          if(composite)
          {
@@ -1170,14 +1170,14 @@ std::string oms::DataInfo::getInfo() const
          }
 
          // this code outputs each polygon
-#else 
+#else
 
-         while (klvInfo.valid() && klvInfo->table()) 
+         while (klvInfo.valid() && klvInfo->table())
          {
             ossimString klvnumber = ossimString::toString(idx);
             appendVideoGeom(result, klvInfo->table(),"                  ", "\n", klvnumber.c_str());
             klvInfo = thePrivateData->thePredatorVideo->nextKlv();
-            idx++; 
+            idx++;
          }
 #endif
          result += "        </spatialMetadata>\n";
@@ -1203,7 +1203,7 @@ std::string oms::DataInfo::getInfo() const
    }
 
    return result;
-   
+
 } // End: std::string oms::DataInfo::getInfo() const
 
 bool oms::DataInfo::isVideo()const
@@ -1250,12 +1250,12 @@ std::string oms::DataInfo::getImageInfo(int entry)
       {
          appendRasterEntries(result, "            ", "\n");
       }
-      else 
+      else
       {
-         appendRasterEntry(result, "            ", "\n"); 
+         appendRasterEntry(result, "            ", "\n");
       }
 //      appendRasterEntryDateTime(result, "            ", "\n");
-      
+
       result += "         </rasterEntries>\n";
       appendRasterDataSetMetadata(result, "         ", "\n");
       result += "      </RasterDataSet>\n";
@@ -1264,7 +1264,7 @@ std::string oms::DataInfo::getImageInfo(int entry)
    }
 
    return result;
-      
+
 }
 
 std::string oms::DataInfo::getVideoInfo()
@@ -1283,14 +1283,14 @@ std::string oms::DataInfo::getVideoInfo()
          {
             buf.resize(filesize);
             in.read(&buf.front(), filesize);
-            
+
             result = std::string(buf.begin(), buf.end());
          }
       }
    }
    else if(thePrivateData->thePredatorVideoFrameInfo.valid())
    {
-      
+
       ossimDate startDate;
       ossimDate endDate;
       if(thePrivateData->thePredatorVideoFrameInfo->klvTable()->getDate(startDate, true))
@@ -1308,23 +1308,23 @@ std::string oms::DataInfo::getVideoInfo()
       result += "         </fileObjects>\n";
       result += "         <width>"+ossimString::toString(thePrivateData->thePredatorVideo->imageWidth()).string()+"</width>\n";
       result += "         <height>"+ossimString::toString(thePrivateData->thePredatorVideo->imageHeight()).string()+"</height>\n";
-      
+
       // RPALKO - replaced 1 line with everything to END RPALKO
-      result += "         <spatialMetadata>\n"; 
+      result += "         <spatialMetadata>\n";
       ossim_uint32 idx = 0;
       // safer to rewind
       thePrivateData->thePredatorVideo->rewind();
       geos::geom::Geometry* composite = 0;
       ossimRefPtr<ossimPredatorVideo::KlvInfo> klvInfo = thePrivateData->thePredatorVideo->nextKlv();
 // this code does a union of all the polygons
-#if 1 
+#if 1
       while(klvInfo.valid() &&klvInfo->table())
       {
          geos::geom::Geometry* geom = createGeomFromKlv(klvInfo->table());
          if(!composite)
          {
-            composite = geom; 
-         } 
+            composite = geom;
+         }
          else if(geom)
          {
             try
@@ -1340,7 +1340,7 @@ std::string oms::DataInfo::getVideoInfo()
                   << "oms::DataInfo::getVideoInfo caught exception: " << e.what() << std::endl;
                if(geom) delete geom;
                geom = 0;
-               
+
             }
             catch(...)
             {
@@ -1351,7 +1351,7 @@ std::string oms::DataInfo::getVideoInfo()
             }
          }
          klvInfo = thePrivateData->thePredatorVideo->nextKlv();
-         idx++; 
+         idx++;
       }
       if(composite)
       {
@@ -1380,14 +1380,14 @@ std::string oms::DataInfo::getVideoInfo()
       }
 
       // this code outputs each polygon
-#else 
+#else
 
-      while (klvInfo.valid() && klvInfo->table()) 
+      while (klvInfo.valid() && klvInfo->table())
       {
          ossimString klvnumber = ossimString::toString(idx);
          appendVideoGeom(result, klvInfo->table(),"                  ", "\n", klvnumber.c_str());
          klvInfo = thePrivateData->thePredatorVideo->nextKlv();
-         idx++; 
+         idx++;
       }
 #endif
 
@@ -1401,7 +1401,7 @@ std::string oms::DataInfo::getVideoInfo()
       result += "</oms>\n";
    }
 #endif
-   
+
    return result;
 }
 
@@ -1421,7 +1421,7 @@ void oms::DataInfo::appendRasterEntry( std::string& outputString,
    outputString
    += indentation + "   <numberOfBands>"
    + ossimString::toString(
-      ossim::max(thePrivateData->theImageHandler->getNumberOfOutputBands(), 
+      ossim::max(thePrivateData->theImageHandler->getNumberOfOutputBands(),
          thePrivateData->theImageHandler->getNumberOfInputBands())).string()
    + "</numberOfBands>" + separator;
    outputString
@@ -1433,9 +1433,9 @@ void oms::DataInfo::appendRasterEntry( std::string& outputString,
    appendGeometryInformation(outputString, indentation + "   ", separator);
 //   appendRasterEntryDateTime(outputString, indentation + "   ", separator);
    appendRasterEntryMetadata(outputString, indentation + "   ", "\n");
-   
+
    outputString += indentation + "</RasterEntry>" + separator;
-   
+
 }
 
 void oms::DataInfo::appendRasterEntries(std::string& outputString,
@@ -1444,7 +1444,7 @@ void oms::DataInfo::appendRasterEntries(std::string& outputString,
    ossim_uint32 numberOfEntries =
    thePrivateData->theImageHandler->getNumberOfEntries();
    ossim_uint32 idx = 0;
-   
+
    for (idx = 0; idx < numberOfEntries; ++idx)
    {
       if(thePrivateData->theImageHandler->setCurrentEntry(idx))
@@ -1490,8 +1490,8 @@ void oms::DataInfo::appendAssociatedFiles(std::string& outputString,
       //---
       // Special case/hack to handle NPP VIIRS hdf5 files that were split by
       // NOAA for customer.
-      // 
-      // Example: 
+      //
+      // Example:
       // GDNBO_npp_d20140113_t0828103_e0833507_b11463_c20140113143351340475_noaa_ops.h5
       // IICMO_npp_d20140113_t0828103_e0833507_b11463_c20140113143351446171_noaa_ops.h5
       // SVDNB_npp_d20140113_t0828103_e0833507_b11463_c20140113143351340692_noaa_ops.h5
@@ -1505,7 +1505,7 @@ void oms::DataInfo::appendAssociatedFiles(std::string& outputString,
          ossimString os = mainFile.substr( pos, mainFile.size()-pos );
          ossimString stringSeparator = "_";
          std::vector<ossimString> list;
-         
+
          os.split( list, stringSeparator );
          if ( list.size() > 5)
          {
@@ -1521,7 +1521,7 @@ void oms::DataInfo::appendAssociatedFiles(std::string& outputString,
                   {
                      file = file.expand();
                      if ( (file != expandedMain) )
-                     {  
+                     {
                         ossimString ext = file.ext().downcase();
                         if ( ( ext != "geom") && (ext != "his") && ( ext != "ocg") &&
                              (ext != "omd") && ( ext != "ovr") && !file.contains("thumb") )
@@ -1533,14 +1533,14 @@ void oms::DataInfo::appendAssociatedFiles(std::string& outputString,
                            {
                               outputString += indentation
                                  + "   <RasterFile type=\"support\">" + separator
-                                 + indentation + "      <name>" 
+                                 + indentation + "      <name>"
                                  + ossimXmlString::wrapCDataIfNeeded(file).string() + "</name>"
                                  + separator + indentation + "   </RasterFile>"
                                  + separator;
                            }
                         }
                      }
-                     
+
                   } while ( dir.getNext( file ) );
                }
             }
@@ -1890,7 +1890,7 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
    ossimGpt wgs84;
    ossimString groundGeometry;
    ossimString validGroundGeometry;
-   
+
    if (geom.valid()&&geom->getProjection())
    {
       ossimDpt gsd = geom->getMetersPerPixel();
@@ -1940,7 +1940,7 @@ void oms::DataInfo::appendGeometryInformation(std::string& outputString,
 
       outputString += indentation + "<groundGeom srs=\"epsg:4326\">"
          + groundGeometry.string() + "</groundGeom>" + separator;
-      
+
       outputString += indentation + "<TiePointSet version='1'>" + separator;
       outputString += indentation + "   " + "<Image>" + separator;
       outputString += indentation + "      " + "<coordinates>";
@@ -1998,19 +1998,19 @@ void appendMetadataTag(ossimRefPtr<ossimProperty> property,
          {
             ossimString containerName = container->getName();
             ossimString newIndentation = indentation + "   ";
-            
+
             outputString += indentation + "<tag name=\"" + containerName.string()
                + "\">" + separator;
-            
+
             ossimKeywordlist coeffs;
-            
+
             for (idx = 0; idx < n; ++idx)
             {
                ossimRefPtr<ossimProperty> prop = container->getProperty(idx);
                if (prop.valid())
                {
                   ossimString childName = prop->getName();
-                  
+
                   // Add some special handling for NITF coefficients
                   // Consolidate into a single tag
                   if (containerName == "RPC00B" && childName.match(
@@ -2025,48 +2025,48 @@ void appendMetadataTag(ossimRefPtr<ossimProperty> property,
                   }
                }
             }
-            
+
             //  Add the consolidated coeffs, if they exist
             if (coeffs.getSize() > 0)
             {
                std::vector<ossimString> namedSet;
-               
+
                namedSet.push_back("LINE_DEN");
                namedSet.push_back("LINE_NUM");
                namedSet.push_back("SAMP_DEN");
                namedSet.push_back("SAMP_NUM");
-               
+
                for (int i = 0, size = namedSet.size(); i < size; i++)
                {
                   outputString += newIndentation.string();
                   outputString += "<tag name=\"" + namedSet[i].string() + "\">";
-                  
+
                   std::vector<ossimString> namedCoeffs =
                   coeffs.findAllKeysThatContains(namedSet[i]);
-                  
+
                   for (int j = 0, size = namedCoeffs.size(); j < size; j++)
                   {
                      outputString += namedCoeffs[j].afterRegExp(namedSet[i] + "_COEFF_").string();
-                     
+
                      outputString += "=";
                      outputString += coeffs.find(namedCoeffs[j]);
-                     
+
                      if (j < size - 1)
                         outputString += ", ";
                   }
-                  
+
                   outputString += "</tag>";
                   outputString += separator;
                }
             }
-            
+
             outputString += indentation + "</tag>" + separator;
          }
       }
       else
       {
          ossimString value = property->valueToString().trim();
-         
+
          // Only add the tag if it has a value
          if (!value.empty())
          {
@@ -2137,7 +2137,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          {
             outputString += indentation + "   <organizationalProgramNumber>" +
                blankOutBinary(value).trim().string() + "</organizationalProgramNumber>" +
-               separator; 
+               separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_SECURITY_CLASSIFICATION))
@@ -2158,7 +2158,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
             {
                securityClassification = "SECRET";
             }
-            else 
+            else
             {
                securityClassification = value;
             }
@@ -2170,7 +2170,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          if(!value.empty())
          {
             outputString += indentation + "   <releaseInstructions>" + value.string() +
-               "</releaseInstructions>" + separator; 
+               "</releaseInstructions>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_SECURITY_CAVEATS))
@@ -2179,7 +2179,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          if(!value.empty())
          {
             outputString += indentation + "   <securityCaveats>" + value.string() +
-               "</securityCaveats>" + separator; 
+               "</securityCaveats>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_CLASSIFICATION_COMMENT))
@@ -2187,7 +2187,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <classificationComment>" + value.string() + "</classificationComment>" + separator; 
+            outputString += indentation + "   <classificationComment>" + value.string() + "</classificationComment>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_ORIGINAL_PRODUCER_NAME))
@@ -2195,7 +2195,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <originalProducerName>" + value.string() + "</originalProducerName>" + separator; 
+            outputString += indentation + "   <originalProducerName>" + value.string() + "</originalProducerName>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_IMAGE_SOURCE_SENSOR))
@@ -2203,7 +2203,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <imageSourceSensor>" + value.string() + "</imageSourceSensor>" + separator; 
+            outputString += indentation + "   <imageSourceSensor>" + value.string() + "</imageSourceSensor>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_PLATFORM_DESIGNATION))
@@ -2211,16 +2211,16 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <platformDesignation>" + value.string() + "</platformDesignation>" + separator; 
+            outputString += indentation + "   <platformDesignation>" + value.string() + "</platformDesignation>" + separator;
          }
       }
-/*      
+/*
       if(klvTable->valueAsString(value, KLV_KEY_INDICATED_AIR_SPEED))
       {
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <indicatedAirSpeed>" + value.string() + "</indicatedAirSpeed>" + separator; 
+            outputString += indentation + "   <indicatedAirSpeed>" + value.string() + "</indicatedAirSpeed>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_STATIC_PRESSURE))
@@ -2228,7 +2228,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <staticAirPressure>" + value.string() + "</staticAirPressure>" + separator; 
+            outputString += indentation + "   <staticAirPressure>" + value.string() + "</staticAirPressure>" + separator;
          }
       }
       if(klvTable->valueAsString(value, KLV_KEY_PLATFORM_GROUND_SPEED))
@@ -2236,7 +2236,7 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
          value = value.trim();
          if(!value.empty())
          {
-            outputString += indentation + "   <groundSpeed>" + value.string() + "</groundSpeed>" + separator; 
+            outputString += indentation + "   <groundSpeed>" + value.string() + "</groundSpeed>" + separator;
          }
       }
 */
@@ -2252,30 +2252,30 @@ void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
       //         grazingAngle = ossimString::toString(90.0 - grazingAngle.toDouble());
       //      }
       klvTable->valueAsString(missionNumber, KLV_KEY_MISSION_NUMBER);
-      
+
       outputString += indentation + "   <securityClassification>" + securityClassification.string()
-         + "</securityClassification>" + separator; 
-      //      outputString += indentation + "   <azimuthAngle>" + azimuthAngle + "</azimuthAngle>" + separator; 
-      //      outputString += indentation + "   <grazingAngle>" + grazingAngle + "</grazingAngle>" + separator; 
+         + "</securityClassification>" + separator;
+      //      outputString += indentation + "   <azimuthAngle>" + azimuthAngle + "</azimuthAngle>" + separator;
+      //      outputString += indentation + "   <grazingAngle>" + grazingAngle + "</grazingAngle>" + separator;
       outputString += indentation + "   <missionId>" + missionNumber.string() + "</missionId>" +
-         separator; 
+         separator;
       outputString += indentation + "   <fileType>" + thePrivateData->formatName() +
-         "</fileType>" + separator; 
+         "</fileType>" + separator;
       outputString += indentation + "   <filename>" + thePrivateData->theFilename.string() +
-         "</filename>" + separator; 
-      
+         "</filename>" + separator;
+
 #if 0
-      outputString += indentation + "   <imageId>" + imageId + "</imageId>" + separator; 
-      outputString += indentation + "   <sensorId>" + sensorId + "</sensorId>" + separator; 
-      outputString += indentation + "   <countryCode>" + countryCode + "</countryCode>" + separator; 
-      outputString += indentation + "   <imageCategory>" + imageCategory + "</imageCategory>" + separator; 
-      outputString += indentation + "   <grazingAngle>" + grazingAngle + "</grazingAngle>" + separator; 
-      outputString += indentation + "   <title>" + title + "</title>" + separator; 
-      outputString += indentation + "   <organization>" + organization + "</organization>" + separator; 
-      outputString += indentation + "   <description>" + description + "</description>" + separator; 
-      outputString += indentation + "   <niirs>" + niirs + "</niirs>" + separator; 
-      outputString += indentation + "   <fileType>" + thePrivateData->formatName() + "</fileType>" + separator; 
-      outputString += indentation + "   <className>" + (thePrivateData->theImageHandler.valid()?thePrivateData->theImageHandler->getClassName():ossimString("")) + "</className>" + separator; 
+      outputString += indentation + "   <imageId>" + imageId + "</imageId>" + separator;
+      outputString += indentation + "   <sensorId>" + sensorId + "</sensorId>" + separator;
+      outputString += indentation + "   <countryCode>" + countryCode + "</countryCode>" + separator;
+      outputString += indentation + "   <imageCategory>" + imageCategory + "</imageCategory>" + separator;
+      outputString += indentation + "   <grazingAngle>" + grazingAngle + "</grazingAngle>" + separator;
+      outputString += indentation + "   <title>" + title + "</title>" + separator;
+      outputString += indentation + "   <organization>" + organization + "</organization>" + separator;
+      outputString += indentation + "   <description>" + description + "</description>" + separator;
+      outputString += indentation + "   <niirs>" + niirs + "</niirs>" + separator;
+      outputString += indentation + "   <fileType>" + thePrivateData->formatName() + "</fileType>" + separator;
+      outputString += indentation + "   <className>" + (thePrivateData->theImageHandler.valid()?thePrivateData->theImageHandler->getClassName():ossimString("")) + "</className>" + separator;
 #endif
       outputString += indentation + "</metadata>" + separator;
    }
@@ -2338,12 +2338,12 @@ static ossimString monthStringToNumberString(const ossimString& monthString)
 std::string oms::DataInfo::convertIdatimToXmlDate(const std::string& idatim) const
 {
    ossimString result = "";
-   
+
    if (idatim.size() == 14)
    {
       if (idatim[8] == 'Z')
       {
-         
+
          ossimString day(idatim.begin(), idatim.begin() + 2);
          ossimString hour(idatim.begin() + 2, idatim.begin() + 4);
          ossimString m(idatim.begin() + 4, idatim.begin() + 6);
@@ -2352,7 +2352,7 @@ std::string oms::DataInfo::convertIdatimToXmlDate(const std::string& idatim) con
          ossimString month(idatim.begin() + 9, idatim.begin() + 12);
          ossimString year(idatim.begin() + 12, idatim.begin() + 14);
          month = monthStringToNumberString(month.downcase());
-         
+
          if (year.toUInt32() > 60)
          {
             result += "19";
@@ -2384,7 +2384,7 @@ std::string oms::DataInfo::convertIdatimToXmlDate(const std::string& idatim) con
          result += sec + "Z";
       }
    }
-   
+
    return result;
 }
 
@@ -2412,7 +2412,7 @@ std::string oms::DataInfo::convertAcqDateToXmlDate(const std::string& value) con
 
 
 void oms::DataInfo::appendRasterEntryDateTime(std::string& outputString,
-                                              const std::string& indentation, 
+                                              const std::string& indentation,
                                               const std::string& separator) const
 {
    ossimRefPtr<ossimProperty> prop;
@@ -2420,7 +2420,7 @@ void oms::DataInfo::appendRasterEntryDateTime(std::string& outputString,
    convertIdatimToXmlDate(
                           thePrivateData->theImageHandler->getPropertyValueAsString(
                                                                                     "IDATIM"));
-   
+
    if (dateValue.empty())
    {
       dateValue = convertAcqDateToXmlDate(
@@ -2437,11 +2437,11 @@ void oms::DataInfo::appendRasterEntryDateTime(std::string& outputString,
       ossimRegExp regexp2("[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][T][0-9][0-9][0-9][0-9][0-9][0-9]");
       ossimRegExp regexp3("[0-9][0-9]-(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-[0-9][0-9][0-9][0-9]");
       ossimRegExp regexp4("[0-9][0-9][0-9][0-9]-(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-[0-9][0-9]");
-      
+
      // lets try a pattern in the file name
       //
       ossimString month, day, year, hours="00", minutes="00", seconds="00";
-      
+
       if(regexp1.find(filename.c_str()))
       {
          ossimString value(regexp1.match(0));
@@ -2487,7 +2487,7 @@ void oms::DataInfo::appendRasterEntryDateTime(std::string& outputString,
             year  = splitArray[0];
          }
       }
-      
+
       if(!month.empty()&&!day.empty()&&!year.empty())
       {
          dateValue = year+"-"+month+"-"+day+"T" + hours + ":" + minutes + ":" + seconds +"Z";
@@ -2508,7 +2508,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 {
    ossimString dateValue = "";
    outputString += indentation + "<metadata>" + separator;
-   
+
    std::shared_ptr<ossimInfoBase> info = ossimInfoFactoryRegistry::instance()->create(thePrivateData->theFilename);
    if(info)
    {
@@ -2516,7 +2516,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       ossimKeywordlist kwl2;
       ossimXmlOutputKeywordList kwl3;
      // ossimKeywordlist kwl3;
-      
+
       //info->print(std::cout);
       //      kwl.removeKeysThatMatch("[^.*image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) +
       //                              "]");
@@ -2563,7 +2563,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString organization;
          ossimString description;
          ossimString niirs;
-         
+
          // Open the dot omd file if present as it can now have metadata in it.
          ossimFilename omdFile;
          getOmdFile( omdFile );
@@ -2571,7 +2571,13 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          {
             kwl3.addFile( omdFile );
          }
-         
+
+         ossimRefPtr<ossimImageGeometry> geom = thePrivateData->theImageHandler->getImageGeometry();
+         bool validModel = false;
+         if(geom){
+            validModel = geom->isAffectedByElevation();
+         }
+
          // This downcases only the keys, not the values.
          kwl.downcaseKeywords();
          kwl3.downcaseKeywords();
@@ -2590,10 +2596,10 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          // Date:
          getDate( kwl3, dateValue.string() );
-         
+
          // Description:
          getDescription( kwl3, description.string() );
-         
+
          // Grazing angle:
          getGrazingAngle( kwl3, grazingAngle.string() );
 
@@ -2607,7 +2613,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          getImageRepresentation( kwl3, imageRepresentation.string() );
 
          // ISOURCE:
-         getIsorce( kwl3, isorce.string() );            
+         getIsorce( kwl3, isorce.string() );
 
          // Mission:
          getMissionId( kwl3, missionId.string() );
@@ -2616,10 +2622,10 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          getNiirs( kwl3, niirs.string() );
 
          getOffNadirAngle( kwl3, offNadirAngle.string() );
-         
+
          // Organization:
          getOrganization( kwl3, organization.string() );
-         
+
          // Product:
          getProductId( kwl3, productId.string() );
 
@@ -2634,13 +2640,13 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          // Strip ID:
          getStripId( kwl3, stripId.string() );
-         
+
          // Sun azimuth:
          getSunAzimuth( kwl3, sunAzimuth.string() );
-          
+
         // Sun elevation:
          getSunElevation( kwl3, sunElevation.string() );
-          
+
          // Target ID:
          getTargetId( kwl3, targetId.string() );
 
@@ -2649,12 +2655,12 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
 
          outputString += indentation + "   <filename>" + ossimXmlString::wrapCDataIfNeeded(thePrivateData->theFilename.string()).string() +
-            "</filename>" + separator; 
+            "</filename>" + separator;
          outputString += indentation + "   <imageId>" + ossimXmlString::wrapCDataIfNeeded(imageId.string()).string() + "</imageId>" +
-            separator; 
+            separator;
          outputString += indentation + "   <imageRepresentation>" + imageRepresentation.string() +
             "</imageRepresentation>" + separator;
-         
+
          if ( isorce.size() )
          {
             outputString += indentation + "   <isorce>" + isorce.string() + "</isorce>" +
@@ -2662,34 +2668,34 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          }
 
          outputString += indentation + "   <targetId>" + targetId.string() + "</targetId>" +
-            separator; 
+            separator;
          outputString += indentation + "   <productId>" + productId.string() + "</productId>" +
-            separator; 
+            separator;
          outputString += indentation + "   <beNumber>" + beNumber.string() + "</beNumber>" +
-            separator; 
+            separator;
          outputString += indentation + "   <cloudCover>" + cloudCover.string() + "</cloudCover>" +
-            separator; 
+            separator;
          outputString += indentation + "   <sensorId>" + sensorId.string() + "</sensorId>" +
-            separator; 
+            separator;
          outputString += indentation + "   <missionId>" + missionId.string() + "</missionId>" +
-            separator; 
+            separator;
          outputString += indentation + "   <countryCode>" + countryCode.string() +
-            "</countryCode>" + separator; 
+            "</countryCode>" + separator;
          outputString += indentation + "   <imageCategory>" + imageCategory.string() +
-            "</imageCategory>" + separator; 
+            "</imageCategory>" + separator;
          outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() +
-            "</azimuthAngle>" + separator; 
+            "</azimuthAngle>" + separator;
          outputString += indentation + "   <grazingAngle>" + grazingAngle.string() +
             "</grazingAngle>" + separator;
                   outputString += indentation + "   <offNadirAngle>" + offNadirAngle.string() +
             "</offNadirAngle>" + separator;
          outputString += indentation + "   <securityClassification>" +
-            securityClassification.string() + "</securityClassification>" + separator; 
+            securityClassification.string() + "</securityClassification>" + separator;
          outputString += indentation + "   <securityCode>" +
-            securityCode.string() + "</securityCode>" + separator; 
-         outputString += indentation + "   <title>" + title.string() + "</title>" + separator; 
+            securityCode.string() + "</securityCode>" + separator;
+         outputString += indentation + "   <title>" + title.string() + "</title>" + separator;
          outputString += indentation + "   <organization>" + organization.string() +
-            "</organization>" + separator; 
+            "</organization>" + separator;
          outputString += indentation + "   <description>" + description.string() +
             "</description>" + separator;
          outputString += indentation + "   <niirs>" + niirs.string() + "</niirs>" + separator;
@@ -2698,11 +2704,13 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          outputString += indentation + "   <sunAzimuth>" + sunAzimuth.string() +
             "</sunAzimuth>" + separator;
          outputString += indentation + "   <sunElevation>" + sunElevation.string() +
-            "</sunElevation>" + separator; 
+            "</sunElevation>" + separator;
+         outputString += indentation + "   <validModel>" + ossimString::toString(validModel).string() +
+            "</validModel>" + separator;
 
          std::ostringstream out;
          out << kwl3;
-         outputString += out.str() + separator;  
+         outputString += out.str() + separator;
       }
    }
    else
@@ -2723,8 +2731,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             azimuthAngle = ossimString::toString(centerGpt.azimuthTo(upGpt));
          }
       }
-      outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() + "</azimuthAngle>" + separator; 
-      
+      outputString += indentation + "   <azimuthAngle>" + azimuthAngle.string() + "</azimuthAngle>" + separator;
+
    }
    ossimRefPtr<ossimImageGeometry> geom = thePrivateData->theImageHandler->getImageGeometry();
    if(geom.valid())
@@ -2732,25 +2740,25 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       bool crossesDateline = geom->getCrossesDateline();
       outputString += indentation + "   <crossesDateline>" + (crossesDateline?"true":"false") + "</crossesDateline>" + separator;
    }
-   outputString += indentation + "   <fileType>" + thePrivateData->formatName() + "</fileType>" + separator; 
-   outputString += indentation + "   <className>" + (thePrivateData->theImageHandler.valid()?thePrivateData->theImageHandler->getClassName().string():ossimString("").string()) + "</className>" + separator; 
+   outputString += indentation + "   <fileType>" + thePrivateData->formatName() + "</fileType>" + separator;
+   outputString += indentation + "   <className>" + (thePrivateData->theImageHandler.valid()?thePrivateData->theImageHandler->getClassName().string():ossimString("").string()) + "</className>" + separator;
    outputString += indentation + "</metadata>" + separator;
-   
+
    if (!dateValue.empty())
    {
       outputString += indentation + "<TimeStamp>" + separator;
       outputString += indentation + "   <when>" + dateValue.string() + "</when>"
          + separator;
       outputString += indentation + "</TimeStamp>" + separator;
-      
+
    }
-   else 
+   else
    {
       ossimString alreadyHasDate;
       appendRasterEntryDateTime(alreadyHasDate,
                                 "", "");
       outputString += alreadyHasDate.string();
-      
+
    }
 
 } // End:  oms::DataInfo::appendRasterEntryMetadata( ... )
@@ -2825,7 +2833,7 @@ void oms::DataInfo::getIsorce( const ossimKeywordlist& kwl,
          isorce = kwl.findKey( keys[0].string() );
       }
    }
-   
+
    if ( isorce.size() )
    {
       isorce = ossimString( isorce ).trim().string();
@@ -2882,11 +2890,11 @@ void oms::DataInfo::getAzimuthAngle( const ossimKeywordlist& kwl,
          }
       }
    }
-   
+
    if ( azimuthAngle.size() )
    {
       azimuthAngle = ossimString( azimuthAngle ).trim().string();
-   } 
+   }
 }
 
 void oms::DataInfo::getBeNumber( const ossimKeywordlist& kwl,
@@ -2905,7 +2913,7 @@ void oms::DataInfo::getBeNumber( const ossimKeywordlist& kwl,
          beNumber = kwl.findKey( keys[0].string() );
       }
    }
-   
+
    if ( beNumber.size() )
    {
       beNumber = ossimString( beNumber ).trim().string();
@@ -2940,9 +2948,9 @@ void oms::DataInfo::getCloudCover( const ossimKeywordlist& kwl,
          }
       }
    }
-   
+
 } // End: getCloudCover( ... )
-                                   
+
 void oms::DataInfo::getCountryCode( const ossimKeywordlist& kwl,
                                     std::string& countryCode ) const
 {
@@ -2982,13 +2990,13 @@ void oms::DataInfo::getCountryCode( const ossimKeywordlist& kwl,
                {
                   countryCode = tgtid.substr( 15, 2 );
                }
-            }     
+            }
          }
       }
    }
-   
+
 } // End: getCountryCode( ... )
-   
+
 void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
                              std::string& dateValue ) const
 {
@@ -3046,7 +3054,7 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
                      dateValue += splitArray[1].string();
                      dateValue += "Z";
                   }
-                  else 
+                  else
                   {
                      dateValue += "T00:00:00Z";
                   }
@@ -3068,7 +3076,7 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
    {
       dateValue = ossimString( dateValue ).trim().string();
    }
-   
+
 } // End: oms::DataInfo::getDate( ... )
 
 void oms::DataInfo::getDescription( const ossimKeywordlist& kwl,
@@ -3084,11 +3092,11 @@ void oms::DataInfo::getDescription( const ossimKeywordlist& kwl,
    {
       description = kwl.findKey( std::string("envi.description"));
    }
-   
+
    if ( description.size() )
    {
       description = ossimString( description ).trim().string();
-   }  
+   }
 }
 
 void oms::DataInfo::getGrazingAngle( const ossimKeywordlist& kwl,
@@ -3133,7 +3141,7 @@ void oms::DataInfo::getGrazingAngle( const ossimKeywordlist& kwl,
                grazingAngle = kwl.findKey( keys[0].string() );
             }
 
-            
+
             // From old code that was commented out.
             // ossimString tempAngleString =
             // kwl.findKey( std::string("nitf.use00a.angletonorth") );
@@ -3150,10 +3158,10 @@ void oms::DataInfo::getGrazingAngle( const ossimKeywordlist& kwl,
                grazingAngle = ossimString::toString( d ).string();
             }
          }
-#endif 
+#endif
       }
    }
-   
+
    if ( grazingAngle.size() )
    {
       grazingAngle = ossimString( grazingAngle ).trim().string();
@@ -3174,7 +3182,7 @@ void oms::DataInfo::getImageId( const ossimKeywordlist& kwl,
       {
          imageId = kwl.findKey( keys[0].string() );
       }
-      
+
       if ( imageId.empty() )
       {
          std::string key = "nitf.iid2";
@@ -3240,7 +3248,7 @@ void oms::DataInfo::getImageCategory( const ossimKeywordlist& kwl,
    if ( imageCategory.size() )
    {
       imageCategory = ossimString( imageCategory ).trim().string();
-   } 
+   }
 }
 
 void oms::DataInfo::getImageRepresentation( const ossimKeywordlist& kwl,
@@ -3273,7 +3281,7 @@ void oms::DataInfo::getImageRepresentation( const ossimKeywordlist& kwl,
    {
       imageRepresentation = ossimString( imageRepresentation ).trim().string();
    }
-   
+
 }
 
 void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
@@ -3310,10 +3318,10 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
             // generic isorce field.
             //---
             std::string iid2 = kwl.findKey( std::string("nitf.iid2") );
-            
+
             ossimString isorce;
             getIsorce( kwl, isorce );
-            
+
             if ( iid2.size() >= 11 )
             {
                // Given: "17APR151234..." return 1234:
@@ -3343,10 +3351,10 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
                         //---
                         missionId = iid2Mission;
                      }
-                  }     
+                  }
                }
             }
-            
+
             if ( missionId.empty() && isorce.size() )
             {
                missionId = isorce.string();
@@ -3359,12 +3367,12 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
          }
       }
    }
-      
+
    if ( missionId.size() )
    {
       missionId = ossimString( missionId ).trim().string();
    }
-   
+
 } // End: getMissionId( ... )
 
 void oms::DataInfo::getNiirs( const ossimKeywordlist& kwl,
@@ -3381,13 +3389,13 @@ void oms::DataInfo::getNiirs( const ossimKeywordlist& kwl,
       {
          // Taking first one...
          niirs = kwl.findKey( keys[0].string() );
-      }      
+      }
 
       if ( niirs.empty())
       {
-         // NITF Exploitation Reference Data(CSEXRA): 
+         // NITF Exploitation Reference Data(CSEXRA):
          niirs = kwl.findKey( std::string("nitf.csexra.predicted_niirs") );
-         
+
          if ( niirs.empty())
          {
             keys.clear();
@@ -3406,7 +3414,7 @@ void oms::DataInfo::getNiirs( const ossimKeywordlist& kwl,
    {
       niirs = ossimString( niirs ).trim().string();
    }
-   
+
 } // End: getNiirs( ... )
 
 void oms::DataInfo::getOrganization( const ossimKeywordlist& kwl,
@@ -3427,7 +3435,7 @@ void oms::DataInfo::getOrganization( const ossimKeywordlist& kwl,
    {
       organization = ossimString( organization ).trim().string();
    }
-   
+
 } // End: getOrganization( ... )
 
 void oms::DataInfo::getOffNadirAngle( const ossimKeywordlist& kwl,
@@ -3469,7 +3477,7 @@ void oms::DataInfo::getProductId( const ossimKeywordlist& kwl,
       {
          // Taking first one...
          productId = kwl.findKey( keys[0].string() );
-      }      
+      }
 
       if ( productId.empty() )
       {
@@ -3477,7 +3485,7 @@ void oms::DataInfo::getProductId( const ossimKeywordlist& kwl,
          if ( productId.empty())
          {
             productId = kwl.findKey( std::string("dted.dsi.product_level") );
-            
+
             if( ossimString( productId ).downcase().contains("rted") )
             {
                // Special case for generated dted:
@@ -3496,7 +3504,7 @@ void oms::DataInfo::getProductId( const ossimKeywordlist& kwl,
                   {
                      productId = "DTED0";
                   }
-                  else 
+                  else
                   {
                      productId = "DTED";
                   }
@@ -3510,14 +3518,14 @@ void oms::DataInfo::getProductId( const ossimKeywordlist& kwl,
    {
       productId = ossimString( productId ).trim().string();
    }
-   
+
 } // End: getProductId( ... )
 
 void oms::DataInfo::getSecurityClassification( const ossimKeywordlist& kwl,
                                                std::string& securityClassification ) const
 {
    // Method assumes keys have been downcased.
-   
+
    securityClassification.clear();
 
    // Look for normalized key first, could be from omd file:
@@ -3535,7 +3543,7 @@ void oms::DataInfo::getSecurityClassification( const ossimKeywordlist& kwl,
          key = "tfrd.common.classification";
          securityClassification = kwl.findKey( key );
          if ( securityClassification.empty() )
-         {  
+         {
             // nitf Image Security Classification tag:
             key = "nitf.isclas";
             securityClassification = kwl.findKey( key );
@@ -3553,7 +3561,7 @@ void oms::DataInfo::getSecurityClassification( const ossimKeywordlist& kwl,
             }
          }
       }
-      
+
    } // Matches: if ( securityClassification.empty() )
 
    if ( securityClassification.size() )
@@ -3577,13 +3585,13 @@ void oms::DataInfo::getSecurityClassification( const ossimKeywordlist& kwl,
       else if(securityClassification == "TS")
       {
          securityClassification = "TOP SECRET";
-      } 
+      }
    }
 }
 void oms::DataInfo::getSecurityCode(const ossimKeywordlist& kwl,
                                     std::string& securityCode)const
 {
-   
+
    securityCode.clear();
    // Look for normalized key first, could be from omd file:
    std::string key = "security_code";
@@ -3598,7 +3606,7 @@ void oms::DataInfo::getSecurityCode(const ossimKeywordlist& kwl,
          key = "tfrd.common.securityCode";
          securityCode = kwl.findKey( key );
          if ( securityCode.empty() )
-         {  
+         {
             // rpf
             key = "nitf.rpf.SecurityCode";
             securityCode = kwl.findKey( key );
@@ -3621,7 +3629,7 @@ void oms::DataInfo::getSecurityCode(const ossimKeywordlist& kwl,
    if(!sicCode.empty())
    {
       securityCode = sicCode.string();
-   }     
+   }
 }
 
 
@@ -3715,7 +3723,7 @@ void oms::DataInfo::getSunAzimuth( const ossimKeywordlist& kwl,
    {
       sunAzimuth = ossimString( sunAzimuth ).trim().string();
    }
-   
+
 } // End: getSunAzimuth( ... )
 
 void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
@@ -3725,15 +3733,15 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
    if ( sunElevation.empty())
    {
       // Normalized:
-      std::vector<ossimString> keys; 
+      std::vector<ossimString> keys;
       ossimString regExp = "common\\.sunel$";
       kwl.findAllKeysThatMatch( keys, regExp );
       if ( keys.size() )
       {
          // Taking first one...
          sunElevation = kwl.findKey( keys[0].string() );
-      }      
-      
+      }
+
       if ( sunElevation.empty())
       {
 			regExp = "\\.sun_elevation$";
@@ -3763,7 +3771,7 @@ void oms::DataInfo::getSunElevation( const ossimKeywordlist& kwl,
    {
       sunElevation = ossimString( sunElevation ).trim().string();
    }
-   
+
 } // End: getSunElevation( ... )
 
 void oms::DataInfo::getTargetId( const ossimKeywordlist& kwl,
@@ -3822,7 +3830,7 @@ void oms::DataInfo::getTitle( const ossimKeywordlist& kwl,
          title = kwl.findKey( std::string("nitf.iid2") );
          if ( title.empty() )
          {
-            title = kwl.findKey( std::string("nitf.ititle") );  
+            title = kwl.findKey( std::string("nitf.ititle") );
          }
       }
    }
