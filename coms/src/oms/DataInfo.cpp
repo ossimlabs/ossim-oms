@@ -2705,7 +2705,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             "</sunAzimuth>" + separator;
          outputString += indentation + "   <sunElevation>" + sunElevation.string() +
             "</sunElevation>" + separator;
-         outputString += indentation + "   <validModel>" + std::string((validModel)?"1":"0") +
+         outputString += indentation + "   <validModel>" + ossimString(validModel).string() +
             "</validModel>" + separator;
 
          std::ostringstream out;
