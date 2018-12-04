@@ -162,6 +162,7 @@ uploadArchives {
              pom.version = "${System.env.OSSIM_VERSION}-${System.env.OSSIM_VERSION_TAG.toUpperCase()}"
              pom.artifactId = "joms"
              pom.groupId = "org.ossim"
+           println "${System.env.REPOSITORY_MANAGER_URL}/ossim-local-${System.env.OSSIM_VERSION_TAG.toLowerCase()}"
        }
     }
 }
