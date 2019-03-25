@@ -2563,6 +2563,9 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          ossimString organization;
          ossimString description;
          ossimString niirs;
+         
+         ossimRefPtr<ossimImageHandler> imageHandler = thePrivateData->theImageHandler; 
+         ossim_uint32 entryId = imageHandler->getCurrentEntry();
 
          // Open the dot omd file if present as it can now have metadata in it.
          ossimFilename omdFile;
@@ -2594,8 +2597,22 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // Country code:
          getCountryCode( kwl3, countryCode.string() );
 
+         // Try using metadata from entry 0 if blank
+         if ( dateValue.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getCountryCode( kwl3, countryCode.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }         
+
          // Date:
          getDate( kwl3, dateValue.string() );
+
+         // Try using metadata from entry 0 if blank
+         if ( dateValue.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getDate( kwl3, dateValue.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }         
 
          // Description:
          getDescription( kwl3, description.string() );
@@ -2618,8 +2635,22 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // Mission:
          getMissionId( kwl3, missionId.string() );
 
+         // Try using metadata from entry 0 if blank
+         if ( missionId.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getMissionId( kwl3, missionId.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }         
+
          // NIIRS:
          getNiirs( kwl3, niirs.string() );
+
+         // Try using metadata from entry 0 if blank
+         if ( niirs.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getNiirs( kwl3, niirs.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }         
 
          getOffNadirAngle( kwl3, offNadirAngle.string() );
 
@@ -2632,11 +2663,31 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // Security classification:
          getSecurityClassification( kwl3, securityClassification.string() );
 
+         // Try using metadata from entry 0 if blank
+         if ( securityClassification.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getSecurityClassification( kwl3, securityClassification.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }
+
          // Security code
          getSecurityCode( kwl3, securityCode.string() );
 
+         // Try using metadata from entry 0 if blank
+         if ( securityCode.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getSecurityCode( kwl3, securityCode.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }
+
          // Sensor:
          getSensorId( kwl3, sensorId.string() );
+
+         if ( sensorId.empty() &&  entryId > 0 ) {
+            imageHandler->setCurrentEntry(0);
+            getSensorId( kwl3, sensorId.string() );
+            imageHandler->setCurrentEntry(entryId);
+         }
 
          // Strip ID:
          getStripId( kwl3, stripId.string() );
