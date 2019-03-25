@@ -2514,8 +2514,13 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
    {
       ossimKeywordlist kwl;
       ossimKeywordlist kwl2;
+      ossimKeywordlist tempDefaultKwl;
+      ossimKeywordlist defaultKwl;
       ossimXmlOutputKeywordList kwl3;
-     // ossimKeywordlist kwl3;
+      ossimRefPtr<ossimImageHandler> imageHandler = thePrivateData->theImageHandler;
+      ossim_uint32 entryId = imageHandler->getCurrentEntry();
+
+      // ossimKeywordlist kwl3;
 
       //info->print(std::cout);
       //      kwl.removeKeysThatMatch("[^.*image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) +
@@ -2527,13 +2532,23 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       //std::cout << "___________________________\n";
       kwl3.getMap() =  kwl.getMap();
       kwl3.removeKeysThatMatch(".*\\.image.*\\..*");
-      kwl.extractKeysThatMatch(kwl2,".*\\.image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\..*");
+      defaultKwl.getMap() = kwl3.getMap();
+      kwl.extractKeysThatMatch(kwl2, ".*\\.image" + ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\..*");
+      kwl.extractKeysThatMatch(defaultKwl, ossimString(".*\\.image0") + "\\..*");
       ossimKeywordlist::KeywordMap::iterator iter = kwl2.getMap().begin();
       while(iter != kwl2.getMap().end())
       {
          ossimString k = iter->first;
          k = k.substitute(".image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()), "");
          kwl3.getMap().insert(make_pair(k.string(), iter->second));
+         ++iter;
+      }
+      iter = tempDefaultKwl.getMap().begin();
+      while (iter != tempDefaultKwl.getMap().end())
+      {
+         ossimString k = iter->first;
+         k = k.substitute(".image0", "");
+         defaultKwl.getMap().insert(make_pair(k.string(), iter->second));
          ++iter;
       }
 
@@ -2581,7 +2596,7 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          // This downcases only the keys, not the values.
          kwl.downcaseKeywords();
          kwl3.downcaseKeywords();
-
+         defaultKwl.downcaseKeywords();
          // Azimuth angle:
          getAzimuthAngle( kwl3, azimuthAngle.string() );
 
@@ -2593,9 +2608,17 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          // Country code:
          getCountryCode( kwl3, countryCode.string() );
+         if (countryCode.empty() && entryId > 0)
+         {
+            getCountryCode(defaultKwl, countryCode.string());
+         }
 
          // Date:
          getDate( kwl3, dateValue.string() );
+         if (dateValue.empty() && entryId > 0)
+         {
+            getDate(defaultKwl, dateValue.string());
+         }
 
          // Description:
          getDescription( kwl3, description.string() );
@@ -2617,9 +2640,17 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          // Mission:
          getMissionId( kwl3, missionId.string() );
+         if (missionId.empty() && entryId > 0)
+         {
+            getMissionId(defaultKwl, missionId.string());
+         }
 
          // NIIRS:
          getNiirs( kwl3, niirs.string() );
+         if (niirs.empty() && entryId > 0)
+         {
+            getNiirs(defaultKwl, niirs.string());
+         }
 
          getOffNadirAngle( kwl3, offNadirAngle.string() );
 
@@ -2631,12 +2662,24 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
 
          // Security classification:
          getSecurityClassification( kwl3, securityClassification.string() );
+         if (securityClassification.empty() && entryId > 0)
+         {
+            getSecurityClassification(defaultKwl, securityClassification.string());
+         }
 
          // Security code
          getSecurityCode( kwl3, securityCode.string() );
+         if (securityCode.empty() && entryId > 0)
+         {
+            getSecurityCode(defaultKwl, securityCode.string());
+         }
 
          // Sensor:
          getSensorId( kwl3, sensorId.string() );
+         if (sensorId.empty() && entryId > 0)
+         {
+            getSensorId(defaultKwl, sensorId.string());
+         }
 
          // Strip ID:
          getStripId( kwl3, stripId.string() );
