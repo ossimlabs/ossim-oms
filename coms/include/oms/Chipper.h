@@ -55,6 +55,8 @@ namespace oms
     *   cut_wms_bbox: "<minx>,<miny>,<maxx>,<maxy>"
     *   hist_op: auto-minmax
     *   image0.file: absolute_path_to_image
+    *   image0.histogram: absolute_path_to_histogram to use
+    *   image0.overview: absolute_path_to_overview to use
     *   image0.entry: 0
     *   operation: ortho
     *   output_radiometry: U8
@@ -66,6 +68,8 @@ namespace oms
     *   ccut_bbox_xywh: "<x>,<y>,<width>,<height>"
     *   hist_op: auto-minmax
     *   image0.file: absolute_path_to_image
+    *   image0.histogram: absolute_path_to_histogram to use
+    *   image0.overview: absolute_path_to_overview to use
     *   image0.entry: 0
     *   operation: chip
     *   output_radiometry: U8
