@@ -294,9 +294,9 @@ void oms::WmsMap::setChainParameters(const ossimKeywordlist& value, int idx)
       return;
    }
    ossimString viewable_bands = value.find("viewable_bands");
-   ossimString sharpen_width = value.find("sharpen_width");
+   ossimString sharpen_percent = value.find("sharpen_percent");
    ossimString bands = value.find("bands");
-   ossimString sharpen_sigma = value.find("sharpen_sigma");
+   // ossimString sharpen_sigma = value.find("sharpen_sigma");
    ossimString stretch_mode = value.find("stretch_mode");
    ossimString stretch_region = value.find("stretch_region");
    ossimString null_flip = value.find("null_flip");
@@ -307,8 +307,7 @@ void oms::WmsMap::setChainParameters(const ossimKeywordlist& value, int idx)
       thePrivateData->m_rotation = rotateString.toDouble();
    }
    ossim_uint32 chainIdx = 0;
-   bool sharpenFlag = (!sharpen_width.empty()&&
-                       !sharpen_sigma.empty());
+   bool sharpenFlag = (!sharpen_percent.empty());
    bool globalStretch = stretch_region == "global";
    bool viewportStretch = stretch_region == "viewport";
    bool validStretch  = (!stretch_mode.empty() && 
@@ -409,7 +408,7 @@ void oms::WmsMap::setChainParameters(const ossimKeywordlist& value, int idx)
    {
       if(sharpenFlag)
       {
-         thePrivateData->inputChains[0]->setSharpen(sharpen_width.toUInt32(), sharpen_sigma.toDouble());
+         thePrivateData->inputChains[0]->setSharpen(sharpen_percent.toDouble());
       }
       else
       {
@@ -424,7 +423,7 @@ void oms::WmsMap::setChainParameters(const ossimKeywordlist& value, int idx)
       {
          if(sharpenFlag)
          {
-            thePrivateData->eightBitThreeBandChain->setSharpen(sharpen_width.toUInt32(), sharpen_sigma.toDouble());
+            thePrivateData->eightBitThreeBandChain->setSharpen(sharpen_percent.toDouble());
          }
          else
          {
@@ -614,9 +613,8 @@ void oms::WmsMap::getUnprojectedMap(
                                     const ossimKeywordlist& options)
 {
    ossimString viewable_bands = options.find("viewable_bands");
-   ossimString sharpen_width = options.find("sharpen_width");
+   ossimString sharpen_percent = options.find("sharpen_percent");
    ossimString bands = options.find("bands");
-   ossimString sharpen_sigma = options.find("sharpen_sigma");
    ossimString stretch_mode = options.find("stretch_mode");
    ossimString stretch_region = options.find("stretch_mode_region");
    ossimString null_flip = options.find("null_flip");
@@ -636,8 +634,7 @@ void oms::WmsMap::getUnprojectedMap(
    ossimIrect areaOfInterest = ossimIrect(startSample, startLine, endSample, endLine);
    bool viewportStretchFlag = ((!stretch_region.empty())&&
                                (stretch_region=="viewport"));
-   bool sharpenFlag = (!sharpen_width.empty()&&
-                       !sharpen_sigma.empty());
+   bool sharpenFlag = (!sharpen_percent.empty());
    ossim_uint32 viewableBands = viewable_bands.empty()?3:viewable_bands.toUInt32();
    if(inputSrc)
    {
@@ -698,7 +695,7 @@ void oms::WmsMap::getUnprojectedMap(
 		
       if(sharpenFlag)
       {
-         imageSpaceChain->setSharpen(sharpen_width.toUInt32(), sharpen_sigma.toDouble());
+         imageSpaceChain->setSharpen(sharpen_percent.toDouble());
       }
       if(!viewportStretchFlag)
       {
