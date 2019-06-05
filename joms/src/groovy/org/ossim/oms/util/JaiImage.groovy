@@ -1,5 +1,8 @@
 package org.ossim.oms.util;
 
+// Can't get JAI to work with the dependencies.  Will comment out until
+// I can get JAI working
+/*
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
 import java.awt.image.ComponentColorModel
@@ -135,3 +138,4 @@ public class JaiImage
   }
 
 }
+*/

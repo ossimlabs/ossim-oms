@@ -107,7 +107,9 @@ public class ImageGenerator {
     }
     result
   }
-
+  // NEED To figure out the JAI Image  dependency.  Can't get it to 
+  // work.  Will comment out for now
+/*
   static BufferedImage renderedImageToBufferedImage(RenderedImage renderedImage, HashMap hints = [:])
   {
     BufferedImage image = null
@@ -151,7 +153,7 @@ public class ImageGenerator {
     }
     image 
   }
-  
+ */ 
   static RenderedImage convertToColorIndexModel( DataBuffer dataBuffer, int width, int height, boolean transparentFlag )
   {
       ImageTypeSpecifier isp = ImageTypeSpecifier.createGrayscale( 8, DataBuffer.TYPE_BYTE, false );
