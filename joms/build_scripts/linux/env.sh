@@ -8,6 +8,9 @@ export JOMS_HOME=$PWD
 echo "@@@@@ SCRIPT_DIR=$SCRIPT_DIR"
 echo "@@@@@ JOMS_HOME=$JOMS_HOME"
 popd >/dev/null
+if [ "$REPOSITORY_MANAGER_URL" == "" ] ;
+export REPOSITORY_MANAGER_URL=https://nexus.ossim.io/repository/all-repos
+then
 
 pushd $JOMS_HOME/../.. >/dev/null
 export OSSIM_DEV_HOME=$PWD
