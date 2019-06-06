@@ -65,7 +65,7 @@ public class ImageGenerator {
     IndexColorModel icm2 = new IndexColorModel(8, size, reds, greens, blues, pixel);
     return new BufferedImage(icm2, raster, image.isAlphaPremultiplied(), null);
   }
-  static BufferedImage optimizeRaster(Raster image, ColorModel colorModel, def hints)//String mimeType, Boolean transparentFlag)
+  static BufferedImage optimizeRaster(Raster image, ColorModel colorModel, HashMap hints)//String mimeType, Boolean transparentFlag)
   {
     BufferedImage result
     String mimeTypeTest = hints.type?.toLowerCase()
@@ -109,10 +109,18 @@ public class ImageGenerator {
   }
   static BufferedImage renderedImageToBufferedImage(RenderedImage renderedImage, HashMap hints = [:])
   {
-    BufferedImage image = null
     SampleModel sampleModel = renderedImage.sampleModel
     ColorModel  colorModel  = renderedImage.colorModel
     Raster      raster      = renderedImage.data
+
+    rasterImageToBuffered(raster, sampleModel, colorModel, hints)
+  }
+  static BufferedImage rasterImageToBuffered(Raster raster, 
+                                             SampleModel sampleModel, 
+                                             ColorModel colorModel,
+                                             HashMap hints = [:])
+  {
+    BufferedImage image;
     Boolean keepBands = hints?.keepBands
     if(hints.keepBands)
     {
@@ -148,7 +156,7 @@ public class ImageGenerator {
         e.printStackTrace()
       }
     }
-    image 
+    image     
   }
   static RenderedImage convertToColorIndexModel( DataBuffer dataBuffer, int width, int height, boolean transparentFlag )
   {
@@ -171,4 +179,5 @@ public class ImageGenerator {
       WritableRaster raster = WritableRaster.createWritableRaster( sampleModel, dataBuffer, null );
       return new BufferedImage( colorModel, raster, false, null );
   }
+
 }
