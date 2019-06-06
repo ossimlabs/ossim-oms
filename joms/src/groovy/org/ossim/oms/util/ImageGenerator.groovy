@@ -65,7 +65,7 @@ public class ImageGenerator {
     IndexColorModel icm2 = new IndexColorModel(8, size, reds, greens, blues, pixel);
     return new BufferedImage(icm2, raster, image.isAlphaPremultiplied(), null);
   }
-  static BufferedImage optimizeRaster(Raster image, ColorModel colorModel, HashMap hints)//String mimeType, Boolean transparentFlag)
+  static BufferedImage optimizeRaster(Raster image, ColorModel colorModel, HashMap hints=[:])//String mimeType, Boolean transparentFlag)
   {
     BufferedImage result
     String mimeTypeTest = hints.type?.toLowerCase()
