@@ -508,10 +508,9 @@ void oms::SingleImageChain::setImageCut(const ossimDrect& rect)
    setImageCut(pointList);
 }
 
-void oms::SingleImageChain::setSharpen(ossim_uint32 kernelWidth,
-                                       ossim_float64 sigmaParameter)
+void oms::SingleImageChain::setSharpen(ossim_float64 percent)
 {
-   theImageSharpenFilter->setWidthAndSigma(kernelWidth, sigmaParameter);
+   theImageSharpenFilter->setSharpenPercent(percent);
    theImageSharpenFilter->setEnableFlag(true);
    ossimPropertyEvent evt(theImageCutter);
    theImageSharpenFilter->propagateEventToOutputs(evt);

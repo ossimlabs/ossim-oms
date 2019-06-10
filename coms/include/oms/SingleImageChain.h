@@ -123,8 +123,7 @@ namespace oms
       void setImageCut(const ossimIrect& rect);
       void setImageCut(const ossimDrect& rect);
 
-      void setSharpen(ossim_uint32 kernelWidth,
-                      ossim_float64 sigmaParameter);
+      void setSharpen(ossim_float64 percent);
       
       ossimImageSource* getImageRenderer();
       const ossimProjection* getViewProjection();
