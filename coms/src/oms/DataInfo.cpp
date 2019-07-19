@@ -1052,7 +1052,7 @@ std::string oms::DataInfo::getInfo() const
          ossim_uint64 filesize = thePrivateData->theExternalVideoGeometryFile.fileSize();
          if(filesize>0)
          {
-            ifstream in(thePrivateData->theExternalVideoGeometryFile.c_str(), std::ios::in|std::ios::binary);
+            std::ifstream in(thePrivateData->theExternalVideoGeometryFile.c_str(), std::ios::in|std::ios::binary);
             if(in.good())
             {
                buf.resize(filesize);
@@ -1278,7 +1278,7 @@ std::string oms::DataInfo::getVideoInfo()
       ossim_uint64 filesize = thePrivateData->theExternalVideoGeometryFile.fileSize();
       if(filesize>0)
       {
-         ifstream in(thePrivateData->theExternalVideoGeometryFile.c_str(), std::ios::in|std::ios::binary);
+         std::ifstream in(thePrivateData->theExternalVideoGeometryFile.c_str(), std::ios::in|std::ios::binary);
          if(in.good())
          {
             buf.resize(filesize);
