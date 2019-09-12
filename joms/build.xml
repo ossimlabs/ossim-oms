@@ -44,6 +44,7 @@
     <echo message="ossim.dependencies   = ${ossim.dependencies}" />
     <echo message="ossim.build = ${ossim.build}"/>
     <echo message="ossim.version = ${ossim.version}"/>
+    <echo message="ossim.versionTag = ${ossim.versionTag}"/>
     <echo message="os.name = ${os.name}"/>
     <echo message="osg.home = ${osg.home}"/>
     <echo message="user.home = ${user.home}"/>
