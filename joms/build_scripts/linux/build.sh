@@ -10,13 +10,21 @@ if [ ! -a local.properties ]
    cp local.properties.template local.properties
 fi
 
-# if [ -z "$GROOVY_HOME" ]; then
-#    echo "HOME Location: ${HOME}"
-#    source "$HOME/.sdkman/bin/sdkman-init.sh"
-#    if [ ! -z "$GROOVY_VERSION" ]; then
-#       sdk use groovy $GROOVY_VERSION
-#    fi
-# fi
+if [ "$GROOVY_HOME" == "" ] ; then
+    echo "ERROR: GROOVY_HOME must be defined!"
+    exit 1
+fi
+
+if [ "$OSSIM_VERSION" == "" ] ; then
+    echo "ERROR: OSSIM_VERSION must be defined!"
+    exit 1
+fi
+
+if [ "$OSSIM_VERSION_TAG" == "" ] ; then
+    echo "ERROR: OSSIM_VERSION_TAG must be defined!"
+    exit 1
+fi
+
 ant clean
 ant build
 antReturnCode=$?

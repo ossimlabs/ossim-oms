@@ -10,12 +10,17 @@ echo "@@@@@ JOMS_HOME=$JOMS_HOME"
 popd >/dev/null
 
 pushd $JOMS_HOME/../.. >/dev/null
+if [ "${OSSIM_DEV_HOME}" == "" ] ; then
 export OSSIM_DEV_HOME=$PWD
+fi
+if [ "${OSSIM_HOME}" == "" ] ; then
 export OSSIM_HOME=$OSSIM_DEV_HOME/ossim
-if [ -z "$OSSIM_BUILD_DIR" ]; then
+fi
+
+if [ "$OSSIM_BUILD_DIR" == "" ]; then
    export OSSIM_BUILD_DIR=$OSSIM_DEV_HOME/build
 fi
-if [ -z "$OSSIM_INSTALL_PREFIX" ]; then
+if [ "$OSSIM_INSTALL_PREFIX" == "" ]; then
    export OSSIM_INSTALL_PREFIX=$OSSIM_DEV_HOME/install
 fi
 popd >/dev/null
