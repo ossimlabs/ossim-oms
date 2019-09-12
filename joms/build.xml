@@ -1,6 +1,6 @@
 
 <project name="joms" default="build" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
-
+<property environment="env"/>
 <scriptdef language="javascript" name="upper">
     <attribute name="string" /> 
     <attribute name="to" />
@@ -17,7 +17,6 @@
                          attributes.get( "string" ).toLowerCase() );
 </scriptdef>
 
-    <property environment="env" />
 
   <path id="maven-ant-tasks.classpath" path="lib/maven-ant-tasks-2.1.3.jar" />
   <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
@@ -48,7 +47,8 @@
     <echo message="os.name = ${os.name}"/>
     <echo message="osg.home = ${osg.home}"/>
     <echo message="user.home = ${user.home}"/>
-    <artifact:remoteRepository id="remote.repository" url="${env.REPOSITORY_MANAGER_URL}/all-repos" />
+   <echo message="repository_manager.url = ${repository_manager.url}"/>
+    <artifact:remoteRepository id="remote.repository" url="${repository_manager.url}/all-repos" />
 
     <artifact:dependencies filesetId="dependency.fileset">
         <remoteRepository refid="remote.repository" />
