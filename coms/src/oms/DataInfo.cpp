@@ -1311,7 +1311,6 @@ std::string oms::DataInfo::getVideoInfo()
       }
       if(!composite->isEmpty())
       {
-         GEOSWKTWriter* writer = GEOSWKTWriter_create();
          std::string tempGeom = composite->toString();
          result += "<groundGeom area=\"";
          result += (ossimString::toString(composite->getArea() * ossimGpt().metersPerDegree().y)).string();
