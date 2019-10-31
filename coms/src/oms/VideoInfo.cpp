@@ -158,35 +158,26 @@ void oms::VideoInfo::close()
 
 void geomUnion(GEOSGeometry *geom, GEOSGeometry **composite)
 {
+   if(!geom) return;
+   if(!GEOSisValid(geom))
+   {
+      GEOSGeom_destroy(geom);
+      return;
+   }
    if (!*composite)
    {
-      if (GEOSisValid(geom))
-      {
-         *composite = geom;
-      }
+      *composite = geom;
    }
    else if (geom)
    {
-      try
+      GEOSGeometry *newGeom = GEOSUnion(geom, *composite);
+      if (newGeom)
       {
-         if (GEOSisValid(geom))
-         {
-            GEOSGeometry *newGeom = GEOSUnion(geom, *composite);
-            if (newGeom)
-            {
-               GEOSGeom_destroy(*composite);
-               *composite = newGeom;
-            }
-            GEOSGeom_destroy(geom);
-            geom = 0;
-         }
+         GEOSGeom_destroy(*composite);
+         *composite = newGeom;
       }
-      catch (...)
-      {
-         if (geom)
-            GEOSGeom_destroy(geom);
-         geom = 0;
-      }
+      GEOSGeom_destroy(geom);
+      geom = 0;
    }
 }
 
