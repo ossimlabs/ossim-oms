@@ -319,7 +319,7 @@ GEOSGeometry *geomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
    GEOSWKTReader *reader = GEOSWKTReader_create();
    GEOSGeometry *result = 0;
 
-   std::string multipolygon("MULTIPOLYGON(((" + 
+   ossimString multipolygon(ossimString("MULTIPOLYGON(((") + 
          ossimString::toString(ul.lond()) + " " + 
          ossimString::toString(ul.latd()) + "," + 
          ossimString::toString(ur.lond()) + " " + 
@@ -329,7 +329,7 @@ GEOSGeometry *geomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
          ossimString::toString(ll.lond()) + " " + 
          ossimString::toString(ll.latd()) + "," + 
          ossimString::toString(ul.lond()) + " " + 
-         ossimString::toString(ul.latd()) + " " + ")))");
+         ossimString::toString(ul.latd()) + " " + ossimString(")))"));
    result = GEOSWKTReader_read(reader, multipolygon.c_str());
    GEOSWKTReader_destroy(reader);
 
