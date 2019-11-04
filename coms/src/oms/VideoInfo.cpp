@@ -269,7 +269,8 @@ GEOSGeometry *geomFromSensorPosition(ossimRefPtr<ossimPredatorKlvTable> klvTable
    {
       GEOSWKTReader *reader = GEOSWKTReader_create();
 
-      ossimString str("POINT(" + ossimString::toString(lon) + " " + ossimString::toString(lat) + ")");
+      ossimString str(ossimString("POINT(") + ossimString::toString(lon) + 
+                      ossimString(" ") + ossimString::toString(lat) + ossimString(")"));
       result = GEOSWKTReader_read(reader, str.c_str());
       GEOSWKTReader_destroy(reader);
    }
