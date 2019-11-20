@@ -21,16 +21,7 @@
 #include <ossim/base/ossimXmlString.h>
 #include <ossim/base/ossimPolygon.h>
 #include <ossim/base/ossimPolyArea2d.h>
-#include <geos/geom/Coordinate.h>
-#include <geos/geom/CoordinateArraySequence.h>
-#include <geos/geom/GeometryFactory.h>
-#include <geos/geom/LinearRing.h>
-#include <geos/geom/Point.h>
-#include <geos/geom/Polygon.h>
-#include <geos/geom/PrecisionModel.h>
-#include <geos/io/WKTReader.h>
-#include <geos/io/WKTWriter.h>
-#include <geos/util/GEOSException.h>
+
 #ifdef OSSIM_VIDEO_ENABLED
 #  include <ossimPredator/ossimPredatorVideo.h>
 #  include <ossimPredator/ossimPredatorKlvTable.h>
@@ -39,6 +30,7 @@
 #include <sstream>
 #include <memory>
 #include <ctype.h>
+#include <geos_c.h>
 #if 0
 static ossimString monthToNumericString(const ossimString& month)
 {
@@ -789,8 +781,9 @@ void appendToMultiGeometry(std::string& /*result*/,
 
 }
 
-geos::geom::Geometry* createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
+std::shared_ptr<ossimPolyArea2d> createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTable)
 {
+   std::shared_ptr<ossimPolyArea2d> result;
    ossimGpt wgs84;
    ossimGpt ul;
    ossimGpt ur;
@@ -829,13 +822,13 @@ geos::geom::Geometry* createGeomFromKlv(ossimRefPtr<ossimPredatorKlvTable> klvTa
    lr.changeDatum(wgs84.datum());
    ll.changeDatum(wgs84.datum());
 
-   geos::io::WKTReader reader;
-   geos::geom::Geometry* result = 0;
+   // geos::io::WKTReader reader;
+   // geos::geom::Geometry* result = 0;
 
-
+   result = std::make_shared<ossimPolyArea2d>();
    try
    {
-      result = reader.read("MULTIPOLYGON((("
+      result->setFromWkt("MULTIPOLYGON((("
                            +ossimString::toString(ul.lond())+" "
                            +ossimString::toString(ul.latd())+","
                            +ossimString::toString(ur.lond())+" "
@@ -1087,7 +1080,7 @@ std::string oms::DataInfo::getInfo() const
          result += "         <spatialMetadata>\n";
          ossim_uint32 idx = 0;
          // safer to rewind
-         geos::geom::Geometry* composite = 0;
+         std::shared_ptr<ossimPolyArea2d> composite = 0;
          thePrivateData->thePredatorVideo->rewind();
          ossimRefPtr<ossimPredatorVideo::KlvInfo> klvInfo = thePrivateData->thePredatorVideo->nextKlv();
 
@@ -1095,7 +1088,7 @@ std::string oms::DataInfo::getInfo() const
 #if 1
          while(klvInfo.valid() &&klvInfo->table())
          {
-            geos::geom::Geometry* geom = createGeomFromKlv(klvInfo->table());
+            std::shared_ptr<ossimPolyArea2d> geom = createGeomFromKlv(klvInfo->table());
             //std::cout << klvInfo->table()->print(std::cout) << std::endl;
             if(!composite)
             {
@@ -1115,26 +1108,21 @@ std::string oms::DataInfo::getInfo() const
                   //      std::cout << "VALID? " << geom->isValid() << std::endl;
                   if(geom->isValid())
                   {
-                     geos::geom::Geometry* newGeom = geom->Union(composite);
+                     *composite+=*geom;
 
-                     if(geom) delete geom;
-                     delete composite;
-                     composite = newGeom;
-
+                     geom = 0;
                   }
                }
                catch ( const std::exception& e )
                {
                   ossimNotify(ossimNotifyLevel_WARN)
                      << "oms::DataInfo::getInfo caught ossim exception: " << e.what() << std::endl;
-                  if(geom) delete geom;
                   geom = 0;
                }
                catch(...)
                {
                   ossimNotify(ossimNotifyLevel_WARN)
                      << "oms::DataInfo::getInfo caught ossim exception!" << std::endl;
-                  if(geom) delete geom;
                   geom = 0;
                }
             }
@@ -1143,16 +1131,13 @@ std::string oms::DataInfo::getInfo() const
          }
          if(composite)
          {
-            geos::io::WKTWriter writer;
-            std::string tempGeom;
             try
             {
-               tempGeom = writer.write(composite);
                //std::cout << "OUTPUT = " << tempGeom << std::endl;
                result += "<groundGeom area=\"";
                result += (ossimString::toString(composite->getArea()*ossimGpt().metersPerDegree().y)).string();
                result += "\" srs=\"epsg:4326\"";
-               result += ">" + tempGeom + "</groundGeom>";
+               result += ">" + composite->toString() + "</groundGeom>";
             }
             catch ( const std::exception& e )
             {
@@ -1165,7 +1150,6 @@ std::string oms::DataInfo::getInfo() const
                   << "oms::DataInfo::getInfo caught ossim exception!" << std::endl;
             }
 
-            delete composite;
             composite = 0;
          }
 
@@ -1314,68 +1298,24 @@ std::string oms::DataInfo::getVideoInfo()
       ossim_uint32 idx = 0;
       // safer to rewind
       thePrivateData->thePredatorVideo->rewind();
-      geos::geom::Geometry* composite = 0;
       ossimRefPtr<ossimPredatorVideo::KlvInfo> klvInfo = thePrivateData->thePredatorVideo->nextKlv();
 // this code does a union of all the polygons
 #if 1
-      while(klvInfo.valid() &&klvInfo->table())
+      std::shared_ptr<ossimPolyArea2d> composite = std::make_shared<ossimPolyArea2d>();
+      while (klvInfo.valid() && klvInfo->table())
       {
-         geos::geom::Geometry* geom = createGeomFromKlv(klvInfo->table());
-         if(!composite)
-         {
-            composite = geom;
-         }
-         else if(geom)
-         {
-            try
-            {
-               geos::geom::Geometry* newGeom = composite->Union(geom);
-               if(geom) delete geom;
-               delete composite;
-               composite = newGeom;
-            }
-            catch ( const std::exception& e )
-            {
-               ossimNotify(ossimNotifyLevel_WARN)
-                  << "oms::DataInfo::getVideoInfo caught exception: " << e.what() << std::endl;
-               if(geom) delete geom;
-               geom = 0;
-
-            }
-            catch(...)
-            {
-               ossimNotify(ossimNotifyLevel_WARN)
-                  << "oms::DataInfo::getVideoInfo caught exception!" << std::endl;
-               if(geom) delete geom;
-               geom = 0;
-            }
-         }
+         std::shared_ptr<ossimPolyArea2d> geom = createGeomFromKlv(klvInfo->table());
+         *composite += *geom;
          klvInfo = thePrivateData->thePredatorVideo->nextKlv();
          idx++;
       }
-      if(composite)
+      if(!composite->isEmpty())
       {
-         geos::io::WKTWriter writer;
-         std::string tempGeom;
-         try
-         {
-            tempGeom = writer.write(composite);
-            result += "<groundGeom area=\"";
-            result += (ossimString::toString(composite->getArea()*ossimGpt().metersPerDegree().y)).string();
-            result += "\" srs=\"epsg:4326\"";
-            result += ">" + tempGeom + "</groundGeom>";
-         }
-         catch ( const std::exception& e )
-         {
-            ossimNotify(ossimNotifyLevel_WARN)
-               << "oms::DataInfo::getVideoInfo caught exception: " << e.what() << std::endl;
-         }
-         catch(...)
-         {
-            ossimNotify(ossimNotifyLevel_WARN)
-               << "oms::DataInfo::getVideoInfo caught exception!" << std::endl;
-         }
-         delete composite;
+         std::string tempGeom = composite->toString();
+         result += "<groundGeom area=\"";
+         result += (ossimString::toString(composite->getArea() * ossimGpt().metersPerDegree().y)).string();
+         result += "\" srs=\"epsg:4326\"";
+         result += ">" + tempGeom + "</groundGeom>";
          composite = 0;
       }
 
@@ -1385,7 +1325,9 @@ std::string oms::DataInfo::getVideoInfo()
       while (klvInfo.valid() && klvInfo->table())
       {
          ossimString klvnumber = ossimString::toString(idx);
-         appendVideoGeom(result, klvInfo->table(),"                  ", "\n", klvnumber.c_str());
+         appendVideoGeom(result, klvInfo->table(),
+                         "                  ", "\n", 
+                         klvnumber.c_str());
          klvInfo = thePrivateData->thePredatorVideo->nextKlv();
          idx++;
       }
