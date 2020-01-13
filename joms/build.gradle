@@ -159,7 +159,7 @@ uploadArchives {
   dependsOn copyJarToBuildDir
     repositories {
        mavenDeployer {
-             repository(url: "${System.env.REPOSITORY_MANAGER_URL}/ossimlabs") {
+             repository(url: "${System.env.MAVEN_UPLOAD_URL}") {
              authentication(userName: "${System.env.REPOSITORY_MANAGER_USER}", password: "${System.env.REPOSITORY_MANAGER_PASSWORD}")
 }
              pom.version = "${System.env.OSSIM_VERSION}-${System.env.OSSIM_VERSION_TAG.toUpperCase()}"
