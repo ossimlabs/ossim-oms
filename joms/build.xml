@@ -53,6 +53,7 @@
 
     <artifact:dependencies filesetId="dependency.fileset">
         <remoteRepository refid="remote.repository" />
+	    <echo message="repository_manager.url = ${repository_manager.url}"/>
 
         <dependency groupId="org.apache.commons" artifactId="commons-compress" version="1.9"/>
         <dependency groupId="commons-lang" artifactId="commons-lang" version="2.6"/>
