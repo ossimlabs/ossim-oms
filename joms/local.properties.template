@@ -30,7 +30,7 @@ ossim.dependencies=${env.OSSIM_DEPENDENCIES}
 ossim.version=${env.OSSIM_VERSION}
 ossim.versionTag=${env.OSSIM_VERSION_TAG}
 repository_manager.repoId=ossim.remote.repo
-repository_manager.url=${env.REPOSITORY_MANAGER_URL}
+repository_manager.url=${env.REPOSITORY_MANAGER_URL}/all-repos
 
 <!-- Home of ossimPredator. -->
 predator.home=${env.OSSIM_DEV_HOME}/ossim-video
