@@ -49,7 +49,7 @@
     <echo message="osg.home = ${osg.home}"/>
     <echo message="user.home = ${user.home}"/>
    <echo message="repository_manager.url = ${repository_manager.url}"/>
-    <artifact:remoteRepository id="remote.repository" url="${repository_manager.url}/all-repos" />
+    <artifact:remoteRepository id="remote.repository" url="${repository_manager.url}" />
 
     <artifact:dependencies filesetId="dependency.fileset">
         <remoteRepository refid="remote.repository" />
@@ -115,8 +115,8 @@
        		         <taskdef name="groovyc"
                 	    classname="org.codehaus.groovy.ant.Groovyc">
                 	    <classpath>
-				            <fileset dir="${groovy.home}/embeddable/">
-        				        <include name="groovy-all-*.jar"/>
+				            <fileset dir="${groovy.home}/lib/">
+        				        <include name="*.jar"/>
       				        </fileset>
                             <pathelement path="${basedir}/bin"/>
                 	    </classpath>
@@ -437,7 +437,7 @@
     <target name="mvn-install" depends="install">
         <exec executable="mvn">
             <arg value="install:install-file"/>
-            <arg value="-Dmaven.repo.remote=${env.OSSIM_MAVEN_PROXY}"/>
+            <arg value="-Dmaven.repo.remote=${env.MAVEN_REPO_URL}"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
             <arg value="-DgroupId=org.ossim"/>
             <arg value="-DartifactId=${module.name}"/>
