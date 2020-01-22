@@ -49,7 +49,7 @@
     <echo message="osg.home = ${osg.home}"/>
     <echo message="user.home = ${user.home}"/>
    <echo message="repository_manager.url = ${repository_manager.url}"/>
-    <artifact:remoteRepository id="remote.repository" url="${repository_manager.url}/all-repos" />
+    <artifact:remoteRepository id="remote.repository" url="${repository_manager.url}/repository/all-repos" />
 
     <artifact:dependencies filesetId="dependency.fileset">
         <remoteRepository refid="remote.repository" />
