@@ -2615,7 +2615,6 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
          {
             getSecurityCode(defaultKwl, securityCode.string());
          }
-
          // Sensor:
          getSensorId( kwl3, sensorId.string() );
          if (sensorId.empty() && entryId > 0)
@@ -3055,6 +3054,14 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
             }
          }
       }
+      if(dateValue.empty())
+      {
+         dateValue = kwl.findKey("nitf.csdida.time");
+         if(!dateValue.empty())
+         {
+            dateValue += "Z";
+         }
+      }
    }
 
    if ( dateValue.size() )
@@ -3273,6 +3280,14 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
                                   std::string& missionId ) const
 {
 	missionId = kwl.findKey( std::string("mission_id") ); // omd file
+
+   ossimString platformCode = kwl.find("nitf.csdida.platform_code");
+   ossimString vehicleId = kwl.find("nitf.csdida.vehicle_id");
+   if (!platformCode.empty() && !vehicleId.empty())
+   {
+      missionId = (platformCode + vehicleId).c_str();
+   }
+
    if ( missionId.empty())
    {
       // Normalized:
@@ -3624,13 +3639,18 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
    sensorId = kwl.findKey( std::string("sensor_id") ); // omd file
    if ( sensorId.empty())
    {
-      sensorId = kwl.findKey( std::string("nitf.common.sensor_id") );
-      if ( sensorId.empty() )
+      sensorId = kwl.find("nitf.csdida.sensor_id");
+      if(sensorId.empty())
       {
-         sensorId = kwl.findKey( std::string("tfrd.common.sensor_id") );
+         sensorId = kwl.findKey(std::string("nitf.common.sensor_id"));
+
          if ( sensorId.empty() )
          {
-            sensorId = kwl.findKey( std::string("tiff.gdalmetadata.instrument") );
+            sensorId = kwl.findKey( std::string("tfrd.common.sensor_id") );
+            if ( sensorId.empty() )
+            {
+               sensorId = kwl.findKey( std::string("tiff.gdalmetadata.instrument") );
+            }
          }
       }
    }
