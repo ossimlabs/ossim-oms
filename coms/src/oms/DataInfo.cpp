@@ -3028,11 +3028,19 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
             if ( tiffDate.size() )
             {
                std::vector<ossimString> splitArray;
-               tiffDate.split(splitArray, " ");
-               if(splitArray.size() > 0)
+
+               // test first if we are 'T' seaprated
+               //
+               tiffDate.split(splitArray, "T");
+               if(splitArray.size() != 2)
+               {
+                  splitArray.clear();
+                  tiffDate.split(splitArray, " ");
+               }
+               if (splitArray.size() > 0)
                {
                   dateValue = splitArray[0].substitute(":", "-", true).string();
-                  if(splitArray.size() > 1)
+                  if (splitArray.size() > 1)
                   {
                      dateValue += "T";
                      dateValue += splitArray[1].string();
