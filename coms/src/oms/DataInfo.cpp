@@ -3281,8 +3281,8 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
 {
 	missionId = kwl.findKey( std::string("mission_id") ); // omd file
 
-   ossimString platformCode = kwl.find("nitf.csdida.platform_code");
-   ossimString vehicleId = kwl.find("nitf.csdida.vehicle_id");
+   ossimString platformCode = kwl.findKey("nitf.csdida.platform_code");
+   ossimString vehicleId = kwl.findKey("nitf.csdida.vehicle_id");
    if (!platformCode.empty() && !vehicleId.empty())
    {
       missionId = (platformCode + vehicleId).c_str();
@@ -3639,7 +3639,7 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
    sensorId = kwl.findKey( std::string("sensor_id") ); // omd file
    if ( sensorId.empty())
    {
-      sensorId = kwl.find("nitf.csdida.sensor_id");
+      sensorId = kwl.findKey("nitf.csdida.sensor_id");
       if(sensorId.empty())
       {
          sensorId = kwl.findKey(std::string("nitf.common.sensor_id"));
