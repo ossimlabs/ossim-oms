@@ -153,7 +153,11 @@ public:
       {
          for(++textChars;textChars!=value.end();++textChars)
          {
-            if(!isalnum(*(textChars) ))
+            bool test = isalnum(*textChars) ||
+                        (*textChars == '-') ||
+                        (*textChars == '_') ||
+                        (*textChars == '.');
+            if (!test)
             {
                result = false;
                break;
@@ -200,7 +204,7 @@ public:
                ossim_uint32 idx = 0;
                for(idx = 0; ((idx < splitValues.size()-1)&&tagOk);++idx)
                {
-                  if(!validTag(splitValues[idx]))
+                  if (!validTag(splitValues[idx]))
                   {
                      tagOk = false;
                   }
@@ -235,7 +239,6 @@ public:
       {
          out << *(metadata.get())<<std::endl;
       }
-
    }
    void replaceSpecialCharacters(ossimString& value)const
    {
@@ -2468,10 +2471,8 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       //      kwl.removeKeysThatMatch("[^.*image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) +
       //                              "]");
       info->getKeywordlist(kwl);
+
       replaceSpacesInKeys(kwl);
-      //std::cout << "___________________________\n";
-      //std::cout << kwl << std::endl;
-      //std::cout << "___________________________\n";
       kwl3.getMap() =  kwl.getMap();
       kwl3.removeKeysThatMatch(".*\\.image.*\\..*");
       defaultKwl.getMap() = kwl3.getMap();
@@ -3024,10 +3025,18 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
          }
          else
          {
-            ossimString tiffDate(kwl.find("tiff.date_time"));
-            if ( tiffDate.size() )
+            ossimString tiffDate(kwl.find("tiff.acquisition_date"));
+
+            if(tiffDate.empty())
+            {
+               tiffDate = kwl.findKey("tiff.date_time");
+            }
+            if (!tiffDate.empty())
             {
                std::vector<ossimString> splitArray;
+
+               // strip any decimal based seconds
+               tiffDate = tiffDate.replaceStrThatMatch("\\..*", "");
 
                // test first if we are 'T' seaprated
                //
@@ -3044,7 +3053,10 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
                   {
                      dateValue += "T";
                      dateValue += splitArray[1].string();
-                     dateValue += "Z";
+                     if(!splitArray[1].endsWith("Z"))
+                     {
+                        dateValue += "Z";
+                     }
                   }
                   else
                   {
@@ -3651,13 +3663,16 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
       if(sensorId.empty())
       {
          sensorId = kwl.findKey(std::string("nitf.common.sensor_id"));
-
          if ( sensorId.empty() )
          {
-            sensorId = kwl.findKey( std::string("tfrd.common.sensor_id") );
-            if ( sensorId.empty() )
+            sensorId = kwl.findKey(std::string("tiff.sensor_id"));
+            if(sensorId.empty())
             {
-               sensorId = kwl.findKey( std::string("tiff.gdalmetadata.instrument") );
+               sensorId = kwl.findKey(std::string("tfrd.common.sensor_id"));
+               if (sensorId.empty())
+               {
+                  sensorId = kwl.findKey(std::string("tiff.gdalmetadata.instrument"));
+               }
             }
          }
       }
@@ -3666,7 +3681,7 @@ void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
    {
       sensorId = kwl.findKey( std::string("envi.sensor_type"));
    }
-   if ( sensorId.size() )
+   if ( !sensorId.empty() )
    {
       sensorId = ossimString( sensorId ).trim().string();
    }
