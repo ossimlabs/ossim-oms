@@ -21,6 +21,7 @@
 #include <ossim/base/ossimXmlString.h>
 #include <ossim/base/ossimPolygon.h>
 #include <ossim/base/ossimPolyArea2d.h>
+#include <ossim/base/KwlNodeXmlFormatter.h>
 
 #ifdef OSSIM_VIDEO_ENABLED
 #  include <ossimPredator/ossimPredatorVideo.h>
@@ -108,7 +109,7 @@ static ossimString blankOutBinary(const ossimString& s)
    return result;
 }
 
-
+#if 0
 class ossimXmlOutputKeywordList : public ossimKeywordlist
 {
 public:
@@ -257,7 +258,7 @@ public:
    }
    bool m_includeMetadataTagName;
 };
-
+#endif
 namespace oms
 {
    class DataInfoPrivateData
@@ -2461,11 +2462,10 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       ossimKeywordlist kwl2;
       ossimKeywordlist tempDefaultKwl;
       ossimKeywordlist defaultKwl;
-      ossimXmlOutputKeywordList kwl3;
+      // ossimXmlOutputKeywordList kwl3;
+      ossimKeywordlist kwl3;
       ossimRefPtr<ossimImageHandler> imageHandler = thePrivateData->theImageHandler;
       ossim_uint32 entryId = imageHandler->getCurrentEntry();
-
-      // ossimKeywordlist kwl3;
 
       //info->print(std::cout);
       //      kwl.removeKeysThatMatch("[^.*image"+ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) +
@@ -2473,7 +2473,10 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
       info->getKeywordlist(kwl);
 
       replaceSpacesInKeys(kwl);
-      kwl3.getMap() =  kwl.getMap();
+      // std::cout << "_________________________\n";
+      // std::cout << kwl << "\n";
+      // std::cout << "_________________________\n";
+      kwl3.getMap() = kwl.getMap();
       kwl3.removeKeysThatMatch(".*\\.image.*\\..*");
       defaultKwl.getMap() = kwl3.getMap();
       kwl.extractKeysThatMatch(kwl2, ".*\\.image" + ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\..*");
@@ -2694,8 +2697,17 @@ void oms::DataInfo::appendRasterEntryMetadata( std::string& outputString,
             "</validModel>" + separator;
 
          std::ostringstream out;
-         out << kwl3;
+         //out << kwl3;
+         //outputString += out.str() + separator;
+
+         std::shared_ptr<ossim::KwlNodeFormatter> formatter =
+             std::make_shared<ossim::KwlNodeXmlFormatter>(kwl3);
+         // std::cout << " ----------------------------------------- \n";
+         formatter->write(out,
+                          ossim::KwlNodeFormatter::FormatHints(3,true, false, true));
          outputString += out.str() + separator;
+
+         // std::cout << " ----------------------------------------- \n";
       }
    }
    else
@@ -3025,26 +3037,30 @@ void oms::DataInfo::getDate( const ossimKeywordlist& kwl,
          }
          else
          {
-            ossimString tiffDate(kwl.find("tiff.acquisition_date"));
+            ossimString dateString(kwl.findKey("tiff.acquisition_date"));
 
-            if(tiffDate.empty())
+            if (dateString.empty())
             {
-               tiffDate = kwl.findKey("tiff.date_time");
+               dateString = kwl.findKey("tiff.date_time");
             }
-            if (!tiffDate.empty())
+            if(dateString.empty())
+            {
+               dateString = kwl.findKey("jp2.acquisition_date");
+            }
+            if (!dateString.empty())
             {
                std::vector<ossimString> splitArray;
 
                // strip any decimal based seconds
-               tiffDate = tiffDate.replaceStrThatMatch("\\..*", "");
+               dateString = dateString.replaceStrThatMatch("\\..*", "");
 
                // test first if we are 'T' seaprated
                //
-               tiffDate.split(splitArray, "T");
+               dateString.split(splitArray, "T");
                if(splitArray.size() != 2)
                {
                   splitArray.clear();
-                  tiffDate.split(splitArray, " ");
+                  dateString.split(splitArray, " ");
                }
                if (splitArray.size() > 0)
                {
@@ -3656,36 +3672,45 @@ void oms::DataInfo::getSecurityCode(const ossimKeywordlist& kwl,
 void oms::DataInfo::getSensorId( const ossimKeywordlist& kwl,
                                  std::string& sensorId ) const
 {
-   sensorId = kwl.findKey( std::string("sensor_id") ); // omd file
-   if ( sensorId.empty())
-   {
-      sensorId = kwl.findKey("nitf.csdida.sensor_id");
-      if(sensorId.empty())
+      // Normalized:
+      std::vector<ossimString> keys;
+      ossimString regExp = "sensor_id$";
+      kwl.findAllKeysThatMatch(keys, regExp);
+      if (keys.size())
       {
-         sensorId = kwl.findKey(std::string("nitf.common.sensor_id"));
-         if ( sensorId.empty() )
-         {
-            sensorId = kwl.findKey(std::string("tiff.sensor_id"));
-            if(sensorId.empty())
-            {
-               sensorId = kwl.findKey(std::string("tfrd.common.sensor_id"));
-               if (sensorId.empty())
-               {
-                  sensorId = kwl.findKey(std::string("tiff.gdalmetadata.instrument"));
-               }
-            }
-         }
+         // Taking first one...
+         sensorId = kwl.findKey(keys[0].string());
+      }
+//      sensorId = kwl.findKey(std::string("sensor_id")); // omd file
+      // if (sensorId.empty())
+      // {
+      //    sensorId = kwl.findKey("nitf.csdida.sensor_id");
+      //    if (sensorId.empty())
+      //    {
+      //       sensorId = kwl.findKey(std::string("nitf.common.sensor_id"));
+      //       if (sensorId.empty())
+      //       {
+      //          sensorId = kwl.findKey(std::string("tiff.sensor_id"));
+      //          if (sensorId.empty())
+      //          {
+      //             sensorId = kwl.findKey(std::string("tfrd.common.sensor_id"));
+                  if (sensorId.empty())
+                  {
+                     sensorId = kwl.findKey(std::string("tiff.gdalmetadata.instrument"));
+                  }
+      //          }
+      //       }
+      //    }
+      // }
+      if (sensorId.empty())
+      {
+         sensorId = kwl.findKey(std::string("envi.sensor_type"));
+      }
+      if (!sensorId.empty())
+      {
+         sensorId = ossimString(sensorId).trim().string();
       }
    }
-   if(sensorId.empty())
-   {
-      sensorId = kwl.findKey( std::string("envi.sensor_type"));
-   }
-   if ( !sensorId.empty() )
-   {
-      sensorId = ossimString( sensorId ).trim().string();
-   }
-}
 
 void oms::DataInfo::getStripId( const ossimKeywordlist& kwl,
                        std::string& stripId ) const
