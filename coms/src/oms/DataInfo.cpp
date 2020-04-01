@@ -2450,7 +2450,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       }
    }
    void appendMetadataTag(ossimRefPtr<ossimProperty> property,
-                          std::string &outputString, const std::string &indentation,
+                          std::string &outputString, 
+                          const std::string &indentation,
                           const std::string &separator)
    {
       if (property.valid())
@@ -2557,7 +2558,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
 
    void appendMetadataTag(ossimRefPtr<ossimProperty> property,
                           ossimKeywordlist& kwl, 
-                          ossim_uint32 tagIdx;
                           const ossimString& prefix)
    {
       if (property.valid())
@@ -2584,9 +2584,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
             else
             {
                ossimString containerName = container->getName();
-               ossimString newIndentation = indentation + "   ";
-
-               outputString += indentation + "<tag name=\"" + containerName.string() + "\">" + separator;
+               ossimString newPrefix = prefix + containerName + ".";
 
                ossimKeywordlist coeffs;
 
@@ -2606,8 +2604,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                      }
                      else
                      {
-                        appendMetadataTag(prop.get(), outputString,
-                                          newIndentation, separator);
+                        appendMetadataTag(prop.get(), kwl, newPrefix);
                      }
                   }
                }
@@ -2624,8 +2621,9 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
 
                   for (int i = 0, size = namedSet.size(); i < size; i++)
                   {
-                     outputString += newIndentation.string();
-                     outputString += "<tag name=\"" + namedSet[i].string() + "\">";
+                     ossimString newPrefix = prefix + namedSet[i];
+                     // outputString += newIndentation.string();
+                     // outputString += "<tag name=\"" + namedSet[i].string() + "\">";
 
                      std::vector<ossimString> namedCoeffs =
                          coeffs.findAllKeysThatContains(namedSet[i]);
