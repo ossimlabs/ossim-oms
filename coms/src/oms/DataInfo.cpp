@@ -745,6 +745,41 @@ void oms::DataInfo::close()
    }
 }
 
+void appendDateRange(ossimKeywordlist& kwl, 
+                     const ossimDate &startDate,
+                     const ossimDate &endDate, 
+                     const ossimString &prefix)
+{
+   std::ostringstream outStart, outEnd;
+   double roundStart = ((int) ((startDate.getSec()
+                                + startDate.getFractionalSecond()) * 1000)) / 1000.0;
+   double roundEnd =
+   ((int) ((endDate.getSec() + endDate.getFractionalSecond()) * 1000))
+   / 1000.0;
+   outStart << std::setw(4) << std::setfill('0') << startDate.getYear() << "-"
+   << std::setw(2) << std::setfill('0') << startDate.getMonth() << "-"
+   << std::setw(2) << std::setfill('0') << startDate.getDay() << "T"
+   << std::setw(2) << std::setfill('0') << startDate.getHour() << ":"
+   << std::setw(2) << std::setfill('0') << startDate.getMin() << ":"
+   << std::setw(2) << std::setfill('0') << roundStart << "Z";
+
+   outEnd << std::setw(4) << std::setfill('0') << endDate.getYear() << "-"
+   << std::setw(2) << std::setfill('0') << endDate.getMonth() << "-"
+   << std::setw(2) << std::setfill('0') << endDate.getDay() << "T"
+   << std::setw(2) << std::setfill('0') << endDate.getHour() << ":"
+   << std::setw(2) << std::setfill('0') << endDate.getMin() << ":"
+   << std::setw(2) << std::setfill('0') << roundEnd << "Z";
+
+   kwl.add(prefix.c_str(), "TimeSpan.begin", outStart.str().c_str());
+   kwl.add(prefix.c_str(), "TimeSpan.end", outEnd.str().c_str());
+
+   // outputString += (indentation + "<TimeSpan>" + separator + indentation
+   //                  + "   <begin>" + outStart.str() + "</begin>" + separator
+   //                  + indentation + "   <end>" + outEnd.str() + "</end>" + separator
+   //                  + indentation + "</TimeSpan>" + separator);
+
+}
+
 void appendDateRange(std::string& outputString, const ossimDate& startDate,
                      const ossimDate& endDate, const std::string& indentation,
                      const std::string& separator)
@@ -773,7 +808,6 @@ void appendDateRange(std::string& outputString, const ossimDate& startDate,
                     + "   <begin>" + outStart.str() + "</begin>" + separator
                     + indentation + "   <end>" + outEnd.str() + "</end>" + separator
                     + indentation + "</TimeSpan>" + separator);
-
 }
 #ifdef OSSIM_VIDEO_ENABLED
 
@@ -860,6 +894,160 @@ std::shared_ptr<ossimPolyArea2d> createGeomFromKlv(ossimRefPtr<ossimPredatorKlvT
    }
 
    return result;
+}
+
+void appendVideoGeom(ossimKeywordlist& kwl,
+                     ossimRefPtr<ossimPredatorKlvTable> klvTable,
+                     const std::string& klvnumber,
+                     const ossimString& prefix)
+{
+   ossimGpt wgs84;
+   ossimGpt ul;
+   ossimGpt ur;
+   ossimGpt lr;
+   ossimGpt ll;
+   ossimString groundGeometry;
+   ossimString obliquityAngle;
+   ossimString sensorPosition;
+   ossimString horizontalFOV;
+   ossimString verticalFOV;
+   ossimString elevation;
+   ossimString sensorDistance;
+
+   if (!klvTable->getCornerPoints(ul, ur, lr, ll))
+   {
+#if 1
+      ossim_float64 lat, lon, elev;
+      if (klvTable->getFrameCenter(lat, lon, elev))
+      {
+         ul.latd(lat);
+         ul.lond(lon);
+         ur = ul;
+         lr = ul;
+         ll = ul;
+      }
+      else if (klvTable->getSensorPosition(lat, lon, elev))
+      {
+         ul.latd(lat);
+         ul.lond(lon);
+         ur = ul;
+         lr = ul;
+         ll = ul;
+      }
+      else
+      {
+         return;
+      }
+#else
+      return;
+#endif
+   }
+   ul.changeDatum(wgs84.datum());
+   ur.changeDatum(wgs84.datum());
+   lr.changeDatum(wgs84.datum());
+   ll.changeDatum(wgs84.datum());
+   // RPALKO -modified to the end of appendVideoGeom
+   ossimGeoPolygon geoPoly;
+   geoPoly.addPoint(ul);
+   geoPoly.addPoint(ur);
+   geoPoly.addPoint(lr);
+   geoPoly.addPoint(ll);
+   double degarea = ossim::abs(geoPoly.area());
+
+   groundGeometry += ("MULTIPOLYGON(((" + ossimString::toString(ul.lond()) + " " + ossimString::toString(ul.latd()) + "," + ossimString::toString(ur.lond()) + " " + ossimString::toString(ur.latd()) + "," + ossimString::toString(lr.lond()) + " " + ossimString::toString(lr.latd()) + "," + ossimString::toString(ll.lond()) + " " + ossimString::toString(ll.latd()) + "," + ossimString::toString(ul.lond()) + " " + ossimString::toString(ul.latd()) + " " + ")))");
+
+   ossim_float32 oangle;
+   if (klvTable->getObliquityAngle(oangle))
+   {
+      obliquityAngle += (ossimString::toString(oangle));
+   }
+   else
+   {
+      obliquityAngle = "";
+   }
+
+   ossim_float32 hfov;
+   if (klvTable->getHorizontalFieldOfView(hfov))
+   {
+      horizontalFOV += (ossimString::toString(hfov));
+   }
+   else
+   {
+      horizontalFOV = "";
+   }
+
+   ossim_float32 vfov;
+   if (klvTable->getVerticalFieldOfView(vfov))
+   {
+      verticalFOV += (ossimString::toString(vfov));
+   }
+   else
+   {
+      verticalFOV = "";
+   }
+
+   ossim_float64 latsp, lonsp, elevsp;
+   ossimGpt llsp;
+
+   if (klvTable->getSensorPosition(latsp, lonsp, elevsp))
+   {
+      llsp.latd(latsp);
+      llsp.lond(lonsp);
+      llsp.changeDatum(wgs84.datum());
+      sensorPosition += ("POINT(" + ossimString::toString(llsp.lond()) + " " + ossimString::toString(llsp.latd()) + ")");
+      elevation += (ossimString::toString(elevsp));
+   }
+   // Convert degrees squared area to meters squared based on sensor position
+   ossimDpt sensormpd = llsp.metersPerDegree();
+   ossim_float64 mtrsperlat = sensormpd.y;
+   ossim_float64 mtrsperlon = sensormpd.x;
+   double mtrssqdperdegsqd = mtrsperlat * mtrsperlon;
+   double area = degarea * mtrssqdperdegsqd;
+   ossimString geoArea;
+   geoArea += (ossimString::toString(area));
+
+   // using the distance from the sensor to the frame to weed out cases where we have absolutely bogus coordinates in the Predator video
+   ossimGpt closept;
+   // Use the center of the bottom of the frame as the closest point.
+   closept.latd(ll.latd() - ((ll.latd() - lr.latd()) * 0.5));
+   closept.lond(ll.lond() - ((ll.lond() - lr.lond()) * 0.5));
+
+   ossimEcefPoint start(llsp);
+   ossimEcefPoint end(closept);
+
+   ossim_float64 distance = (end - start).length();
+//   std::cout << "*************************** " << distance/elevation.toDouble() << std::endl;
+#if 0
+   ossim_float64 distance = std::pow(std::pow(((llsp.lond() -
+                                                closept.lond()) * mtrsperlon), 2) + std::pow(((llsp.latd() -
+                                                                                               closept.latd()) * mtrsperlat), 2), 0.5);
+#endif
+   sensorDistance += (ossimString::toString(distance));
+   ossimString videostartutc;
+   if (!klvTable->valueAsString(videostartutc,
+                                KLV_KEY_VIDEO_START_DATE_TIME_UTC))
+   {
+      videostartutc = "";
+   }
+   ossimString groundGeomPrefix = prefix + "groundGeom" + klvnumber;
+   ossimString newPrefix = prefix + "groundGeom" + klvnumber + ".";
+   kwl.add(newPrefix.c_str(), "@area", geoArea.c_str());
+   kwl.add(newPrefix.c_str(), "@elevation", elevation.c_str());
+   kwl.add(newPrefix.c_str(), "@klvnumber", klvnumber.c_str());
+   kwl.add(newPrefix.c_str(), "@horizontalFOV", horizontalFOV.c_str());
+   kwl.add(newPrefix.c_str(), "@verticalFOV", verticalFOV.c_str());
+   kwl.add(newPrefix.c_str(), "@sensorDistance", sensorDistance.c_str());
+   kwl.add(newPrefix.c_str(), "@sensorPosition", sensorPosition.c_str());
+   kwl.add(newPrefix.c_str(), "@videoStartUTC", videostartutc.c_str());
+   kwl.add(newPrefix.c_str(), "@obliquityAngle", obliquityAngle.c_str());
+   kwl.add(newPrefix.c_str(), "@srs", "EPSG:4326");
+   kwl.add(groundGeomPrefix.c_str(), groundGeometry.c_str());
+   // result += indentation+"<groundGeom area=\""+geoArea.string()+"\" elevation=\""
+   //    +elevation.string()+"\" klvnumber=\""+klvnumber+"\" horizontalFOV=\""
+   //    +horizontalFOV.string()+"\" verticalFOV=\""+verticalFOV.string()+"\" sensorDistance=\""
+   //    +sensorDistance.string()+"\" sensorPosition=\""+sensorPosition.string()+"\" videoStartUTC=\""
+   //    +videostartutc.string()+"\" obliquityAngle=\""+obliquityAngle.string()
+   //    +"\" srs=\"epsg:4326\">"+groundGeometry.string()+"</groundGeom>"+separator;
 }
 
 void appendVideoGeom(std::string& result,
@@ -1016,7 +1204,7 @@ std::string oms::DataInfo::getInfo() const
 {
    std::string result = "";
    ossimKeywordlist kwl;
-
+   bool errorsOcurred = false;
    try
    {
       if (!thePrivateData)
@@ -1024,30 +1212,9 @@ std::string oms::DataInfo::getInfo() const
 
       if (thePrivateData->theImageHandler.valid())
       {
-         appendAssociatedFiles(kwl, "oms.dataSets.RasterDataSet.fileObjects.");
-         appendRasterEntries(kwl, "oms.dataSets.RasterDataSet.rasterEntries.");
-         // appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet.");
-         std::ostringstream out;
-         kwl.toXML(out);
-         result = out.str();
-         // return result;
-         // result += "<oms>\n";
-         // result += "   <dataSets>\n";
-         // result += "      <RasterDataSet>\n";
-         // result += "         <fileObjects>\n";
-         // result += "            <RasterFile type=\"main\" format=\""
-         //    + thePrivateData->formatName() + "\">\n";
-         // result += "               <name>" + ossimXmlString::wrapCDataIfNeeded(thePrivateData->theFilename).string() + "</name>\n";
-         // result += "            </RasterFile>\n";
-         // appendAssociatedFiles(result, "         ", "\n");
-         // result += "         </fileObjects>\n";
-         // result += "         <rasterEntries>\n";
-         // appendRasterEntries(result, "            ", "\n");
-         // result += "         </rasterEntries>\n";
-         // appendRasterDataSetMetadata(result, "         ", "\n");
-         // result += "      </RasterDataSet>\n";
-         // result += "   </dataSets>\n";
-         // result += "</oms>\n";
+         appendAssociatedFiles(kwl, "oms.dataSets.RasterDataSet0.fileObjects.");
+         appendRasterEntries(kwl, "oms.dataSets.RasterDataSet0.rasterEntries.");
+         // appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet0.");
       }
 #ifdef OSSIM_VIDEO_ENABLED
       else if(!thePrivateData->theExternalVideoGeometryFile.empty()&&
@@ -1069,7 +1236,6 @@ std::string oms::DataInfo::getInfo() const
       }
       else if(thePrivateData->thePredatorVideoFrameInfo.valid())
       {
-         // std::cout << "DataInfo::getInfo video!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
          ossimDate startDate;
          ossimDate endDate;
          if(thePrivateData->thePredatorVideoFrameInfo->klvTable()->getDate(startDate, true))
@@ -1077,19 +1243,15 @@ std::string oms::DataInfo::getInfo() const
             endDate = startDate;
             endDate.addSeconds(thePrivateData->thePredatorVideo->duration());
          }
-         result += "<oms>\n";
-         result += "   <dataSets>\n";
-         result += "      <VideoDataSet>\n";
-         result += "         <fileObjects>\n";
-         result += "            <VideoFile type=\"main\" format=\""+thePrivateData->formatName()+"\">\n";
-         result += "                <name>"+thePrivateData->theFilename.string()+"</name>\n";
-         result += "            </VideoFile>\n";
-         result += "         </fileObjects>\n";
-         result += "         <width>"+ossimString::toString(thePrivateData->thePredatorVideo->imageWidth()).string()+"</width>\n";
-         result += "         <height>"+ossimString::toString(thePrivateData->thePredatorVideo->imageHeight()).string()+"</height>\n";
+         kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.@type"
+                 ,"main");
+         kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.@format", thePrivateData->formatName().c_str());
+         kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.name", thePrivateData->theFilename.c_str());
+         kwl.add("oms.dataSets.VideoDataSet0.width", thePrivateData->thePredatorVideo->imageWidth());
+         kwl.add("oms.dataSets.VideoDataSet0.height", thePrivateData->thePredatorVideo->imageHeight());
+         ossimString spatialMetaPrefix = "oms.dataSets.VideoDataSet0.spatialMetaData.";
 
-         // RPALKO - replaced 1 line with everything to END RPALKO
-         result += "         <spatialMetadata>\n";
+         // // RPALKO - replaced 1 line with everything to END RPALKO
          ossim_uint32 idx = 0;
          // safer to rewind
          std::shared_ptr<ossimPolyArea2d> composite = 0;
@@ -1113,11 +1275,6 @@ std::string oms::DataInfo::getInfo() const
             {
                try
                {
-                  //         geos::io::WKTWriter writer;
-                  //        std::string tempGeom;
-                  //       std::cout << "Input geom = " << writer.write(geom) << std::endl;
-                  //      std::cout << "Union to:    " << writer.write(composite) << std::endl;
-                  //      std::cout << "VALID? " << geom->isValid() << std::endl;
                   if(geom->isValid())
                   {
                      *composite+=*geom;
@@ -1145,11 +1302,9 @@ std::string oms::DataInfo::getInfo() const
          {
             try
             {
-               //std::cout << "OUTPUT = " << tempGeom << std::endl;
-               result += "<groundGeom area=\"";
-               result += (ossimString::toString(composite->getArea()*ossimGpt().metersPerDegree().y)).string();
-               result += "\" srs=\"epsg:4326\"";
-               result += ">" + composite->toString() + "</groundGeom>";
+               kwl.add("oms.dataSets.VideoDataSet0.spatialMetadata.groundGeom.@area", composite->getArea()*ossimGpt().metersPerDegree().y);
+               kwl.add("oms.dataSets.VideoDataSet0.spatialMetadata.groundGeom.@srs", "epsg:4326");
+               kwl.add("oms.dataSets.VideoDataSet0.spatialMetadata.groundGeom", composite->toString().c_str());
             }
             catch ( const std::exception& e )
             {
@@ -1171,31 +1326,35 @@ std::string oms::DataInfo::getInfo() const
          while (klvInfo.valid() && klvInfo->table())
          {
             ossimString klvnumber = ossimString::toString(idx);
-            appendVideoGeom(result, klvInfo->table(),"                  ", "\n", klvnumber.c_str());
+            appendVideoGeom(kwl, klvInfo->table(),
+                            klvnumber.c_str(), spatialMetaPrefix);
             klvInfo = thePrivateData->thePredatorVideo->nextKlv();
             idx++;
          }
 #endif
-         result += "        </spatialMetadata>\n";
-         appendDateRange(result, startDate, endDate, "         ", "\n");
-         appendVideoDataSetMetadata(result, "         ", "\n");
-         result += "      </VideoDataSet>\n";
-         result += "   </dataSets>\n";
-         result += "</oms>\n";
+         appendDateRange(kwl, startDate, endDate, "oms.dataSets.VideoDataSet0.");
+         appendVideoDataSetMetadata(kwl, "oms.dataSets.VideoDataSet0.");
       }
 #endif
    }
    catch ( const std::exception& e )
    {
+      errorsOcurred = true;
       ossimNotify(ossimNotifyLevel_WARN)
          << "oms::DataInfo::getInfo caught ossim exception: " << e.what() << std::endl;
-      result = "";
    }
    catch ( ... )
    {
+      errorsOcurred = true;
       ossimNotify(ossimNotifyLevel_WARN)
          << "oms::DataInfo::getInfo caught exception!" << std::endl;
-      result = "";
+   }
+
+   if(kwl.getSize()&&!errorsOcurred)
+   {
+      std::ostringstream out;
+      kwl.toXML(out);
+      result = out.str();
    }
 
    return result;
@@ -1231,6 +1390,7 @@ std::string oms::DataInfo::getImageInfo(int entry)
 
    if (thePrivateData->theImageHandler.valid())
    {
+      ossimKeywordlist kwl;
       appendAssociatedFiles(kwl, "oms.dataSets.RasterDataSet.fileObjects.");
       if(entry < 0)
       {
@@ -1256,6 +1416,7 @@ std::string oms::DataInfo::getVideoInfo()
 {
    std::string result;
 #ifdef OSSIM_VIDEO_ENABLED
+   ossimKeywordlist kwl;
    if(!thePrivateData->theExternalVideoGeometryFile.empty()&&
            thePrivateData->theExternalVideoGeometryFile.exists())
    {
@@ -1283,6 +1444,11 @@ std::string oms::DataInfo::getVideoInfo()
          endDate = startDate;
          endDate.addSeconds(thePrivateData->thePredatorVideo->duration());
       }
+      kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.@type", "main");
+      kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.@format", thePrivateData->formatName().c_str());
+      kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.name", thePrivateData->theFilename.c_str());
+      kwl.add("oms.dataSets.VideoDataSet0.width", thePrivateData->thePredatorVideo->imageWidth());
+      kwl.add("oms.dataSets.VideoDataSet0.height", thePrivateData->thePredatorVideo->imageHeight());
       result += "<oms>\n";
       result += "   <dataSets>\n";
       result += "      <VideoDataSet>\n";
@@ -2729,8 +2895,172 @@ void oms::DataInfo::appendRasterDataSetMetadata(std::string &outputString,
    }
 }
 
-void oms::DataInfo::appendVideoDataSetMetadata(std::string& outputString,
-                                               const std::string& indentation, const std::string& separator) const
+void oms::DataInfo::appendVideoDataSetMetadata(ossimKeywordlist& kwl,
+                                               const ossimString& prefix) const
+{
+#ifdef OSSIM_VIDEO_ENABLED
+   ossimString newPrefix = prefix + "metadata.";
+   if (thePrivateData->thePredatorVideoFrameInfo.valid() &&
+       thePrivateData->thePredatorVideoFrameInfo->klvTable())
+   {
+      ossimRefPtr<ossimPredatorKlvTable> klvTable = thePrivateData->thePredatorVideoFrameInfo->klvTable();
+      ossimString value;
+      ossimString securityClassification;
+      //      ossimString grazingAngle;
+      //      ossimString azimuthAngle;
+      ossimString missionNumber;
+      //outputString += indentation + "<metadata>" + separator;
+      if (klvTable->valueAsString(value, KLV_KEY_ORGANIZATIONAL_PROGRAM_NUMBER))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "organizationalProgramNumber", blankOutBinary(value).trim().c_str());
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_SECURITY_CLASSIFICATION))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            value = value.downcase();
+            if (value.contains("unclas"))
+            {
+               securityClassification = "UNCLASSIFIED";
+            }
+            else if (value.contains("top"))
+            {
+               securityClassification = "TOP SECRET";
+            }
+            else if (value.contains("secret"))
+            {
+               securityClassification = "SECRET";
+            }
+            else
+            {
+               securityClassification = value;
+            }
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_SECURITY_RELEASE_INSTRUCTIONS))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "releaseInstructions", value.c_str());
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_SECURITY_CAVEATS))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "securityCaveats", value.c_str());
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_CLASSIFICATION_COMMENT))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "classificationComment", value.c_str());
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_ORIGINAL_PRODUCER_NAME))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "originalProducerName", value.c_str());
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_IMAGE_SOURCE_SENSOR))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "imageSourceSensor", value.c_str());
+         }
+      }
+      if (klvTable->valueAsString(value, KLV_KEY_PLATFORM_DESIGNATION))
+      {
+         value = value.trim();
+         if (!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "platformDesignation", value.c_str());
+         }
+      }
+      if(klvTable->valueAsString(value, KLV_KEY_INDICATED_AIR_SPEED))
+      {
+         value = value.trim();
+         if(!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "indicatedAirSpeed", value.c_str());
+         }
+      }
+      if(klvTable->valueAsString(value, KLV_KEY_STATIC_PRESSURE))
+      {
+         value = value.trim();
+         if(!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "staticAirPressure", value.c_str());
+         }
+      }
+      if(klvTable->valueAsString(value, KLV_KEY_PLATFORM_GROUND_SPEED))
+      {
+         value = value.trim();
+         if(!value.empty())
+         {
+            kwl.add(newPrefix.c_str(), "groundSpeed", value.c_str());
+         }
+      }
+      //      if(!klvTable->valueAsString(azimuthAngle, KLV_KEY_DEVICE_ABSOLUTE_HEADING))
+      //      {
+      //         if(!klvTable->valueAsString(azimuthAngle, KLV_KEY_ANGLE_TO_NORTH))
+      //         {
+      //            klvTable->valueAsString(azimuthAngle, KLV_KEY_PLATFORM_HEADING_ANGLE);
+      //         }
+      //      }
+      //      if(klvTable->valueAsString(grazingAngle,KLV_KEY_OBLIQUITY_ANGLE))
+      //      {
+      //         grazingAngle = ossimString::toString(90.0 - grazingAngle.toDouble());
+      //      }
+      klvTable->valueAsString(missionNumber, KLV_KEY_MISSION_NUMBER);
+
+      kwl.add(newPrefix.c_str(), "securityClassification", securityClassification.c_str());
+      kwl.add(newPrefix.c_str(), "missionId", missionNumber.c_str());
+      kwl.add(newPrefix.c_str(), "fileType", thePrivateData->formatName().c_str());
+      kwl.add(newPrefix.c_str(), "filename", thePrivateData->theFilename.c_str());
+      // outputString += indentation + "   <securityClassification>" + securityClassification.string() + "</securityClassification>" + separator;
+      //      outputString += indentation + "   <azimuthAngle>" + azimuthAngle + "</azimuthAngle>" + separator;
+      //      outputString += indentation + "   <grazingAngle>" + grazingAngle + "</grazingAngle>" + separator;
+      // outputString += indentation + "   <missionId>" + missionNumber.string() + "</missionId>" +
+      //                 separator;
+      // outputString += indentation + "   <fileType>" + thePrivateData->formatName() +
+      //                 "</fileType>" + separator;
+      // outputString += indentation + "   <filename>" + thePrivateData->theFilename.string() +
+      //                 "</filename>" + separator;
+
+#if 0
+      outputString += indentation + "   <imageId>" + imageId + "</imageId>" + separator;
+      outputString += indentation + "   <sensorId>" + sensorId + "</sensorId>" + separator;
+      outputString += indentation + "   <countryCode>" + countryCode + "</countryCode>" + separator;
+      outputString += indentation + "   <imageCategory>" + imageCategory + "</imageCategory>" + separator;
+      outputString += indentation + "   <grazingAngle>" + grazingAngle + "</grazingAngle>" + separator;
+      outputString += indentation + "   <title>" + title + "</title>" + separator;
+      outputString += indentation + "   <organization>" + organization + "</organization>" + separator;
+      outputString += indentation + "   <description>" + description + "</description>" + separator;
+      outputString += indentation + "   <niirs>" + niirs + "</niirs>" + separator;
+      outputString += indentation + "   <fileType>" + thePrivateData->formatName() + "</fileType>" + separator;
+      outputString += indentation + "   <className>" + (thePrivateData->theImageHandler.valid()?thePrivateData->theImageHandler->getClassName():ossimString("")) + "</className>" + separator;
+#endif
+      // outputString += indentation + "</metadata>" + separator;
+   }
+#endif
+}
+
+void oms::DataInfo::appendVideoDataSetMetadata(std::string & outputString,
+                                                  const std::string &indentation, const std::string &separator) const
 {
 #ifdef OSSIM_VIDEO_ENABLED
    if(thePrivateData->thePredatorVideoFrameInfo.valid()&&

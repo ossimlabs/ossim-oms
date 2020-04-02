@@ -100,6 +100,8 @@ private:
    void appendRasterDataSetMetadata(std::string &outputString,
                                     const std::string &indentation,
                                     const std::string &separator) const;
+   void appendVideoDataSetMetadata(ossimKeywordlist &kwl,
+                                   const ossimString& prefix=ossimString("")) const;
    void appendVideoDataSetMetadata(std::string &outputString,
                                    const std::string &indentation,
                                    const std::string &separator) const;
