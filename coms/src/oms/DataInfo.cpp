@@ -1415,8 +1415,8 @@ std::string oms::DataInfo::getImageInfo(int entry)
 std::string oms::DataInfo::getVideoInfo()
 {
    std::string result;
-#ifdef OSSIM_VIDEO_ENABLED
    ossimKeywordlist kwl;
+#ifdef OSSIM_VIDEO_ENABLED
    if(!thePrivateData->theExternalVideoGeometryFile.empty()&&
            thePrivateData->theExternalVideoGeometryFile.exists())
    {
@@ -1449,19 +1449,9 @@ std::string oms::DataInfo::getVideoInfo()
       kwl.add("oms.dataSets.VideoDataSet0.fileObjects.VideoFile0.name", thePrivateData->theFilename.c_str());
       kwl.add("oms.dataSets.VideoDataSet0.width", thePrivateData->thePredatorVideo->imageWidth());
       kwl.add("oms.dataSets.VideoDataSet0.height", thePrivateData->thePredatorVideo->imageHeight());
-      result += "<oms>\n";
-      result += "   <dataSets>\n";
-      result += "      <VideoDataSet>\n";
-      result += "         <fileObjects>\n";
-      result += "            <VideoFile type=\"main\" format=\""+thePrivateData->formatName()+"\">\n";
-      result += "                <name>"+ossimXmlString::wrapCDataIfNeeded(thePrivateData->theFilename).string()+"</name>\n";
-      result += "            </VideoFile>\n";
-      result += "         </fileObjects>\n";
-      result += "         <width>"+ossimString::toString(thePrivateData->thePredatorVideo->imageWidth()).string()+"</width>\n";
-      result += "         <height>"+ossimString::toString(thePrivateData->thePredatorVideo->imageHeight()).string()+"</height>\n";
+      ossimString spatialMetaPrefix = "oms.dataSets.VideoDataSet0.spatialMetaData.";
 
       // RPALKO - replaced 1 line with everything to END RPALKO
-      result += "         <spatialMetadata>\n";
       ossim_uint32 idx = 0;
       // safer to rewind
       thePrivateData->thePredatorVideo->rewind();
@@ -1478,11 +1468,10 @@ std::string oms::DataInfo::getVideoInfo()
       }
       if(!composite->isEmpty())
       {
-         std::string tempGeom = composite->toString();
-         result += "<groundGeom area=\"";
-         result += (ossimString::toString(composite->getArea() * ossimGpt().metersPerDegree().y)).string();
-         result += "\" srs=\"epsg:4326\"";
-         result += ">" + tempGeom + "</groundGeom>";
+
+         kwl.add("oms.dataSets.VideoDataSet0.spatialMetadata.groundGeom.@area", composite->getArea() * ossimGpt().metersPerDegree().y);
+         kwl.add("oms.dataSets.VideoDataSet0.spatialMetadata.groundGeom.@srs", "epsg:4326");
+         kwl.add("oms.dataSets.VideoDataSet0.spatialMetadata.groundGeom", composite->toString().c_str());
          composite = 0;
       }
 
@@ -1492,24 +1481,23 @@ std::string oms::DataInfo::getVideoInfo()
       while (klvInfo.valid() && klvInfo->table())
       {
          ossimString klvnumber = ossimString::toString(idx);
-         appendVideoGeom(result, klvInfo->table(),
-                         "                  ", "\n", 
-                         klvnumber.c_str());
+         appendVideoGeom(kwl, klvInfo->table(),
+                         klvnumber.c_str(), spatialMetaPrefix);
          klvInfo = thePrivateData->thePredatorVideo->nextKlv();
          idx++;
       }
 #endif
 
-
-
-      result += "        </spatialMetadata>\n";
-      appendDateRange(result, startDate, endDate, "         ", "\n");
-      appendVideoDataSetMetadata(result, "         ", "\n");
-      result += "      </VideoDataSet>\n";
-      result += "   </dataSets>\n";
-      result += "</oms>\n";
+      appendDateRange(kwl, startDate, endDate, "oms.dataSets.VideoDataSet0.");
+      appendVideoDataSetMetadata(kwl, "oms.dataSets.VideoDataSet0.");
    }
 #endif
+   if (kwl.getSize())
+   {
+      std::ostringstream out;
+      kwl.toXML(out);
+      result = out.str();
+   }
 
    return result;
 }
