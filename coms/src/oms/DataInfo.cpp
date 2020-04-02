@@ -1353,7 +1353,7 @@ std::string oms::DataInfo::getInfo() const
    if(kwl.getSize()&&!errorsOcurred)
    {
       std::ostringstream out;
-      kwl.toXML(out);
+      kwl.toXML(out, "");
       result = out.str();
    }
 
@@ -1403,7 +1403,7 @@ std::string oms::DataInfo::getImageInfo(int entry)
 
       // appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet.");
       std::ostringstream out;
-      kwl.toXML(out);
+      kwl.toXML(out,"");
       result = out.str();
 
    }
