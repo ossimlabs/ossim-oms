@@ -3997,7 +3997,11 @@ void oms::DataInfo::appendRasterEntryMetadata(
          kwl.add(newPrefix.c_str(), "sunAzimuth", sunAzimuth.c_str());
          kwl.add(newPrefix.c_str(), "sunElevation", sunElevation.c_str());
          kwl.add(newPrefix.c_str(), "validModel", stripId.c_str());
-         kwl.add(newPrefix.c_str(), kwl3);
+         
+         ossimKeywordlist outKwl(tempKwl);
+         outKwl.stripPrefixFromAll(".*\\.image" + ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\.");
+         outKwl.removeKeysThatMatch(".*\\.image.*\\..*");
+         kwl.add(newPrefix.c_str(), outKwl);
       }
    }
    else
