@@ -1026,11 +1026,11 @@ std::string oms::DataInfo::getInfo() const
       {
          appendAssociatedFiles(kwl, "oms.dataSets.RasterDataSet.fileObjects.");
          appendRasterEntries(kwl, "oms.dataSets.RasterDataSet.rasterEntries.");
-         appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet.");
+         // appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet.");
          std::ostringstream out;
          kwl.toXML(out);
          result = out.str();
-         return result;
+         // return result;
          // result += "<oms>\n";
          // result += "   <dataSets>\n";
          // result += "      <RasterDataSet>\n";
@@ -1218,7 +1218,6 @@ bool oms::DataInfo::isImagery()const
    return thePrivateData->theImageHandler.valid();
 }
 
-
 std::string oms::DataInfo::getImageInfo(int entry)
 {
    std::string result = "";
@@ -1232,31 +1231,21 @@ std::string oms::DataInfo::getImageInfo(int entry)
 
    if (thePrivateData->theImageHandler.valid())
    {
-      result += "<oms>\n";
-      result += "   <dataSets>\n";
-      result += "      <RasterDataSet>\n";
-      result += "         <fileObjects>\n";
-      result += "            <RasterFile type=\"main\" format=\""
-      + thePrivateData->formatName() + "\">\n";
-      result += "                <name>" + ossimXmlString::wrapCDataIfNeeded(thePrivateData->theFilename).string() + "</name>\n";
-      result += "            </RasterFile>\n";
-      result += "         </fileObjects>\n";
-      result += "         <rasterEntries>\n";
+      appendAssociatedFiles(kwl, "oms.dataSets.RasterDataSet.fileObjects.");
       if(entry < 0)
       {
-         appendRasterEntries(result, "            ", "\n");
+         appendRasterEntries(kwl, "oms.dataSets.RasterDataSet.rasterEntries.");
       }
       else
       {
-         appendRasterEntry(result, "            ", "\n");
+         appendRasterEntry(kwl, "oms.dataSets.RasterDataSet.rasterEntries.RasterEntry0.");
       }
-//      appendRasterEntryDateTime(result, "            ", "\n");
 
-      result += "         </rasterEntries>\n";
-      appendRasterDataSetMetadata(result, "         ", "\n");
-      result += "      </RasterDataSet>\n";
-      result += "   </dataSets>\n";
-      result += "</oms>\n";
+      // appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet.");
+      std::ostringstream out;
+      kwl.toXML(out);
+      result = out.str();
+
    }
 
    return result;
@@ -2560,6 +2549,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                           ossimKeywordlist& kwl, 
                           const ossimString& prefix)
    {
+      #if 0
       if (property.valid())
       {
          ossimContainerProperty *container =
@@ -2658,11 +2648,14 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
             }
          }
       }
+      #endif
    }
 
+/*
 void oms::DataInfo::appendRasterDataSetMetadata(ossimKeywordlist& kwl,
                                                 const ossimString& prefix) const
 {
+   // #if 0
    std::vector<ossimRefPtr<ossimProperty>> properties;
    thePrivateData->theImageHandler->getPropertyList(properties);
    if (properties.size())
@@ -2689,7 +2682,7 @@ void oms::DataInfo::appendRasterDataSetMetadata(ossimKeywordlist& kwl,
                       container->getProperty(idx2);
                   if (prop.valid())
                   {
-                     appendMetadataTag(prop.get(), kwl, idx2, propPrefix);
+                     appendMetadataTag(prop.get(), kwl, propPrefix);
                   }
                }
             }
@@ -2697,7 +2690,7 @@ void oms::DataInfo::appendRasterDataSetMetadata(ossimKeywordlist& kwl,
       }
    }
 }
-
+*/
 void oms::DataInfo::appendRasterDataSetMetadata(std::string &outputString,
                                                 const std::string &indentation,
                                                 const std::string &separator) const
@@ -3678,18 +3671,6 @@ void oms::DataInfo::appendRasterEntryMetadata(
          kwl.add(newPrefix.c_str(), "sunElevation", sunElevation.c_str());
          kwl.add(newPrefix.c_str(), "validModel", stripId.c_str());
          kwl.add(newPrefix.c_str(), kwl3);
-         std::ostringstream out;
-         //out << kwl3;
-         //outputString += out.str() + separator;
-
-         // std::shared_ptr<ossim::KwlNodeFormatter> formatter =
-         //     std::make_shared<ossim::KwlNodeXmlFormatter>(kwl3);
-         // // std::cout << " ----------------------------------------- \n";
-         // formatter->write(out,
-         //                  ossim::KwlNodeFormatter::FormatHints(3, true, false, true));
-         // outputString += out.str() + separator;
-
-         // std::cout << " ----------------------------------------- \n";
       }
    }
    else
@@ -3758,31 +3739,6 @@ bool oms::DataInfo::getWktFootprint( const ossimImageGeometry* geom, std::string
          s = polyArea.toString();
          status = true;
       }
-      // ossimKeywordlist kwl;
-      // if ( geom->saveState( kwl ) )
-      // {
-      //    s = kwl.findKey( std::string("projection.wkt_footprint") );
-      //    if ( s.size() )
-      //    {
-      //       status = true;
-      //    }
-      //    else
-      //    {
-      //       std::vector<ossimGpt> poly;
-      //       geom->localToWorld(ossimDpt(0,0), gpt);
-      //       poly.push_back(gpt);
-      //       geom->localToWorld(ossimDpt(w1, 0), gpt);
-      //       poly.push_back(gpt);
-      //       geom->localToWorld(ossimDpt(w1, h1), gpt);
-      //       poly.push_back(gpt);
-      //       geom->localToWorld(ossimDpt(0, h1), gpt);
-      //       poly.push_back(gpt);
-      //       poly.push_back(poly[0]);
-      //       ossimPolyArea2d polyArea(poly);
-      //       s = polyArea.toMultiPolygon().toString();
-      //       status = !s.empty();
-      //    }
-      // }
    }
    return status;
 }

@@ -95,8 +95,8 @@ private:
    void appendGeometryInformation(std::string &outputString,
                                   const std::string &indentation,
                                   const std::string &separator) const;
-   void appendRasterDataSetMetadata(ossimKeywordlist& kwl,
-                                    const ossimString& prefix=ossimString("")) const;
+   // void appendRasterDataSetMetadata(ossimKeywordlist& kwl,
+   //                                  const ossimString& prefix=ossimString("")) const;
    void appendRasterDataSetMetadata(std::string &outputString,
                                     const std::string &indentation,
                                     const std::string &separator) const;
