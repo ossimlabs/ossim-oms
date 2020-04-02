@@ -1353,7 +1353,12 @@ std::string oms::DataInfo::getInfo() const
    if(kwl.getSize()&&!errorsOcurred)
    {
       std::ostringstream out;
-      kwl.toXML(out, "");
+      std::shared_ptr<ossim::KwlNodeXmlFormatter> formatter =
+          std::make_shared<ossim::KwlNodeXmlFormatter>(kwl, "");
+      ossim::KwlNodeFormatter *baseFormatter = formatter.get();
+      baseFormatter->write(out, ossim::KwlNodeFormatter::FormatHints(3,false, false, false));
+
+      //      kwl.toXML(out, "");
       result = out.str();
    }
 
@@ -1403,9 +1408,13 @@ std::string oms::DataInfo::getImageInfo(int entry)
 
       // appendRasterDataSetMetadata(kwl, "oms.dataSets.RasterDataSet.");
       std::ostringstream out;
-      kwl.toXML(out,"");
-      result = out.str();
+      std::shared_ptr<ossim::KwlNodeXmlFormatter> formatter =
+          std::make_shared<ossim::KwlNodeXmlFormatter>(kwl, "");
+      ossim::KwlNodeFormatter *baseFormatter = formatter.get();
+      baseFormatter->write(out, ossim::KwlNodeFormatter::FormatHints(3, false, false, false));
 
+      //      kwl.toXML(out, "");
+      result = out.str();
    }
 
    return result;
