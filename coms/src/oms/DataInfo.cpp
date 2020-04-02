@@ -1625,9 +1625,9 @@ void oms::DataInfo::appendAssociatedFiles(ossimKeywordlist &kwl,
    ossimFilename mainFile = thePrivateData->theImageHandler->getFilename();
    ossim_uint32 startIdx = 1;
    ossimString newPrefix = prefix + "RasterFile";
-   kwl.add("oms.dataSets.RasterDataSet.fileObjects.RasterFile0.@type", "main");
-   kwl.add("oms.dataSets.RasterDataSet.fileObjects.RasterFile0.@format", thePrivateData->formatName().c_str());
-   kwl.add("oms.dataSets.RasterDataSet.fileObjects.RasterFile0.name", thePrivateData->theFilename.c_str());
+   kwl.add(prefix.c_str(), "RasterFile0.@type", "main");
+   kwl.add(prefix.c_str(), "RasterFile0.@format", thePrivateData->formatName().c_str());
+   kwl.add(prefix.c_str(), "RasterFile0.name", thePrivateData->theFilename.c_str());
 
    if ((mainFile.ext().downcase() == "h5") || (mainFile.contains("_noaa_ops")))
    {
