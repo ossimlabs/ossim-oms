@@ -21,6 +21,7 @@
 #include <ossim/base/ossimXmlString.h>
 #include <ossim/base/ossimPolygon.h>
 #include <ossim/base/ossimPolyArea2d.h>
+#include <ossim/base/ossimXmlDocument.h>
 #include <ossim/base/KwlNodeXmlFormatter.h>
 
 #ifdef OSSIM_VIDEO_ENABLED
@@ -3797,10 +3798,31 @@ void oms::DataInfo::appendRasterEntryMetadata(
       info->getKeywordlist(tempKwl);
 
       replaceSpacesInKeys(tempKwl);
-      // std::cout << "_________________________\n";
-      // std::cout << kwl << "\n";
-      // std::cout << "_________________________\n";
-      kwl3.getMap() = tempKwl.getMap();
+      ossimKeywordlist desdata;
+
+      tempKwl.extractKeysThatMatch(desdata, ".*DESDATA$");
+      tempKwl.removeKeysThatMatch(".*DESDATA$");
+
+      for (auto x : desdata.getMap())
+      {
+         ossimXmlDocument xml;
+
+         if(ossimString(x.second).startsWith("<"))
+         {
+            if(xml.readString(x.second))
+            {
+               xml.toKwl(tempKwl, x.first+".");
+            }
+            else
+            {
+               tempKwl.add(x.first.c_str(), x.second.c_str());
+            }
+         }
+      }
+         // std::cout << "_________________________\n";
+         // std::cout << kwl << "\n";
+         // std::cout << "_________________________\n";
+         kwl3.getMap() = tempKwl.getMap();
       kwl3.removeKeysThatMatch(".*\\.image.*\\..*");
       defaultKwl.getMap() = kwl3.getMap();
       kwl.extractKeysThatMatch(kwl2, ".*\\.image" + ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\..*");
