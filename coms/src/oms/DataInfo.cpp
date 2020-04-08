@@ -3719,7 +3719,7 @@ void oms::DataInfo::appendRasterEntryMetadata(std::string &outputString,
              std::make_shared<ossim::KwlNodeXmlFormatter>(kwl3);
          // std::cout << " ----------------------------------------- \n";
          formatter->write(out,
-                          ossim::KwlNodeFormatter::FormatHints(3, true, false, true));
+                          ossim::KwlNodeFormatter::FormatHints(3, ossim::KwlNodeFormatter::FormatHints::FORMAT_HINTS_PRETTY_PRINT_FLAG));
          outputString += out.str() + separator;
 
          // std::cout << " ----------------------------------------- \n";
