@@ -438,7 +438,7 @@
     <target name="mvn-install" depends="install">
         <exec executable="mvn">
             <arg value="install:install-file"/>
-            <arg value="-Dmaven.repo.remote=${env.MAVEN_REPO_URL}"/>
+            <arg value="-Dmaven.repo.remote=${env.REPOSITORY_MANAGER_URL}"/>
             <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
             <arg value="-DgroupId=org.ossim"/>
             <arg value="-DartifactId=${module.name}"/>
