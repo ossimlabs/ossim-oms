@@ -10,6 +10,7 @@
 #include <ossim/base/ossimDatumFactory.h>
 #include <ossim/base/ossimDatum.h>
 #include <ossim/base/ossimConnectableObject.h>
+#include <ossim/ossimConfig.h>
 #include <ossim/base/ossimConstants.h>
 #include <ossim/base/ossimDpt.h>
 #include <ossim/base/ossimFilename.h>
@@ -88,6 +89,7 @@
 #include <oms/GeodeticEvaluator.h>
 #include <oms/Init.h>
 #include <oms/Mosaic.h>
+#include <ossim/ossimConfig.h>
 #include <ossim/base/ossimConstants.h>
 #include <oms/Util.h>
 #include <oms/WmsView.h>
@@ -246,12 +248,12 @@ void operator delete(void *v)
 //%rename (printOut) operator<<;
 %rename (assignToGrect) ossimGrect::operator=;
 %rename (printConversionTool) ossimUnitConversionTool::operator<<;
+%include <ossim/ossimConfig.h>
 %include <ossim/base/ossimConstants.h>
 %include <ossim/base/ossimUnitConversionTool.h>
 %include <oms/Constants.h>
 %include <oms/ImageUtil.h>
 %include <oms/Object.h>
-%include <ossim/base/ossimConstants.h>
 %include <ossim/base/ossimException.h>
 %include <ossim/support_data/ossimNmeaMessage.h>
 %include <ossim/support_data/ossimNmeaMessageSequencer.h>
