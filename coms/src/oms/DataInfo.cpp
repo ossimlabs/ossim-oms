@@ -4059,13 +4059,13 @@ void oms::DataInfo::appendRasterEntryMetadata(
 
    if (!dateValue.empty())
    {
-      ossimString timePrefix = newPrefix + "TimeStamp.";
+      ossimString timePrefix = prefix + "TimeStamp.";
 
       kwl.add(timePrefix.c_str(), "when", dateValue.c_str());
    }
    else
    {
-      appendRasterEntryDateTime(kwl, newPrefix);
+      appendRasterEntryDateTime(kwl, prefix);
    }
 
 } // End:  oms::DataInfo::appendRasterEntryMetadata( ... )
