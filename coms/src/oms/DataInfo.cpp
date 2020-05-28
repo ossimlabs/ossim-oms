@@ -2489,9 +2489,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
 
          std::string polyString;
          //std::cout <<"----------------GETTING FOOTPRINT--------------------\n";
-         // outputString += indentation + "<gsd unit=\"meters\" dx=\"" +
-         //                 ossimString::toString(gsd.x, 15).string() + "\" dy=\"" +
-         //                 ossimString::toString(gsd.y, 15).string() + "\"/>" + separator;
 
          if (getWktFootprint(geom.get(), polyString))
          {
@@ -2503,6 +2500,10 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          }
          std::ostringstream coordinates;
          std::ostringstream gcoords;
+         kwl.add(prefix.c_str(), "gsd.@unit", "meters");
+         kwl.add(prefix.c_str(), "gsd.@dx", ossimString::toString(gsd.x, 20).c_str());
+         kwl.add(prefix.c_str(), "gsd.@dy", ossimString::toString(gsd.y, 20).c_str());
+         kwl.add(prefix.c_str(), "gsd.@mean", ossimString::toString((gsd.y+gsd.x)*0.5, 20).c_str());
          kwl.add(prefix.c_str(), "groundGeom.@srs", "epsg:4326");
          kwl.add(prefix.c_str(), "groundGeom", groundGeometry.c_str());
          kwl.add(prefix.c_str(), "TiePointSet.@version", "1");
