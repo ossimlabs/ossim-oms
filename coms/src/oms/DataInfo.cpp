@@ -3460,7 +3460,7 @@ void oms::DataInfo::appendRasterEntryDateTime(ossimKeywordlist& kwl,
    // this part is better done in JAVA land and not here.  I will take this out for now
    if (!dateValue.empty())
    {
-      ossimString newPrefix = prefix + "TimeStamp";
+      ossimString newPrefix = prefix + "TimeStamp.";
       kwl.add(newPrefix, "when", dateValue.c_str());
    }
 }
@@ -3826,9 +3826,10 @@ void oms::DataInfo::appendRasterEntryMetadata(
          kwl3.getMap() = tempKwl.getMap();
       kwl3.removeKeysThatMatch(".*\\.image.*\\..*");
       defaultKwl.getMap() = kwl3.getMap();
-      kwl.extractKeysThatMatch(kwl2, ".*\\.image" + ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\..*");
-      kwl.extractKeysThatMatch(defaultKwl, ossimString(".*\\.image0") + "\\..*");
+      tempKwl.extractKeysThatMatch(kwl2, ".*\\.image" + ossimString::toString(thePrivateData->theImageHandler->getCurrentEntry()) + "\\..*");
+      tempKwl.extractKeysThatMatch(defaultKwl, ossimString(".*\\.image0") + "\\..*");
       ossimKeywordlist::KeywordMap::iterator iter = kwl2.getMap().begin();
+
       while (iter != kwl2.getMap().end())
       {
          ossimString k = iter->first;
@@ -4058,7 +4059,7 @@ void oms::DataInfo::appendRasterEntryMetadata(
 
    if (!dateValue.empty())
    {
-      ossimString timePrefix = newPrefix + "TimeStamp";
+      ossimString timePrefix = newPrefix + "TimeStamp.";
 
       kwl.add(timePrefix.c_str(), "when", dateValue.c_str());
    }
