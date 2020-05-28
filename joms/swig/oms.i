@@ -2099,7 +2099,7 @@ namespace std
   static $javaclassname convertMap(java.util.Map<String,String> in) {
     $javaclassname out = new $javaclassname();
     for (java.util.Map.Entry<String, String> entry : in.entrySet()) {
-      out.set(entry.getKey(), entry.getValue());
+      out.put(entry.getKey(), entry.getValue());
     }
     return out;
   }
