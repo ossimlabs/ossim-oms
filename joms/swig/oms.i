@@ -2196,8 +2196,8 @@ public:
 %feature("director", assumeoverride=1) ossim::ossimViewshedUtil;
 
 %typemap(jni) NativeChip * "jobject"
-%typemap(jtype) NativeChip * "java.awt.image.Raster"
-%typemap(jstype) NativeChip * "java.awt.image.Raster"
+%typemap(jtype) NativeChip * "java.awt.image.WritableRaster"
+%typemap(jstype) NativeChip * "java.awt.image.WritableRaster"
 %typemap(javain) NativeChip * "$javainput"
 %typemap(javaout) NativeChip * {
     return $jnicall;
