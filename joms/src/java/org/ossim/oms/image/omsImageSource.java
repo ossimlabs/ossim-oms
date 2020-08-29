@@ -25,7 +25,7 @@ import java.awt.image.PixelInterleavedSampleModel;
 
 import org.ossim.oms.image.ImageDataBuffer;
 
-import com.sun.imageio.plugins.common.BogusColorSpace;
+//import com.sun.imageio.plugins.common.BogusColorSpace;
 
 public class omsImageSource
 {
@@ -440,7 +440,7 @@ public class omsImageSource
          }
          else
          {
-            colorSpace = new BogusColorSpace( numBands );
+            //colorSpace = new BogusColorSpace( numBands );
          }
 
          boolean hasAlpha = ( numBands == 2 ) || ( numBands == 4 );

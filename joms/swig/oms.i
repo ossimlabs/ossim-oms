@@ -198,6 +198,7 @@ void operator delete(void *v)
 }
 #endif // commented out the operator new and delete override for now
 
+#include "NativeChipper.h"
 %}
 
 
@@ -2193,3 +2194,140 @@ public:
 %feature("director", assumeoverride=1) ossim::ossimUtility;
 %feature("director", assumeoverride=1) ossim::ossimChipProcUtil;
 %feature("director", assumeoverride=1) ossim::ossimViewshedUtil;
+
+%typemap(jni) NativeChip * "jobject"
+%typemap(jtype) NativeChip * "java.awt.image.WritableRaster"
+%typemap(jstype) NativeChip * "java.awt.image.WritableRaster"
+%typemap(javain) NativeChip * "$javainput"
+%typemap(javaout) NativeChip * {
+    return $jnicall;
+}
+%typemap(out) NativeChip * {
+   
+   ossim_uint32 width = $1->getWidth();
+   ossim_uint32 height = $1->getHeight();
+   ossim_uint32 numberOfBands = $1->getNumberOfBands();
+   ossim_uint32 numOfElements = width * height * numberOfBands;
+   ossimIrect destRect = $1->getImageRectangle();
+
+   jclass dataBufferClass;
+   jmethodID dataBufferConstructor;
+   jobject dataBuffer;
+
+   ossimScalarType scalarType  = $1->getScalarType();
+
+   if  ( scalarType == OSSIM_UINT8 /* 8 bit unsigned integer */
+      || scalarType == OSSIM_SINT8 /* 8 bit signed integer */ )
+   {            
+      jbyteArray dataB = jenv->NewByteArray(numOfElements);
+      jbyte* destB = jenv->GetByteArrayElements(dataB, NULL);
+
+      $1->unloadTile(destB, destRect, OSSIM_BIP);
+      jenv->ReleaseByteArrayElements(dataB, destB, 0);
+
+      dataBufferClass = jenv->FindClass("java/awt/image/DataBufferByte");
+      dataBufferConstructor = jenv->GetMethodID(dataBufferClass, "<init>", "([BI)V");
+      dataBuffer = jenv->NewObject(dataBufferClass, dataBufferConstructor, dataB, numOfElements);
+   } 
+   else if ( scalarType == OSSIM_SINT16 /* 16 bit signed integer */
+      || scalarType == OSSIM_CINT16 /* 16 bit complex integer */ )
+   {                
+      jshortArray dataS = jenv->NewShortArray(numOfElements);
+      jshort* destS = jenv->GetShortArrayElements(dataS, NULL);
+
+      $1->unloadTile(destS, destRect, OSSIM_BIP);
+      jenv->ReleaseShortArrayElements(dataS, destS, 0);
+
+      dataBufferClass = jenv->FindClass("java/awt/image/DataBufferShort");
+      dataBufferConstructor = jenv->GetMethodID(dataBufferClass, "<init>", "([SI)V");
+      dataBuffer = jenv->NewObject(dataBufferClass, dataBufferConstructor, dataS, numOfElements);
+
+   } 
+   else if ( scalarType == OSSIM_UINT9 /* 16 bit unsigned integer (9 bits used) */ 
+      || scalarType == OSSIM_UINT10 /* 16 bit unsigned integer (10 bits used) */
+      || scalarType == OSSIM_UINT11 /* 16 bit unsigned integer (11 bits used) */
+      || scalarType == OSSIM_UINT12 /* 16 bit unsigned integer (12 bits used) */
+      || scalarType == OSSIM_UINT13 /* 16 bit unsigned integer (13 bits used) */
+      || scalarType == OSSIM_UINT14 /* 16 bit unsigned integer (14 bits used) */
+      || scalarType == OSSIM_UINT15 /* 16 bit unsigned integer (15 bits used) */
+      || scalarType == OSSIM_UINT16 /* 16 bit unsigned integer */ ) 
+   {
+      jshortArray dataUS = jenv->NewShortArray(numOfElements);
+      jshort* destUS = jenv->GetShortArrayElements(dataUS, NULL);
+
+      $1->unloadTile(destUS, destRect, OSSIM_BIP);
+      jenv->ReleaseShortArrayElements(dataUS, destUS, 0);
+
+      dataBufferClass = jenv->FindClass("java/awt/image/DataBufferUShort");
+      dataBufferConstructor = jenv->GetMethodID(dataBufferClass, "<init>", "([SI)V");
+      dataBuffer = jenv->NewObject(dataBufferClass, dataBufferConstructor, dataUS, numOfElements);
+   }
+   else if ( scalarType == OSSIM_FLOAT32 /* 32 bit floating point */
+      || scalarType == OSSIM_CFLOAT32 /* 32 bit complex floating point */
+      || scalarType == OSSIM_NORMALIZED_FLOAT /* 32 bit normalized floating point */)
+   {
+      jfloatArray dataF = jenv->NewFloatArray(numOfElements);
+      jfloat* destF = jenv->GetFloatArrayElements(dataF, NULL);
+
+      $1->unloadTile(destF, destRect, OSSIM_BIP);
+      jenv->ReleaseFloatArrayElements(dataF, destF, 0);
+
+      dataBufferClass = jenv->FindClass("java/awt/image/DataBufferFloat");
+      dataBufferConstructor = jenv->GetMethodID(dataBufferClass, "<init>", "([FI)V");
+      dataBuffer = jenv->NewObject(dataBufferClass, dataBufferConstructor, dataF, numOfElements);
+   }   
+   else if ( scalarType == OSSIM_UINT32 /* 32 bit unsigned integer */
+      || scalarType == OSSIM_SINT32 /* 32 bit signed integer */
+      || scalarType == OSSIM_CINT32 /* 32 bit complex integer */ )
+   {
+      jintArray dataI = jenv->NewIntArray(numOfElements);
+      jint* destI = jenv->GetIntArrayElements(dataI, NULL);
+
+      $1->unloadTile(destI, destRect, OSSIM_BIP);
+      jenv->ReleaseIntArrayElements(dataI, destI, 0);
+
+      dataBufferClass = jenv->FindClass("java/awt/image/DataBufferInt");
+      dataBufferConstructor = jenv->GetMethodID(dataBufferClass, "<init>", "([II)V");
+      dataBuffer = jenv->NewObject(dataBufferClass, dataBufferConstructor, dataI, numOfElements);
+   }
+   else if ( scalarType == OSSIM_FLOAT64 /* 64 bit floating point */
+      || scalarType == OSSIM_CFLOAT64 /* 64 bit complex floating point */
+      || scalarType == OSSIM_NORMALIZED_DOUBLE /* 64 bit normalized floating point */ )
+   {
+      jdoubleArray dataD = jenv->NewDoubleArray(numOfElements);
+      jdouble* destD = jenv->GetDoubleArrayElements(dataD, NULL);
+
+      $1->unloadTile(destD, destRect, OSSIM_BIP);
+      jenv->ReleaseDoubleArrayElements(dataD, destD, 0);
+
+      dataBufferClass = jenv->FindClass("java/awt/image/DataBufferDouble");
+      dataBufferConstructor = jenv->GetMethodID(dataBufferClass, "<init>", "([DI)V");
+      dataBuffer = jenv->NewObject(dataBufferClass, dataBufferConstructor, dataD, numOfElements);
+   }
+
+   jclass rasterClass = jenv->FindClass("java/awt/image/Raster");
+
+   jmethodID rasterMethod = jenv->GetStaticMethodID(rasterClass, "createInterleavedRaster", 
+      "(Ljava/awt/image/DataBuffer;IIII[ILjava/awt/Point;)Ljava/awt/image/WritableRaster;" );
+
+   jintArray bandOffsets = jenv->NewIntArray(numberOfBands);
+   jint* bandOffset = jenv->GetIntArrayElements(bandOffsets, NULL);
+
+   for ( ossim_uint32 i = 0; i < numberOfBands; i++ ) {
+      bandOffset[i] = i;
+   }
+
+   jenv->ReleaseIntArrayElements(bandOffsets, bandOffset, 0);
+
+   jobject raster = jenv->CallStaticObjectMethod(rasterClass, rasterMethod, dataBuffer, width, height, 
+      numberOfBands * width, numberOfBands, bandOffsets, NULL );
+
+   delete $1;
+   $result = raster;
+}
+
+
+
+//%include "NativeChip.h"
+%newobject NativeChipper::run(std::map<std::string,std::string>);
+%include "NativeChipper.h"

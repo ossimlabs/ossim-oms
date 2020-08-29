@@ -147,13 +147,13 @@
   <target name="compile-java">
     <mkdir dir="bin"/>
     <mkdir dir="${oms.home}/lib"/>
-    <javac source="1.6" target="1.6" srcdir="gensrc" destdir="bin" debug="on">
+    <javac srcdir="gensrc" destdir="bin" debug="on">
       <classpath>
         <fileset dir="${oms.home}/lib" includes="*.jar"/>
         <fileset dir="lib" includes="*.jar"/>
       </classpath>
     </javac>
-    <javac debug="on" source="1.6" target="1.6" srcdir="src/java" destdir="bin" excludes="**/RasterEngineTest.java">
+    <javac debug="on" srcdir="src/java" destdir="bin" excludes="**/RasterEngineTest.java">
       <classpath>
         <fileset dir="${oms.home}/lib" includes="*.jar"/>
         <fileset dir="lib" includes="*.jar"/>
