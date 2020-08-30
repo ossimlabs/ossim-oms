@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 
-class OSSIM_DLL NativeChip : public ossimReferenced
+class OSSIMDLLEXPORT NativeChip : public ossimReferenced
 {
 public:
     /** default constructor */

@@ -7,7 +7,7 @@
 #include <string>
 #include "NativeChip.h"
 
-class OSSIM_DLL NativeChipper : public ossimReferenced
+class OSSIMDLLEXPORT NativeChipper : public ossimReferenced
 {
 public:
    /** default constructor */
