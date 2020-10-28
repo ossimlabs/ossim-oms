@@ -23,6 +23,8 @@
 #include <ossim/base/ossimPolyArea2d.h>
 #include <ossim/base/ossimXmlDocument.h>
 #include <ossim/base/KwlNodeXmlFormatter.h>
+#include <ossim/base/ossimScalarTypeLut.h>
+
 
 #ifdef OSSIM_VIDEO_ENABLED
 #  include <ossimPredator/ossimPredatorVideo.h>
@@ -2321,7 +2323,11 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    {
       ossim_uint32 bits = 0;
       ossimString dataType;
-      switch (thePrivateData->theImageHandler->getOutputScalarType())
+      ossimScalarType scalarType = thePrivateData->theImageHandler->getOutputScalarType();
+
+      // std::cout << "This is the scalarType: " <<  ossimScalarTypeLut::instance()->getEntryString(scalarType) << std::endl;
+
+      switch (scalarType)
       {
       case OSSIM_UINT8:
       {
@@ -2333,6 +2339,12 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       {
          bits = 8;
          dataType = "sint";
+         break;
+      }
+      case OSSIM_UINT12:
+      {
+         bits = 12;
+         dataType = "uint";
          break;
       }
       case OSSIM_UINT16:
@@ -2391,7 +2403,12 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
    {
       ossim_uint32 bits = 0;
       ossimString dataType;
-      switch (thePrivateData->theImageHandler->getOutputScalarType())
+
+      ossimScalarType scalarType = thePrivateData->theImageHandler->getOutputScalarType();
+
+      // std::cout << "This is the scalarType: " <<  ossimScalarTypeLut::instance()->getEntryString(scalarType) << std::endl;
+
+      switch (scalarType)
       {
       case OSSIM_UINT8:
       {
@@ -2403,6 +2420,12 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       {
          bits = 8;
          dataType = "sint";
+         break;
+      }
+      case OSSIM_UINT12:
+      {
+         bits = 12;
+         dataType = "uint";
          break;
       }
       case OSSIM_UINT16:
@@ -4600,7 +4623,6 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
                                   std::string& missionId ) const
 {
 	missionId = kwl.findKey( std::string("mission_id") ); // omd file
-
 
    if ( missionId.empty())
    {
