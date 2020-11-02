@@ -2324,91 +2324,87 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       ossim_uint32 bits = 0;
       ossimString dataType;
       ossimScalarType scalarType = thePrivateData->theImageHandler->getOutputScalarType();
-
-      // std::cout << "This is the scalarType: " <<  ossimScalarTypeLut::instance()->getEntryString(scalarType) << std::endl;
-
-      switch (scalarType)
-      {
-      case OSSIM_UINT8:
-      {
-         bits = 8;
-         dataType = "uint";
-         break;
-      }
-      case OSSIM_SINT8:
-      {
-         bits = 8;
-         dataType = "sint";
-         break;
-      }
-      case OSSIM_UINT12:
-      {
-         bits = 12;
-         dataType = "uint";
-         break;
-      }
-      case OSSIM_UINT16:
-      {
-         bits = 16;
-         dataType = "uint";
-         break;
-      }
-      case OSSIM_SINT16:
-      {
-         bits = 16;
-         dataType = "sint";
-         break;
-      }
-      case OSSIM_USHORT11:
-      {
-         bits = 11;
-         dataType = "uint";
-         break;
-      }
-      case OSSIM_SINT32:
-      {
-         bits = 32;
-         dataType = "sint";
-         break;
-      }
-      case OSSIM_UINT32:
-      {
-         bits = 32;
-         dataType = "uint";
-         break;
-      }
-      case OSSIM_FLOAT32:
-      {
-         bits = 32;
-         dataType = "float";
-         break;
-      }
-      case OSSIM_FLOAT64:
-      {
-         bits = 64;
-         dataType = "float";
-         break;
-      }
-      default:
-      {
-         dataType = "unknown";
-         break;
-      }
-      }
-      if ((dataType == "unknown") && thePrivateData && thePrivateData->theImageHandler)
-      {
+      ossimString bitDepth;
+   
+      //omd overrides
+      if (thePrivateData && thePrivateData->theImageHandler){
          ossimFilename omd = thePrivateData->theImageHandler->createDefaultMetadataFilename();
-
          if(omd.exists())
          {
             ossimKeywordlist omdKwl(omd);
-
-            ossimString bitDepth= omdKwl.findKey("bit_depth");
-
-            if(!bitDepth.empty())
+            bitDepth= omdKwl.findKey("bit_depth");
+         }
+      }
+      if(bitDepth.empty()){
+         bits = bitDepth.toInt32();
+         dataType = "omd_override";
+      }else{
+         switch (scalarType){
+            case OSSIM_UINT8:
             {
-               bits = bitDepth.toInt32();
-            }      
+               bits = 8;
+               dataType = "uint";
+               break;
+            }
+            case OSSIM_SINT8:
+            {
+               bits = 8;
+               dataType = "sint";
+               break;
+            }
+            case OSSIM_UINT12:
+            {
+               bits = 12;
+               dataType = "uint";
+               break;
+            }
+            case OSSIM_UINT16:
+            {
+               bits = 16;
+               dataType = "uint";
+               break;
+            }
+            case OSSIM_SINT16:
+            {
+               bits = 16;
+               dataType = "sint";
+               break;
+            }
+            case OSSIM_USHORT11:
+            {
+               bits = 11;
+               dataType = "uint";
+               break;
+            }
+            case OSSIM_SINT32:
+            {
+               bits = 32;
+               dataType = "sint";
+               break;
+            }
+            case OSSIM_UINT32:
+            {
+               bits = 32;
+               dataType = "uint";
+               break;
+            }
+            case OSSIM_FLOAT32:
+            {
+               bits = 32;
+               dataType = "float";
+               break;
+            }
+            case OSSIM_FLOAT64:
+            {
+               bits = 64;
+               dataType = "float";
+               break;
+            }
+            default:
+            {
+               dataType = "unknown";
+               break;
+            }
          }
       }
       kwl.add(prefix.c_str(), "bitDepth", ossimString::toString(bits).c_str());
@@ -2504,10 +2500,31 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       ossimGpt wgs84;
       ossimString groundGeometry;
       ossimString validGroundGeometry;
-
+      ossimFilename omd;
+      ossimString gsdUnit = "meters";
+      if (thePrivateData && thePrivateData->theImageHandler){
+         omd = thePrivateData->theImageHandler->createDefaultMetadataFilename();
+      }
       if (geom.valid() && geom->getProjection())
       {
          ossimDpt gsd = geom->getMetersPerPixel();
+         
+         if(omd.exists()) //gsd overrides
+         {
+            ossimKeywordlist omdKwl(omd);
+            ossimString gsdX = omdKwl.findKey("gsd_x");
+            ossimString gsdY = omdKwl.findKey("gsd_y");
+            ossimString gsdUnitOMD = omdKwl.findKey("gsd_unit");
+            if( !gsdX.empty()  ){
+               gsd.x=  ossimString::toDouble(gsdX);
+            }
+            if( !gsdY.empty() ){
+               gsd.y=  ossimString::toDouble(gsdY);
+            }
+            if( !gsdUnit.empty() ){
+               gsdUnit= gsdUnitOMD;
+            }
+         }
          ossimGpt ul;
          ossimGpt ur;
          ossimGpt lr;
@@ -2539,7 +2556,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          }
          std::ostringstream coordinates;
          std::ostringstream gcoords;
-         kwl.add(prefix.c_str(), "gsd.@unit", "meters");
+         kwl.add(prefix.c_str(), "gsd.@unit", gsdUnit);
          kwl.add(prefix.c_str(), "gsd.@dx", ossimString::toString(gsd.x, 20).c_str());
          kwl.add(prefix.c_str(), "gsd.@dy", ossimString::toString(gsd.y, 20).c_str());
          kwl.add(prefix.c_str(), "gsd.@mean", ossimString::toString((gsd.y+gsd.x)*0.5, 20).c_str());
@@ -4087,6 +4104,7 @@ void oms::DataInfo::appendRasterEntryMetadata(
       }
       kwl.add(newPrefix.c_str(), "azimuthAngle", azimuthAngle.c_str());
    }
+   
    ossimRefPtr<ossimImageGeometry> geom = thePrivateData->theImageHandler->getImageGeometry();
    if (geom.valid())
    {
@@ -4105,6 +4123,12 @@ void oms::DataInfo::appendRasterEntryMetadata(
    else
    {
       appendRasterEntryDateTime(kwl, prefix);
+   }
+
+   ossimFilename omdFile = thePrivateData->theImageHandler->createDefaultMetadataFilename();
+   if(omdFile.exists())
+   {
+      kwl.add(newPrefix.c_str(), ossimKeywordlist(omdFile));
    }
 
 } // End:  oms::DataInfo::appendRasterEntryMetadata( ... )
@@ -4639,7 +4663,7 @@ void oms::DataInfo::getMissionId( const ossimKeywordlist& kwl,
                                   std::string& missionId ) const
 {
 	missionId = kwl.findKey( std::string("mission_id") ); // omd file
-
+   
    if ( missionId.empty())
    {
       // Normalized:
