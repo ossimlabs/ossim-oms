@@ -2525,7 +2525,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                gsdUnit= gsdUnitOMD;
             }
          }
-         std::cout<<"gsd: "<<gsd<<std::endl;
          ossimGpt ul;
          ossimGpt ur;
          ossimGpt lr;
