@@ -2395,6 +2395,22 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          break;
       }
       }
+      if ((dataType == "unknown") && thePrivateData && thePrivateData->theImageHandler)
+      {
+         ossimFilename omd = thePrivateData->theImageHandler->createDefaultMetadataFilename();
+
+         if(omd.exists())
+         {
+            ossimKeywordlist omdKwl(omd);
+
+            ossimString bitDepth= omdKwl.findKey("bit_depth");
+
+            if(!bitDepth.empty())
+            {
+               bits = bitDepth.toInt32();
+            }      
+         }
+      }
       kwl.add(prefix.c_str(), "bitDepth", ossimString::toString(bits).c_str());
       kwl.add(prefix.c_str(), "dataType", dataType.c_str());
    }
