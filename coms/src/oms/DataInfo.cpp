@@ -2500,10 +2500,28 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
       ossimGpt wgs84;
       ossimString groundGeometry;
       ossimString validGroundGeometry;
-
+      ossimFilename omd;
+      ossimString gsdUnits = "meters";
+      if (thePrivateData && thePrivateData->theImageHandler){
+         omd = thePrivateData->theImageHandler->createDefaultMetadataFilename();
+      }
       if (geom.valid() && geom->getProjection())
       {
          ossimDpt gsd = geom->getMetersPerPixel();
+         
+         if(omd.exists()) //gsd overrides
+         {
+            ossimKeywordlist omdKwl(omd);
+            ossimString gsdX = omdKwl.findKey("gsd_x");
+            ossimString gsdY = omdKwl.findKey("gsd_y");
+            if( !gsdX.empty()  ){
+               gsd.x=  ossimString::toDouble(gsdX);
+            }
+            if( !gsdY.empty() ){
+               gsd.y=  ossimString::toDouble(gsdY);
+            }
+         }
+         std::cout<<"gsd: "<<gsd<<std::endl;
          ossimGpt ul;
          ossimGpt ur;
          ossimGpt lr;
@@ -2535,7 +2553,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          }
          std::ostringstream coordinates;
          std::ostringstream gcoords;
-         kwl.add(prefix.c_str(), "gsd.@unit", "meters");
+         kwl.add(prefix.c_str(), "gsd.@unit", ossimString::toString(gsdUnits).c_str());
          kwl.add(prefix.c_str(), "gsd.@dx", ossimString::toString(gsd.x, 20).c_str());
          kwl.add(prefix.c_str(), "gsd.@dy", ossimString::toString(gsd.y, 20).c_str());
          kwl.add(prefix.c_str(), "gsd.@mean", ossimString::toString((gsd.y+gsd.x)*0.5, 20).c_str());
