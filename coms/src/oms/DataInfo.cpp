@@ -2332,13 +2332,14 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          if(omd.exists())
          {
             ossimKeywordlist omdKwl(omd);
-            bitDepth= omdKwl.findKey("bit_depth");
+            bitDepth = omdKwl.findKey("bit_depth");
+            dataType = omdKwl.findKey("data_type");
          }
       }
-      if(bitDepth.empty()){
+
+      if( ! bitDepth.empty() && ! dataType.empty()){
          bits = bitDepth.toInt32();
-         dataType = "omd_override";
-      }else{
+      } else {
          switch (scalarType){
             case OSSIM_UINT8:
             {
@@ -2407,6 +2408,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
             }
          }
       }
+
       kwl.add(prefix.c_str(), "bitDepth", ossimString::toString(bits).c_str());
       kwl.add(prefix.c_str(), "dataType", dataType.c_str());
    }
