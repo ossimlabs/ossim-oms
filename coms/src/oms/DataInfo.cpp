@@ -2523,7 +2523,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
             if( !gsdY.empty() ){
                gsd.y=  ossimString::toDouble(gsdY);
             }
-            if( !gsdUnit.empty() ){
+            if( !gsdUnitOMD.empty() ){
                gsdUnit= gsdUnitOMD;
             }
          }
@@ -2665,7 +2665,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                           std::string &outputString, 
                           const std::string &indentation,
                           const std::string &separator)
-   {
+   {            
       if (property.valid())
       {
          ossimContainerProperty *container =
@@ -2703,6 +2703,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                   {
                      ossimString childName = prop->getName();
 
+                     std::cout << childName << std::endl;
+
                      // Add some special handling for NITF coefficients
                      // Consolidate into a single tag
                      if (containerName == "RPC00B" && childName.match(
@@ -2737,8 +2739,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
                          coeffs.findAllKeysThatContains(namedSet[i]);
 
                      for (int j = 0, size = namedCoeffs.size(); j < size; j++)
-                     {
-                        outputString += namedCoeffs[j].afterRegExp(namedSet[i] + "_COEFF_").string();
+                     {                        
+                        outputString += namedCoeffs[j].afterRegExp(namedSet[i] + "_COEFF_" ).string();
 
                         outputString += "=";
                         outputString += coeffs.find(namedCoeffs[j]);
