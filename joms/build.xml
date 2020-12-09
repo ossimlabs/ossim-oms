@@ -416,7 +416,8 @@
       <arg value="-Dmaven.wagon.http.ssl.insecure=true"/>
       <arg value="-Dmaven.wagon.http.ssl.allowall=true"/>
       <arg value="-Dmaven.wagon.http.ssl.ignore.validity.dates=true"/>
-      <arg value="-Durl=${repository_manager.url}-${ossim.versionTagLowerCase}"/>
+      <!--arg value="-Durl=${repository_manager.url}-${ossim.versionTagLowerCase}"/-->
+      <arg value="-Durl=${repository_manager.url}"/>
       <arg value="-Dfile=../lib/${module.name}-${ossim.version}-${ossim.versionTag}.jar"/>
       <arg value="-DrepositoryId=${repository_manager.repoId}"/>
       <arg value="-DgroupId=org.ossim"/>
