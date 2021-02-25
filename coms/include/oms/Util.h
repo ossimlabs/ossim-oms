@@ -191,6 +191,13 @@ namespace oms
       
       static ossimRefPtr<ossimImageGeometry> createBilinearModel(std::vector<ossimDpt>& imagePoints,
                                                                  std::vector<ossimGpt>& groundPoints);
+
+      static bool intersectWgs84Ellipsoid(double ecefPt[3],
+                                          double ecefOrigin[3],
+                                          double ecefLos[3]);
+      static bool intersectWgs84EllipsoidToLatLon(double latLonResult[2],
+                                                  double ecefOrigin[3],
+                                                  double ecefLos[3]);
    };
 } // End of namespace oms.
 

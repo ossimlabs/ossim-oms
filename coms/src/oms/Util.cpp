@@ -9,8 +9,13 @@
 
 #include <oms/Util.h>
 #include <oms/ImageOutputFormat.h>
+#include <ossim/base/ossimEllipsoidFactory.h>
 #include <ossim/base/ossimIpt.h>
 #include <ossim/base/ossimIrect.h>
+#include <ossim/base/ossimEcefPoint.h>
+#include <ossim/base/ossimEcefVector.h>
+#include <ossim/base/ossimEcefRay.h>
+#include <ossim/base/ossimEllipsoid.h>
 #include <ossim/base/ossimKeywordlist.h>
 #include <ossim/base/ossimString.h>
 #include <ossim/base/ossimFilename.h>
@@ -956,3 +961,33 @@ ossimRefPtr<ossimImageGeometry> oms::Util::createBilinearModel(std::vector<ossim
    return result;
 }
 
+bool oms::Util::intersectWgs84Ellipsoid(double ecefPt[3],
+                                        double ecefOrigin[3],
+                                        double ecefLos[3])
+{
+   const ossimEllipsoid* el = ossimEllipsoidFactory::instance()->wgs84();
+   ossimEcefPoint resultPt;
+   ossimEcefVector los(ecefLos[0], ecefLos[1], ecefLos[2]);
+   ossimEcefPoint origin(ecefOrigin[0], ecefOrigin[1], ecefOrigin[2]);
+
+   bool returnValue = el->nearestIntersection(ossimEcefRay(origin, los), resultPt);
+
+   ecefPt[0] = resultPt.x();
+   ecefPt[1] = resultPt.y();
+   ecefPt[2] = resultPt.z();
+
+   return returnValue;
+}
+
+bool oms::Util::intersectWgs84EllipsoidToLatLon(double latLonResult[2],
+                                                double ecefOrigin[3],
+                                                double ecefLos[3])
+{
+   double ecefPt[3] = {0};
+   bool result       = intersectWgs84Ellipsoid(ecefPt, ecefOrigin, ecefLos);
+   ossimGpt latLonPt = ossimEcefPoint(ecefPt[0], ecefPt[1], ecefPt[2]);
+   latLonResult[0] = latLonPt.latd();
+   latLonResult[1] = latLonPt.lond();
+
+   return result;
+}
