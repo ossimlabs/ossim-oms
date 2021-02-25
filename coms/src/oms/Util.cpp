@@ -22,6 +22,7 @@
 #include <ossim/base/ossimUnitConversionTool.h>
 #include <ossim/base/ossimVisitor.h>
 #include <ossim/base/ossim2dTo2dIdentityTransform.h>
+#include <ossim/elevation/ossimElevManager.h>
 #include <ossim/imaging/ossimImageFileWriter.h>
 #include <ossim/imaging/ossimImageHandlerFactoryBase.h>
 #include <ossim/imaging/ossimImageHandlerRegistry.h>
@@ -988,6 +989,22 @@ bool oms::Util::intersectWgs84EllipsoidToLatLon(double latLonResult[2],
    ossimGpt latLonPt = ossimEcefPoint(ecefPt[0], ecefPt[1], ecefPt[2]);
    latLonResult[0] = latLonPt.latd();
    latLonResult[1] = latLonPt.lond();
+
+   return result;
+}
+
+bool oms::Util::intersectElevationToLatLonHeight(double latLonHeightResult[3],
+                                                 double ecefOrigin[3],
+                                                 double ecefLos[3])
+{
+   ossimEcefPoint origin(ecefOrigin[0], ecefOrigin[1], ecefOrigin[2]);
+   ossimEcefVector los(ecefLos[0], ecefLos[1], ecefLos[2]);
+   ossimGpt gpt;
+   bool result = ossimElevManager::instance()->intersectRay(ossimEcefRay(origin, los),
+                                                            gpt);
+   latLonHeightResult[0] = gpt.latd();
+   latLonHeightResult[1] = gpt.lond();
+   latLonHeightResult[2] = gpt.height();
 
    return result;
 }

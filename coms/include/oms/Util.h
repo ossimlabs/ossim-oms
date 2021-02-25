@@ -198,6 +198,10 @@ namespace oms
       static bool intersectWgs84EllipsoidToLatLon(double latLonResult[2],
                                                   double ecefOrigin[3],
                                                   double ecefLos[3]);
+
+      static bool intersectElevationToLatLonHeight(double latLonHeightResult[3],
+                                             double ecefOrigin[3],
+                                             double ecefLos[3]);
    };
 } // End of namespace oms.
 

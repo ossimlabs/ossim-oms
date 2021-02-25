@@ -45,6 +45,7 @@ public class IntersectionTest
          double ecefVector[]   = new double[3];
          double ecefPt[]       = new double[3];
          double latLon[]       = new double[2];
+         double latLonHeight[]  = new double[3];
          double ecefResultPt[] = new double[3];
          
          ecefVector[0] = -1.0;
@@ -80,6 +81,16 @@ public class IntersectionTest
             System.out.printf("ECEF Intersection: %f, %f\n",
                               ecefResultPt[0], ecefResultPt[1], ecefResultPt[2]);
          }
+         if(Util.intersectElevationToLatLonHeight(latLonHeight, ecefPt, ecefVector))
+         {
+            System.out.println("Intersected Elevation!");
+
+            System.out.printf("ECEF Point: %f, %f, %f\n",
+                              ecefPt[0], ecefPt[1], ecefPt[2]);
+            System.out.printf("ECEF Vector: %f, %f, %f\n",
+                              ecefVector[0], ecefVector[1], ecefVector[2]);
+            System.out.printf("Lat Lon Height Intersection: %f, %f, %f\n",
+                              latLonHeight[0], latLonHeight[1], latLonHeight[2]);         }
       }
       catch( Exception e )
       {
