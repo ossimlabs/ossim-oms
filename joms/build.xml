@@ -201,21 +201,12 @@
           <compilerarg value="-F${ossim.install_prefix}/Frameworks"/>
           <compilerarg value="-I${ossim.install_prefix}/include"/>
           <compilerarg value="-L${ossim.install_prefix}/lib64"/>
-          <!--
-                    <compilerarg value="-F${ossim.dependencies}/Frameworks" />
-                    -->
           <compilerarg value="-D__STDC_CONSTANT_MACROS"/>
           <compilerarg value="-std=c++11"/>
-          <!--
-                        <compilerarg value="-isysroot" />
-                        <compilerarg value="/Developer/SDKs/MacOSX${mac.sdk_version}.sdk"/>
-                    <compilerarg value="-mmacosx-version-min=${mac.sdk_version}" />
-                    -->
           <includepath>
             <path location="swig"/>
             <path location="${jdk.home}/include"/>
             <path location="${jdk.home}/include/darwin"/>
-            <path location="/Developer/SDKs/MacOSX${mac.sdk_version}.sdk/System/Library/Frameworks/JavaVM.framework/Headers"/>
             <path location="${ossim.install_prefix}/include"/>
             <path location="${ossim.dependencies}/Frameworks"/>
             <path location="${ossim.dependencies}/include"/>
@@ -223,31 +214,30 @@
             <path location="/opt/local/include"/>
           </includepath>
           <fileset dir="swig" id="id">
-            <!--
-                        <include name="*.cpp" />
-                        -->
+          <!--
+          <include name="*.cpp" />
+          -->
             <include name="*.cxx"/>
           </fileset>
           <linkerarg value="-dynamiclib"/>
           <linkerarg value="-rpath,${ossim.install_prefix}"/>
-          <linkerarg value="-framework"/>
-          <linkerarg value="JavaVM"/>
+          <!-- <linkerarg value="JavaVM"/> -->
           <linkerarg value="-L/usr/local/lib"/>
           <linkerarg value="-L/opt/local/lib"/>
-          <linkerarg value="-F${ossim.build}"/>
-          <linkerarg value="-F${ossim.build}"/>
+          <!-- <linkerarg value="-F${ossim.build}"/>
+          <linkerarg value="-F${ossim.build}"/> -->
           <linkerarg value="-F${ossim.install_prefix}/Frameworks"/>
           <!--
-                    <linkerarg value="-F${ossim.dependencies}/Frameworks" />
-                    <linkerarg value="-F${ossim.dependencies}/Frameworks" />
-                    -->
+          <linkerarg value="-F${ossim.dependencies}/Frameworks" />
+          <linkerarg value="-F${ossim.dependencies}/Frameworks" />
+          -->
           <linkerarg value="-framework"/>
           <linkerarg value="ossim"/>
           <linkerarg value="-framework"/>
           <linkerarg value="oms"/>
           <!--
-                    <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
-                    -->
+          <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
+          -->
           <syslibset libs="c,stdc++"/>
         </cc>
         <move file="lib${module.name}.dylib" tofile="${library.name}"/>

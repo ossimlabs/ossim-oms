@@ -60,6 +60,7 @@ defaultTasks 'uploadArchives'
 
 repositories {
    mavenLocal()
+   maven { url "https://nexus.ossim.io/repository/all-repos" }
    mavenCentral()
 }
 
