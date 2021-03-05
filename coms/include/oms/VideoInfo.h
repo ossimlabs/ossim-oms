@@ -9,6 +9,7 @@
 // $Id: VideoInfo.h 12991 2008-06-04 19:14:59Z gpotts $
 #ifndef videoInfo_HEADER
 #define videoInfo_HEADER 1
+#ifdef OSSIM_VIDEO_ENABLED
 
 #include <vector>
 #include <string>
@@ -80,5 +81,5 @@ namespace oms
     };
 
 } // end of namespace oms
-
+#endif
 #endif /* End of #ifndef omsVideoInfo_HEADER */

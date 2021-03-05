@@ -1,4 +1,6 @@
 #include <oms/VideoInfo.h>
+#ifdef OSSIM_VIDEO_ENABLED
+
 #include <oms/Util.h>
 #include <ossim/base/ossimRefPtr.h>
 #include <ossim/base/ossimRegExp.h>
@@ -785,3 +787,4 @@ void oms::VideoInfo::appendDateRange(std::string &outputString, const ossimDate 
    writeJsonKVP(outputString, "VIDEO_START_TIME", outStart.str(), true, 1);
    writeJsonKVP(outputString, "VIDEO_END_TIME", outEnd.str(), true, 1);
 }
+#endif
