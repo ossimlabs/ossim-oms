@@ -370,10 +370,14 @@ namespace oms
                }
                else if (className.contains("gdaltilesource"))
                {
-                  ossimString driverName =
-                  theImageHandler->getPropertyValueAsString(
-                                                            "driver_short_name");
+                  ossimString driverName = theImageHandler->getPropertyValueAsString("driver_short_name");
+
+                  if ( ! driverName || driverName.empty() ) {
+                     driverName = theImageHandler->getPropertyValueAsString("driver");
+                  }
+
                   driverName = driverName.downcase();
+
                   if (driverName.contains("hfa"))
                   {
                      return "imagine_hfa";
@@ -414,6 +418,10 @@ namespace oms
                   {
                      return "doqq";
                   }
+                  else if (driverName.contains("nitf"))
+                  {
+                     return "nitf";
+                  }                  
                }
                else if (className.contains("tfrd"))
                {
@@ -2546,7 +2554,8 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          ll.changeDatum(wgs84.datum());
 
          std::string polyString;
-         //std::cout <<"----------------GETTING FOOTPRINT--------------------\n";
+         std::cout <<"----------------GETTING FOOTPRINT-2------------------\n";
+         std::cout << kwl.findKey("ground_geom") << std::endl;
 
          if (getWktFootprint(geom.get(), polyString))
          {
@@ -2556,6 +2565,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          {
             groundGeometry += ("MULTIPOLYGON(((" + ossimString::toString(ul.lond()) + " " + ossimString::toString(ul.latd()) + "," + ossimString::toString(ur.lond()) + " " + ossimString::toString(ur.latd()) + "," + ossimString::toString(lr.lond()) + " " + ossimString::toString(lr.latd()) + "," + ossimString::toString(ll.lond()) + " " + ossimString::toString(ll.latd()) + "," + ossimString::toString(ul.lond()) + " " + ossimString::toString(ul.latd()) + ")))");
          }
+
          std::ostringstream coordinates;
          std::ostringstream gcoords;
          kwl.add(prefix.c_str(), "gsd.@unit", gsdUnit);
@@ -2617,7 +2627,7 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          ll.changeDatum(wgs84.datum());
 
          std::string polyString;
-         //std::cout <<"----------------GETTING FOOTPRINT--------------------\n";
+         // std::cout <<"----------------GETTING FOOTPRINT-1--------------\n";
          outputString += indentation + "<gsd unit=\"meters\" dx=\"" +
                          ossimString::toString(gsd.x, 15).string() + "\" dy=\"" +
                          ossimString::toString(gsd.y, 15).string() + "\"/>" + separator;
