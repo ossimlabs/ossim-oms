@@ -2554,7 +2554,6 @@ void oms::DataInfo::appendAssociatedRasterEntryFileObjects(
          ll.changeDatum(wgs84.datum());
 
          std::string polyString;
-         std::cout <<"----------------GETTING FOOTPRINT-2------------------\n";
          std::cout << kwl.findKey("ground_geom") << std::endl;
 
          if (getWktFootprint(geom.get(), polyString))
