@@ -197,8 +197,10 @@
       <then>
         <echo message="${ossim.install_prefix}/Frameworks"/>
         <cc outtype="shared" objdir="swig" outfile="${module.name}">
+        <!-- 
           <compilerarg value="-F${ossim.build}"/>
           <compilerarg value="-F${ossim.install_prefix}/Frameworks"/>
+        -->
           <compilerarg value="-I${ossim.install_prefix}/include"/>
           <compilerarg value="-L${ossim.install_prefix}/lib64"/>
           <compilerarg value="-D__STDC_CONSTANT_MACROS"/>
@@ -208,7 +210,9 @@
             <path location="${jdk.home}/include"/>
             <path location="${jdk.home}/include/darwin"/>
             <path location="${ossim.install_prefix}/include"/>
+            <!--               
             <path location="${ossim.dependencies}/Frameworks"/>
+            -->
             <path location="${ossim.dependencies}/include"/>
             <path location="/usr/local/include"/>
             <path location="/opt/local/include"/>
@@ -226,18 +230,19 @@
           <linkerarg value="-L/opt/local/lib"/>
           <!-- <linkerarg value="-F${ossim.build}"/>
           <linkerarg value="-F${ossim.build}"/> -->
-          <linkerarg value="-F${ossim.install_prefix}/Frameworks"/>
           <!--
+          <linkerarg value="-F${ossim.install_prefix}/Frameworks"/>
           <linkerarg value="-F${ossim.dependencies}/Frameworks" />
           <linkerarg value="-F${ossim.dependencies}/Frameworks" />
           -->
+          <!--            
           <linkerarg value="-framework"/>
           <linkerarg value="ossim"/>
           <linkerarg value="-framework"/>
           <linkerarg value="oms"/>
-          <!--
-          <libset dir="${ossim.dependencies}/lib" libs="OpenThreads" />
           -->
+
+          <libset dir="${ossim.install_prefix}/lib64" libs="oms,ossim" />
           <syslibset libs="c,stdc++"/>
         </cc>
         <move file="lib${module.name}.dylib" tofile="${library.name}"/>
