@@ -38,6 +38,7 @@
   <artifact:remoteRepository id="remote.repository" url="${repository_manager.url}/all-repos"/>
   <artifact:dependencies filesetId="dependency.fileset">
     <remoteRepository url="https://repo.maven.apache.org/maven2/"/>
+    <remoteRepository url="https://repo.osgeo.org/repository/release/"/>
     <dependency groupId="org.apache.commons" artifactId="commons-compress" version="1.9"/>
     <dependency groupId="commons-lang" artifactId="commons-lang" version="2.6"/>
     <dependency groupId="javax.media" artifactId="jai_core" version="1.1.3"/>
