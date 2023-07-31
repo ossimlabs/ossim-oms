@@ -75,7 +75,9 @@
         <property name="ossim.versionTag" value="SNAPSHOT"/>
       </then>
     </if>
+<!--
     <lower string="${ossim.versionTag}" to="ossim.versionTagLowerCase"/>
+-->
   </target>
   <target name="missing-required-properties" unless="properties.set">
     <echo message="Check to see if all variables are set!"/>
