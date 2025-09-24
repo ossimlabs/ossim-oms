@@ -332,7 +332,7 @@ namespace oms{
 
       if(m_privateData->m_entries[entry].valid())
       {
-         m_privateData->m_entries[entry]->m_outputScalarType;
+         result = m_privateData->m_entries[entry]->m_outputScalarType;
       }
 
       return result;

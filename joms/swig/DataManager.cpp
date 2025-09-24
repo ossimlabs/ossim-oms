@@ -29,9 +29,43 @@
 #include <ossim/imaging/ossimHistogramEqualization.h>
 #include <ossim/imaging/ossimVpfTileSource.h>
 #include <ossim/base/ossimProcessListener.h>
+#include <ossim/base/ossimVisitor.h>
 
 
 RTTI_DEF2(DataManager, "DataManager", ossimObject, ossimListenerManager);
+
+namespace
+{
+   ossimConnectableObject* findFirstByName(ossimImageChain* chain,
+                                           const ossimString& className,
+                                           bool recurse)
+   {
+      if (!chain)
+      {
+         return 0;
+      }
+
+      if (!recurse)
+      {
+         const ossimImageChain::ConnectableObjectList& list = chain->imageChainList();
+         for (ossim_uint32 idx = 0; idx < list.size(); ++idx)
+         {
+            const ossimRefPtr<ossimConnectableObject>& child = list[idx];
+            if (child.valid() && child->canCastTo(className))
+            {
+               return child.get();
+            }
+         }
+         return 0;
+      }
+
+      int visitorFlags = ossimVisitor::VISIT_INPUTS | ossimVisitor::VISIT_CHILDREN;
+      ossimTypeNameVisitor visitor(className, true, visitorFlags);
+      chain->accept(visitor);
+      ossimTypeNameVisitor::Collection& objects = visitor.getObjects();
+      return objects.empty() ? 0 : objects.front().get();
+   }
+}
 
 class DataManagerPrivateListener : public ossimConnectableObjectListener,
    public ossimProcessListener
@@ -690,32 +724,33 @@ ossimConnectableObject* DataManager::createStandardOrthoMosaic(const std::vector
    {
      ossimImageChain* chain = PTR_CAST(ossimImageChain, inputs[idx]);
      if(chain)
-       {
-	 ossimConnectableObject* renderer = chain->findFirstObjectOfType("ossimImageRenderer",
-									 false);
-	 if(renderer)
-	   {
-	     
-	     ossimConnectableObject* image = chain->findFirstObjectOfType("ossimImageHandler",
-									  false);
-	     if(image)
-	       {
-		 ossimImageChain* newChain = new ossimImageChain;
-		 ossimConnectableObject* dupIh = (ossimConnectableObject*)image->dup();
-		 newChain->addChild(dupIh);
-		 ossimString description = chain->getDescription();
-		 description = description.replaceAllThatMatch("[a-zA-Z]*:",
-							       "Ortho chain:");
-		 newChain->setDescription(description);
-		 add(newChain);
-		 inputList.push_back(newChain);
-	       }
-	   }
-	 else
-	   {
-	     inputList.push_back(chain);
-	   }
-       }
+     {
+        ossimConnectableObject* renderer = findFirstByName(chain,
+                                                           ossimString("ossimImageRenderer"),
+                                                           false);
+        if(renderer)
+        {
+           ossimConnectableObject* image = findFirstByName(chain,
+                                                           ossimString("ossimImageHandler"),
+                                                           false);
+           if(image)
+           {
+              ossimImageChain* newChain = new ossimImageChain;
+              ossimConnectableObject* dupIh = static_cast<ossimConnectableObject*>(image->dup());
+              newChain->addChild(dupIh);
+              ossimString description = chain->getDescription();
+              description = description.replaceAllThatMatch("[a-zA-Z]*:",
+                                                            "Ortho chain:");
+              newChain->setDescription(description);
+              add(newChain);
+              inputList.push_back(newChain);
+           }
+        }
+        else
+        {
+           inputList.push_back(chain);
+        }
+     }
    }
    if(!inputList.size())
      {
@@ -1571,4 +1606,3 @@ bool DataManager::shapeFilesOnTop() const
    }
    return result;
 }
-
