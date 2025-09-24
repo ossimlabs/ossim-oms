@@ -20,11 +20,70 @@
 #include <ossim/imaging/ossimImageHandler.h>
 #include <ossim/imaging/ossimGeoPolyCutter.h>
 #include <ossim/imaging/ossimFilterResampler.h>
+#include <ossim/base/ossimVisitor.h>
 #include <ossim/projection/ossimProjection.h>
 #include <ossim/base/ossimDatum.h>
 #include <ossim/base/ossimPropertyEvent.h>
 #include <ossim/base/ossimRefreshEvent.h>
 #include <ossim/base/ossimMultiResLevelHistogram.h>
+
+namespace
+{
+   ossimConnectableObject* findFirstByClassName(ossimImageChain* chain,
+                                               const ossimString& className,
+                                               bool recurse)
+   {
+      if (!chain)
+      {
+         return 0;
+      }
+
+      if (!recurse)
+      {
+         const ossimImageChain::ConnectableObjectList& list = chain->imageChainList();
+         for (ossim_uint32 idx = 0; idx < list.size(); ++idx)
+         {
+            const ossimRefPtr<ossimConnectableObject>& child = list[idx];
+            if (child.valid() && child->canCastTo(className))
+            {
+               return const_cast<ossimConnectableObject*>(child.get());
+            }
+         }
+         return 0;
+      }
+
+      int visitorFlags = ossimVisitor::VISIT_INPUTS | ossimVisitor::VISIT_CHILDREN;
+      ossimTypeNameVisitor visitor(className, true, visitorFlags);
+      chain->accept(visitor);
+      ossimCollectionVisitor::ListRef& objects = visitor.getObjects();
+      if (objects.empty())
+      {
+         return 0;
+      }
+      return PTR_CAST(ossimConnectableObject, objects.front().get());
+   }
+
+   ossimConnectableObject* findFirstInputByName(ossimConnectableObject* node,
+                                               const ossimString& className)
+   {
+      if (!node)
+      {
+         return 0;
+      }
+
+      const ossimConnectableObject::ConnectableObjectList& inputs = node->getInputList();
+      for (ossim_uint32 idx = 0; idx < inputs.size(); ++idx)
+      {
+         ossimConnectableObject* input = const_cast<ossimConnectableObject*>(inputs[idx].get());
+         if (input && input->canCastTo(className))
+         {
+            return input;
+         }
+      }
+
+      return 0;
+   }
+}
 
 class oms::SingleImageChain::EventListener : public ossimConnectableObjectListener
 {
@@ -227,7 +286,7 @@ void oms::SingleImageChain::setPropertyGivenClassName(const std::string& classNa
                                                       const std::string& propertyName,
                                                       const std::string& propertyValue)
 {
-   ossimConnectableObject* obj = theImageChain->findFirstObjectOfType(className);
+   ossimConnectableObject* obj = findFirstByClassName(theImageChain.get(), className, true);
    if(obj)
    {
       ((ossimPropertyInterface*)obj)->setProperty(propertyName, propertyValue);
@@ -236,7 +295,7 @@ void oms::SingleImageChain::setPropertyGivenClassName(const std::string& classNa
 
 ossimConnectableObject* oms::SingleImageChain::getConnectableObject(const std::string& className)
 {
-   return  theImageChain->findFirstObjectOfType(className);
+   return findFirstByClassName(theImageChain.get(), className, true);
 }
 
 void oms::SingleImageChain::setToSingleBand(ossim_int32 band)
@@ -295,7 +354,10 @@ void oms::SingleImageChain::setToThreeBandsReverse()
 
 void oms::SingleImageChain::setupSurfaceNormalCalculations()
 {
-   ossimRefPtr<ossimConnectableObject> surfaceNormals = theImageChain->findFirstObjectOfType("ossimImageToPlaneNormalFilter");
+   ossimConnectableObject* rawNormals = findFirstByClassName(theImageChain.get(),
+                                                            ossimString("ossimImageToPlaneNormalFilter"),
+                                                            true);
+   ossimRefPtr<ossimConnectableObject> surfaceNormals = rawNormals;
    if(!surfaceNormals)
    {
       surfaceNormals = ossimImageSourceFactoryRegistry::instance()->createImageSource(ossimString("ossimImageToPlaneNormalFilter"));
@@ -401,7 +463,9 @@ void oms::SingleImageChain::setHistogramFileToDefaultAndMode(const std::string& 
 {
    if(theBandSelector)
    {
-      ossimImageHandler* handler = (ossimImageHandler*)(theBandSelector->findInputObjectOfType("ossimImageHandler"));
+      ossimConnectableObject* handlerObj = findFirstInputByName(theBandSelector,
+                                                               ossimString("ossimImageHandler"));
+      ossimImageHandler* handler = PTR_CAST(ossimImageHandler, handlerObj);
       if(handler)
       {
          ossimFilename histoFile = handler->createDefaultHistogramFilename();
