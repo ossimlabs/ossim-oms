@@ -1,11 +1,10 @@
+cmake_minimum_required(VERSION 3.5)
 PROJECT(ossim-oms)
 Message("################## Setting up C OMS library #########################")
 
 INCLUDE(OssimVersion)
 INCLUDE(OssimUtilities)
 INCLUDE(OssimCommonVariables)
-
-cmake_minimum_required(VERSION 2.8)
 
 subdirs(coms)
 

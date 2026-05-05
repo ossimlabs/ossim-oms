@@ -1,8 +1,4 @@
-IF(NOT APPLE)
-  cmake_minimum_required(VERSION 2.6)
-ELSE(NOT APPLE)
-  cmake_minimum_required(VERSION 2.8)
-ENDIF(NOT APPLE)
+cmake_minimum_required(VERSION 3.5)
 
 find_package(ossim)
 if( OSSIM_FOUND )
